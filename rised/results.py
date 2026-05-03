@@ -112,5 +112,6 @@ class FrameworkReport:
         }
 
     def all_passed(self) -> bool:
-        """Return True only if all evaluated dimensions passed."""
-        return all(v for v in self.summary().values() if v is not None)
+        """Return True only if at least one dimension was evaluated and all evaluated passed."""
+        evaluated = [v for v in self.summary().values() if v is not None]
+        return len(evaluated) > 0 and all(evaluated)
