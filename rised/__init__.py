@@ -67,4 +67,40 @@ def evaluate_all(
     FrameworkReport
         Combined results across all five dimensions.
     """
-    raise NotImplementedError("evaluate_all() will be implemented in Session 3.")
+    import numpy as np
+
+    from rised.deployability import evaluate_deployability
+    from rised.equity import evaluate_equity
+    from rised.inclusivity import evaluate_inclusivity
+    from rised.reliability import evaluate_reliability
+    from rised.sensitivity import evaluate_sensitivity
+
+    X_arr = np.asarray(X)
+
+    reliability = evaluate_reliability(
+        model, X_arr,
+        perturbation_specs=perturbation_specs,
+        feature_names=feature_names,
+    )
+    inclusivity = evaluate_inclusivity(model, X_arr, y_true, demographic_df)
+    sensitivity = evaluate_sensitivity(
+        model, X_arr, y_true,
+        threshold_range=threshold_range,
+    )
+    equity = evaluate_equity(model, X_arr, y_true, demographic_df)
+    deployability = evaluate_deployability(
+        model, X_arr,
+        feature_names=feature_names,
+    )
+
+    return FrameworkReport(
+        reliability=reliability,
+        inclusivity=inclusivity,
+        sensitivity=sensitivity,
+        equity=equity,
+        deployability=deployability,
+        metadata={
+            "n_samples": int(X_arr.shape[0]),
+            "n_features": int(X_arr.shape[1]),
+        },
+    )
