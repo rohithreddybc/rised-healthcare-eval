@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "rised"
+version = "0.1.0"
+description = "RISED Framework: Reliability, Inclusivity, Sensitivity, Equity, and Deployability evaluation for healthcare AI decision-support systems"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Rohith Reddy Bellibatlu", email = "rohithreddybc@gmail.com" }
+]
+keywords = [
+    "healthcare AI",
+    "clinical decision support",
+    "algorithmic fairness",
+    "AI evaluation",
+    "health equity",
+    "risk stratification",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.23.0",
+    "pandas>=1.5.0",
+    "scikit-learn>=1.1.0",
+    "scipy>=1.9.0",
+    "matplotlib>=3.6.0",
+    "seaborn>=0.12.0",
+    "shap>=0.41.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.2.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "ruff>=0.0.290",
+]
+
+[project.urls]
+Homepage = "https://github.com/rohithreddybc/rised"
+Documentation = "https://github.com/rohithreddybc/rised/blob/main/docs/index.md"
+"Bug Tracker" = "https://github.com/rohithreddybc/rised/issues"
+"arXiv Paper" = "https://arxiv.org/abs/ARXIV_ID_PLACEHOLDER"
+
+[tool.setuptools.packages.find]
+include = ["rised*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=rised --cov-report=term-missing"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W", "I"]
