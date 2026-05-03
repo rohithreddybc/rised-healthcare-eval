@@ -28,7 +28,7 @@ htmlcov/
 # Data (large files — use Git LFS or exclude)
 data/
 *.csv
-!examples/synthetic_cohort_5k.csv
+!examples/synthetic_cohort_10k.csv
 
 # LaTeX
 *.aux
