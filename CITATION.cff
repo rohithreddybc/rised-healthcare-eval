@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use RISED in your research, please cite both the software and the paper."
+title: "RISED: Reliability, Inclusivity, Sensitivity, Equity, and Deployability Framework for Healthcare AI Evaluation"
+version: 0.1.0
+date-released: "2025-01-01"
+license: MIT
+repository-code: "https://github.com/rohithreddybc/rised"
+doi: "ZENODO_DOI_PLACEHOLDER"
+authors:
+  - family-names: "Bellibatlu"
+    given-names: "Rohith Reddy"
+    orcid: "https://orcid.org/0009-0003-6083-0364"
+keywords:
+  - healthcare AI evaluation
+  - algorithmic fairness
+  - clinical decision support
+  - health equity
+  - AI reliability
+references:
+  - type: article
+    title: "Evaluating AI-Assisted Decision Support in High-Stakes Healthcare: A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability"
+    authors:
+      - family-names: "Bellibatlu"
+        given-names: "Rohith Reddy"
+    journal: "arXiv"
+    year: 2025
+    url: "https://arxiv.org/abs/ARXIV_ID_PLACEHOLDER"
