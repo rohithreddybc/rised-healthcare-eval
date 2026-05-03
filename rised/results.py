@@ -33,11 +33,13 @@ class InclusivityResult:
     subgroup_calibration: Dict[str, float] = field(default_factory=dict)
     details: Dict[str, Any] = field(default_factory=dict)
 
-    def passed(self, max_gap: float = 0.05) -> bool:
-        """Return True if AUC parity gap is within tolerance."""
+    def passed(self, max_gap: float = 0.05, max_ece: float = 0.10) -> bool:
+        """Return True if AUC parity gap and all subgroup ECEs are within tolerance."""
         if self.auc_parity_gap is None:
             return False
-        return self.auc_parity_gap <= max_gap
+        auc_ok = self.auc_parity_gap <= max_gap
+        ece_ok = all(v <= max_ece for v in self.subgroup_calibration.values())
+        return auc_ok and ece_ok
 
 
 @dataclass
