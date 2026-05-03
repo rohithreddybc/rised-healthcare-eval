@@ -51,9 +51,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rohithreddybc/rised"
-Documentation = "https://github.com/rohithreddybc/rised/blob/main/docs/index.md"
-"Bug Tracker" = "https://github.com/rohithreddybc/rised/issues"
+Homepage = "https://github.com/rohithreddybc/rised-healthcare-eval"
+Documentation = "https://github.com/rohithreddybc/rised-healthcare-eval/blob/main/docs/index.md"
+"Bug Tracker" = "https://github.com/rohithreddybc/rised-healthcare-eval/issues"
 "arXiv Paper" = "https://arxiv.org/abs/ARXIV_ID_PLACEHOLDER"
 
 [tool.setuptools.packages.find]
