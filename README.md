@@ -1,6 +1,7 @@
 # RISED Framework
 
-**A pre-deployment evaluation framework for clinical AI decision-support systems.**
+**A pre-deployment evaluation framework for clinical AI decision-support systems
+spanning Reliability, Inclusivity, Sensitivity, Equity, and Deployability.**
 
 [![Dataset on HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-rised--synthetic--cohort--10k-yellow)](https://huggingface.co/datasets/Rohithreddybc/rised-synthetic-cohort-10k)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -33,14 +34,15 @@ accuracy — on a held-out test set. That number cannot detect:
 
 - A model that flips one in fifteen patient classifications under semantically
   equivalent input encodings (**Reliability**).
-- An AUC parity gap concentrated in the oldest, most comorbid patients
+- An AUC parity gap concentrated in the oldest patient subgroup
   (**Inclusivity**).
-- Unstable threshold behavior that reclassifies 20% of patients when a care
-  manager adjusts the cutoff to expand outreach (**Sensitivity**).
-- Scoring decisions misaligned with clinical need when access barriers distort
-  the training label (**Equity**).
-- Models that are too slow or whose explanations contradict each other patient
-  to patient (**Deployability**).
+- Unstable threshold behavior that reclassifies ~20% of patients when the
+  binary cutoff is adjusted to balance sensitivity vs. specificity (**Sensitivity**).
+- Scoring decisions whose alignment with clinical need depends on the
+  proxy chosen, with the verdict flipping under an independent need proxy
+  (**Equity**).
+- Models whose explanations contradict each other patient to patient or fail
+  per-patient latency targets (**Deployability**).
 
 These failure modes are well-documented at scale in production clinical AI
 (Obermeyer et al., *Science* 2019; Wong et al., *JAMA Intern Med* 2021;
@@ -120,15 +122,20 @@ fig.savefig("scorecard.png", dpi=150)
 ## Reproducing the Paper's Results
 
 The paper applies RISED to an XGBoost classifier (AUROC 0.961, Brier 0.073) on
-the 2,000-patient held-out test split. **Three of five dimensions fail.**
+the 2,000-patient held-out test split, using the CI-based decision rule.
 
 | Dimension | Value | 95% CI | Status |
 |-----------|------:|:------:|:------:|
-| JSS              | 0.064  | [0.058, 0.070]   | **FAIL** |
-| Δ_AUC            | 0.059  | [0.052, 0.097]   | **FAIL** |
-| Max TFR          | 19.9%  | [18.3%, 21.7%]   | **FAIL** |
-| ρ_need           | 0.732  | —                | PASS |
-| Λ (per cohort)   | ~1 ms  | —                | PASS |
+| JSS                       | 0.064  | [0.058, 0.070]   | **FAIL** |
+| Δ_AUC                     | 0.059  | [0.052, 0.097]   | **INCONCLUSIVE**¹ |
+| Max TFR                   | 19.9%  | [18.3%, 21.7%]   | **FAIL** |
+| ρ_need (outcome proxy)    | 0.732  | —                | PASS² |
+| ρ_need (CCI proxy)        | 0.599  | —                | FAIL² |
+| Λ (per cohort)            | ~1 ms  | —                | PASS |
+
+¹ CI [0.052, 0.097] overlaps the 0.05 threshold → INCONCLUSIVE.
+² Equity verdict flips under different proxies; recorded as INCONCLUSIVE pending
+   an externally validated need measure.
 
 Bootstrap CIs from 1,000 iterations with `random_state=42`. Hardware-dependent
 latency reported on a single test machine.
