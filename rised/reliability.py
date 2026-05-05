@@ -22,6 +22,8 @@ def evaluate_reliability(
     X,
     perturbation_specs: Optional[List[Dict[str, Any]]] = None,
     feature_names: Optional[List[str]] = None,
+    n_bootstrap: int = 0,
+    random_state: Optional[int] = None,
 ) -> ReliabilityResult:
     """
     Evaluate the Reliability dimension.
@@ -41,6 +43,10 @@ def evaluate_reliability(
     feature_names : list of str, optional
         Feature names corresponding to columns of X. Not used in computation
         but stored in details for downstream reporting.
+    n_bootstrap : int
+        Number of bootstrap iterations for JSS confidence interval. 0 disables.
+    random_state : int, optional
+        Seed for the bootstrap RNG for reproducibility.
 
     Returns
     -------
@@ -73,10 +79,27 @@ def evaluate_reliability(
     mean_flip = float(np.mean(list(per_perturbation_flip.values())))
     mean_rho = float(np.mean(list(per_perturbation_rho.values())))
 
+    # Bootstrap 95% CI for JSS
+    jss_ci = None
+    if n_bootstrap > 0:
+        rng = np.random.default_rng(random_state)
+        n = len(X_arr)
+        jss_boot = []
+        for _ in range(n_bootstrap):
+            idx = rng.integers(0, n, size=n)
+            baseline_b = model.predict_proba(X_arr[idx])[:, 1]
+            pert_scores_b: List[np.ndarray] = []
+            for spec in perturbation_specs:
+                X_pert_b = apply_perturbation(X_arr[idx], spec)
+                pert_scores_b.append(model.predict_proba(X_pert_b)[:, 1])
+            jss_boot.append(judge_sensitivity_score(baseline_b, pert_scores_b))
+        jss_ci = (float(np.percentile(jss_boot, 2.5)), float(np.percentile(jss_boot, 97.5)))
+
     return ReliabilityResult(
         judge_sensitivity_score=jss,
         perturbation_flip_rate=mean_flip,
         rank_correlation_mean=mean_rho,
+        jss_ci=jss_ci,
         details={
             "per_perturbation_flip_rate": per_perturbation_flip,
             "per_perturbation_rank_correlation": per_perturbation_rho,

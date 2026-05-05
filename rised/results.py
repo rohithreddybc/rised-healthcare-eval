@@ -5,7 +5,7 @@ Result dataclasses for each RISED dimension and the combined FrameworkReport.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -15,13 +15,15 @@ class ReliabilityResult:
     judge_sensitivity_score: Optional[float] = None
     perturbation_flip_rate: Optional[float] = None
     rank_correlation_mean: Optional[float] = None
+    jss_ci: Optional[Tuple[float, float]] = None
+    flip_rate_ci: Dict[str, Tuple[float, float]] = field(default_factory=dict)
     details: Dict[str, Any] = field(default_factory=dict)
 
     def passed(self, threshold: float = 0.05) -> bool:
-        """Return True if flip rate is below threshold."""
-        if self.perturbation_flip_rate is None:
+        """Return True if JSS is below threshold (sub-criterion R1)."""
+        if self.judge_sensitivity_score is None:
             return False
-        return self.perturbation_flip_rate < threshold
+        return self.judge_sensitivity_score < threshold
 
 
 @dataclass
@@ -30,6 +32,7 @@ class InclusivityResult:
 
     subgroup_aucs: Dict[str, float] = field(default_factory=dict)
     auc_parity_gap: Optional[float] = None
+    auc_gap_ci: Optional[Tuple[float, float]] = None
     subgroup_calibration: Dict[str, float] = field(default_factory=dict)
     details: Dict[str, Any] = field(default_factory=dict)
 
@@ -49,6 +52,7 @@ class SensitivityResult:
     threshold_flip_rates: Dict[float, float] = field(default_factory=dict)
     rank_stability_score: Optional[float] = None
     decision_boundary_width: Optional[float] = None
+    max_tfr_ci: Optional[Tuple[float, float]] = None
     details: Dict[str, Any] = field(default_factory=dict)
 
     def passed(self, max_flip_rate: float = 0.10) -> bool:
@@ -79,6 +83,7 @@ class DeployabilityResult:
     """Outputs from the Deployability dimension evaluation."""
 
     mean_inference_latency_ms: Optional[float] = None
+    mean_latency_per_patient_ms: Optional[float] = None
     explanation_faithfulness: Optional[float] = None
     top_feature_stability: Optional[float] = None
     details: Dict[str, Any] = field(default_factory=dict)

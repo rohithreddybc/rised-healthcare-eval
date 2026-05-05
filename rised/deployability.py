@@ -63,6 +63,7 @@ def evaluate_deployability(
         trial_times.append((time.perf_counter() - t0) * 1000.0)
     mean_latency_ms = float(np.mean(trial_times))
     latency_std_ms = float(np.std(trial_times))
+    mean_latency_per_patient_ms = mean_latency_ms / X_arr.shape[0]
 
     # ── 2. SHAP explanation faithfulness ─────────────────────────────────────
     explanation_faithfulness: Optional[float] = None
@@ -132,11 +133,13 @@ def evaluate_deployability(
 
     return DeployabilityResult(
         mean_inference_latency_ms=mean_latency_ms,
+        mean_latency_per_patient_ms=mean_latency_per_patient_ms,
         explanation_faithfulness=explanation_faithfulness,
         top_feature_stability=top_feature_stability,
         details={
             "n_latency_trials": n_latency_trials,
             "latency_std_ms": latency_std_ms,
+            "n_samples": X_arr.shape[0],
             **shap_details,
         },
     )

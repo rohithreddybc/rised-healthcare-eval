@@ -40,6 +40,8 @@ def evaluate_all(
     perturbation_specs=None,
     threshold_range=None,
     feature_names=None,
+    n_bootstrap: int = 0,
+    random_state=None,
     **kwargs,
 ) -> "FrameworkReport":
     """
@@ -81,11 +83,19 @@ def evaluate_all(
         model, X_arr,
         perturbation_specs=perturbation_specs,
         feature_names=feature_names,
+        n_bootstrap=n_bootstrap,
+        random_state=random_state,
     )
-    inclusivity = evaluate_inclusivity(model, X_arr, y_true, demographic_df)
+    inclusivity = evaluate_inclusivity(
+        model, X_arr, y_true, demographic_df,
+        n_bootstrap=n_bootstrap,
+        random_state=random_state,
+    )
     sensitivity = evaluate_sensitivity(
         model, X_arr, y_true,
         threshold_range=threshold_range,
+        n_bootstrap=n_bootstrap,
+        random_state=random_state,
     )
     equity = evaluate_equity(model, X_arr, y_true, demographic_df)
     deployability = evaluate_deployability(
