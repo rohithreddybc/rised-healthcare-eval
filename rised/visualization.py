@@ -227,8 +227,13 @@ def plot_framework_dashboard(
             label = "AUC parity gap"
             val = f"{res.auc_parity_gap:.4f}" if res.auc_parity_gap is not None else "—"
         elif dim == "Sensitivity":
-            label = "Rank stability"
-            val = f"{res.rank_stability_score:.4f}" if res.rank_stability_score is not None else "—"
+            label = "Max TFR (%)"
+            if res.threshold_flip_rates:
+                val = f"{max(res.threshold_flip_rates.values()) * 100:.1f}%"
+            elif res.rank_stability_score is not None:
+                val = f"{res.rank_stability_score:.4f}"
+            else:
+                val = "—"
         elif dim == "Equity":
             label = "ρ_need"
             val = f"{res.need_prediction_correlation:.4f}" if res.need_prediction_correlation is not None else "—"
