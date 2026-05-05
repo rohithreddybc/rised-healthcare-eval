@@ -21,6 +21,8 @@ def evaluate_inclusivity(
     y_true,
     demographic_df: pd.DataFrame,
     subgroup_columns: Optional[List[str]] = None,
+    n_bootstrap: int = 0,
+    random_state: Optional[int] = None,
 ) -> InclusivityResult:
     """
     Evaluate the Inclusivity dimension.
@@ -74,9 +76,41 @@ def evaluate_inclusivity(
     if len(subgroup_aucs) >= 2:
         auc_gap = max(subgroup_aucs.values()) - min(subgroup_aucs.values())
 
+    # Bootstrap 95% CI for AUC parity gap
+    auc_gap_ci = None
+    if n_bootstrap > 0 and auc_gap is not None:
+        rng = np.random.default_rng(random_state)
+        n = len(X_arr)
+        gap_boot = []
+        demo_arr = demographic_df.reset_index(drop=True)
+        for _ in range(n_bootstrap):
+            idx = rng.integers(0, n, size=n)
+            scores_b = model.predict_proba(X_arr[idx])[:, 1]
+            y_b = y[idx]
+            demo_b = demo_arr.iloc[idx]
+            boot_aucs: List[float] = []
+            for col in cols:
+                for grp_val in demo_b[col].unique():
+                    mask_b = (demo_b[col] == grp_val).values
+                    if mask_b.sum() < 30:
+                        continue
+                    n_pos_b = int(y_b[mask_b].sum())
+                    n_neg_b = int(mask_b.sum()) - n_pos_b
+                    if n_pos_b < 2 or n_neg_b < 2:
+                        continue
+                    boot_aucs.append(roc_auc(y_b[mask_b], scores_b[mask_b]))
+            if len(boot_aucs) >= 2:
+                gap_boot.append(max(boot_aucs) - min(boot_aucs))
+        if gap_boot:
+            auc_gap_ci = (
+                float(np.percentile(gap_boot, 2.5)),
+                float(np.percentile(gap_boot, 97.5)),
+            )
+
     return InclusivityResult(
         subgroup_aucs=subgroup_aucs,
         auc_parity_gap=auc_gap,
+        auc_gap_ci=auc_gap_ci,
         subgroup_calibration=subgroup_ece,
         details={"small_group_flags": small_groups},
     )

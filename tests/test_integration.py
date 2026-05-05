@@ -63,13 +63,41 @@ def test_framework_report_all_passed_requires_all_true():
     )
 
     report = FrameworkReport(
-        reliability=ReliabilityResult(perturbation_flip_rate=0.02),
+        reliability=ReliabilityResult(judge_sensitivity_score=0.02),
         inclusivity=InclusivityResult(auc_parity_gap=0.03, subgroup_calibration={"g=A": 0.05}),
         sensitivity=SensitivityResult(threshold_flip_rates={0.5: 0.0, 0.6: 0.04}),
         equity=EquityResult(need_prediction_correlation=0.75),
         deployability=DeployabilityResult(mean_inference_latency_ms=200.0),
     )
     assert report.all_passed() is True
+
+
+def test_evaluate_all_reproducible_with_random_state(fitted_lr, small_cohort, demographic_df):
+    """evaluate_all() with same random_state must produce identical CI values."""
+    X, y = small_cohort
+    specs = [{"type": "gaussian_noise", "scale": 0.05, "random_state": 0, "label": "n5"}]
+    r1 = evaluate_all(
+        fitted_lr, X, y, demographic_df,
+        perturbation_specs=specs, random_state=42, n_bootstrap=20,
+    )
+    r2 = evaluate_all(
+        fitted_lr, X, y, demographic_df,
+        perturbation_specs=specs, random_state=42, n_bootstrap=20,
+    )
+    assert r1.reliability.judge_sensitivity_score == r2.reliability.judge_sensitivity_score
+    assert r1.reliability.jss_ci == r2.reliability.jss_ci
+    assert r1.sensitivity.max_tfr_ci == r2.sensitivity.max_tfr_ci
+    assert r1.inclusivity.auc_gap_ci == r2.inclusivity.auc_gap_ci
+
+
+def test_deployability_per_patient_latency(fitted_lr, small_cohort):
+    """per-patient latency must equal batch latency / n_samples."""
+    from rised.deployability import evaluate_deployability
+    X, _ = small_cohort
+    result = evaluate_deployability(fitted_lr, X, n_latency_trials=5, n_shap_samples=10)
+    assert result.mean_latency_per_patient_ms is not None
+    expected = result.mean_inference_latency_ms / X.shape[0]
+    assert abs(result.mean_latency_per_patient_ms - expected) < 1e-10
 
 
 def test_package_version():

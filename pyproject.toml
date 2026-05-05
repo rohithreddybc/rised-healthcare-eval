@@ -39,7 +39,7 @@ dependencies = [
     "scipy>=1.9.0",
     "matplotlib>=3.6.0",
     "seaborn>=0.12.0",
-    "shap>=0.41.0",
+    "shap>=0.41.0,<0.45.0",
     "xgboost>=1.6.0",
 ]
 

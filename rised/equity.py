@@ -8,6 +8,7 @@ Key reference: Paulus & Kent (2020), "Predictably unequal", npj Digital Medicine
 
 from __future__ import annotations
 
+import warnings
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -69,6 +70,14 @@ def evaluate_equity(
     else:
         need = y
         need_source = "y_true"
+        warnings.warn(
+            "Using y_true as the clinical need proxy. If the model was trained on y_true, "
+            "need_prediction_correlation may be inflated. Provide need_column for an "
+            "independent measure of clinical need (e.g., comorbidity count, subsequent "
+            "hospitalization).",
+            UserWarning,
+            stacklevel=2,
+        )
 
     # Need-prediction correlation (Spearman)
     need_pred_corr = rank_correlation(scores, need)

@@ -20,6 +20,8 @@ def evaluate_sensitivity(
     threshold_range: Optional[np.ndarray] = None,
     tau_ref: float = 0.5,
     boundary_delta: float = 0.05,
+    n_bootstrap: int = 0,
+    random_state: Optional[int] = None,
 ) -> SensitivityResult:
     """
     Evaluate the Sensitivity dimension.
@@ -71,10 +73,31 @@ def evaluate_sensitivity(
 
     decision_boundary_width = float(np.mean(np.abs(scores - tau_ref) <= boundary_delta))
 
+    # Bootstrap 95% CI for max TFR
+    max_tfr_ci = None
+    if n_bootstrap > 0:
+        rng = np.random.default_rng(random_state)
+        n = len(X_arr)
+        max_tfr_boot = []
+        for _ in range(n_bootstrap):
+            idx = rng.integers(0, n, size=n)
+            scores_b = model.predict_proba(X_arr[idx])[:, 1]
+            ref_b = scores_b >= tau_ref
+            flip_rates_b = [
+                float(np.mean(ref_b != (scores_b >= float(round(float(tau), 8)))))
+                for tau in threshold_range
+            ]
+            max_tfr_boot.append(max(flip_rates_b))
+        max_tfr_ci = (
+            float(np.percentile(max_tfr_boot, 2.5)),
+            float(np.percentile(max_tfr_boot, 97.5)),
+        )
+
     return SensitivityResult(
         threshold_flip_rates=threshold_flip_rates,
         rank_stability_score=rank_stability_score,
         decision_boundary_width=decision_boundary_width,
+        max_tfr_ci=max_tfr_ci,
         details={
             "reference_threshold": tau_ref,
             "boundary_delta": boundary_delta,
