@@ -200,79 +200,129 @@ def plot_shap_summary(
     return fig
 
 
+_INCONCLUSIVE_COLOR = "#f9a825"  # amber
+
+
+def _ci_status(point: Optional[float], ci: Optional[Tuple[float, float]],
+               threshold: float, lower_better: bool) -> str:
+    """Return PASS / FAIL / INCONCLUSIVE using a CI-based decision rule.
+
+    lower_better=True : pass when value < threshold (e.g., JSS, gap, TFR)
+    lower_better=False: pass when value >= threshold (e.g., rho_need)
+    Falls back to point estimate if CI not available.
+    """
+    if point is None:
+        return "N/A"
+    if ci is None or ci[0] is None or ci[1] is None:
+        if lower_better:
+            return "PASS" if point < threshold else "FAIL"
+        return "PASS" if point >= threshold else "FAIL"
+    lo, hi = ci
+    if lower_better:
+        if hi < threshold:
+            return "PASS"
+        if lo > threshold:
+            return "FAIL"
+        return "INCONCLUSIVE"
+    if lo >= threshold:
+        return "PASS"
+    if hi < threshold:
+        return "FAIL"
+    return "INCONCLUSIVE"
+
+
 def plot_framework_dashboard(
     report: FrameworkReport,
     title: Optional[str] = None,
 ) -> plt.Figure:
-    """Five-panel dashboard summarizing all RISED dimensions as a scorecard."""
+    """RISED scorecard with point estimate, 95% CI, and CI-based status."""
     dims = ["Reliability", "Inclusivity", "Sensitivity", "Equity", "Deployability"]
-    results_objs = [
-        report.reliability,
-        report.inclusivity,
-        report.sensitivity,
-        report.equity,
-        report.deployability,
-    ]
 
-    # Build summary rows: [dimension, primary metric label, value, passed]
-    rows = []
-    for dim, res in zip(dims, results_objs):
-        if res is None:
-            rows.append((dim, "—", "N/A", None))
-            continue
-        if dim == "Reliability":
-            label = "JSS"
-            val = f"{res.judge_sensitivity_score:.4f}" if res.judge_sensitivity_score is not None else "—"
-        elif dim == "Inclusivity":
-            label = "AUC parity gap"
-            val = f"{res.auc_parity_gap:.4f}" if res.auc_parity_gap is not None else "—"
-        elif dim == "Sensitivity":
-            label = "Max TFR (%)"
-            if res.threshold_flip_rates:
-                val = f"{max(res.threshold_flip_rates.values()) * 100:.1f}%"
-            elif res.rank_stability_score is not None:
-                val = f"{res.rank_stability_score:.4f}"
-            else:
-                val = "—"
-        elif dim == "Equity":
-            label = "ρ_need"
-            val = f"{res.need_prediction_correlation:.4f}" if res.need_prediction_correlation is not None else "—"
-        else:  # Deployability
-            label = "Latency (ms)"
-            val = f"{res.mean_inference_latency_ms:.1f}" if res.mean_inference_latency_ms is not None else "—"
-        rows.append((dim, label, val, res.passed()))
+    rows = []  # (dim, metric, value, ci_str, status)
 
-    fig, ax = plt.subplots(figsize=(8, len(dims) * 0.8 + 1.2))
+    # ── Reliability (JSS < 0.05) ──
+    rel = report.reliability
+    if rel is None or rel.judge_sensitivity_score is None:
+        rows.append(("Reliability", "JSS", "—", "—", "N/A"))
+    else:
+        ci = rel.jss_ci
+        ci_str = f"[{ci[0]:.3f}, {ci[1]:.3f}]" if ci else "—"
+        status = _ci_status(rel.judge_sensitivity_score, ci, 0.05, lower_better=True)
+        rows.append(("Reliability", "JSS",
+                     f"{rel.judge_sensitivity_score:.4f}", ci_str, status))
+
+    # ── Inclusivity (AUC gap <= 0.05) ──
+    inc = report.inclusivity
+    if inc is None or inc.auc_parity_gap is None:
+        rows.append(("Inclusivity", "AUC parity gap", "—", "—", "N/A"))
+    else:
+        ci = inc.auc_gap_ci
+        ci_str = f"[{ci[0]:.3f}, {ci[1]:.3f}]" if ci else "—"
+        status = _ci_status(inc.auc_parity_gap, ci, 0.05, lower_better=True)
+        rows.append(("Inclusivity", "AUC parity gap",
+                     f"{inc.auc_parity_gap:.4f}", ci_str, status))
+
+    # ── Sensitivity (max TFR <= 0.10) ──
+    sen = report.sensitivity
+    if sen is None or not sen.threshold_flip_rates:
+        rows.append(("Sensitivity", "Max TFR (%)", "—", "—", "N/A"))
+    else:
+        max_tfr = max(sen.threshold_flip_rates.values())
+        ci = sen.max_tfr_ci
+        ci_str = f"[{ci[0]*100:.1f}%, {ci[1]*100:.1f}%]" if ci else "—"
+        status = _ci_status(max_tfr, ci, 0.10, lower_better=True)
+        rows.append(("Sensitivity", "Max TFR (%)",
+                     f"{max_tfr*100:.1f}%", ci_str, status))
+
+    # ── Equity (rho_need >= 0.70) ──
+    eq = report.equity
+    if eq is None or eq.need_prediction_correlation is None:
+        rows.append(("Equity", "ρ_need", "—", "—", "N/A"))
+    else:
+        # No CI computed for rho_need; fall back to point estimate
+        status = _ci_status(eq.need_prediction_correlation, None, 0.70, lower_better=False)
+        rows.append(("Equity", "ρ_need",
+                     f"{eq.need_prediction_correlation:.4f}", "—", status))
+
+    # ── Deployability (latency <= 500 ms) ──
+    dep = report.deployability
+    if dep is None or dep.mean_inference_latency_ms is None:
+        rows.append(("Deployability", "Latency (ms)", "—", "—", "N/A"))
+    else:
+        status = _ci_status(dep.mean_inference_latency_ms, None, 500.0, lower_better=True)
+        rows.append(("Deployability", "Latency (ms)",
+                     f"{dep.mean_inference_latency_ms:.1f}", "—", status))
+
+    # ── Render compactly to avoid an empty page in the PDF ──
+    fig, ax = plt.subplots(figsize=(9, 2.6))
     ax.axis("off")
-    table_data = [["Dimension", "Primary metric", "Value", "Status"]]
-    for dim, label, val, passed in rows:
-        status = ("PASS" if passed else "FAIL") if passed is not None else "N/A"
-        table_data.append([dim, label, val, status])
-
-    col_widths = [0.28, 0.32, 0.20, 0.20]
+    headers = ["Dimension", "Primary metric", "Value", "95% CI", "Status"]
+    col_widths = [0.18, 0.22, 0.14, 0.28, 0.18]
     tbl = ax.table(
-        cellText=table_data[1:],
-        colLabels=table_data[0],
+        cellText=[r for r in rows],
+        colLabels=headers,
         colWidths=col_widths,
         loc="center",
         cellLoc="center",
     )
     tbl.auto_set_font_size(False)
-    tbl.set_fontsize(11)
-    tbl.scale(1, 2.0)
+    tbl.set_fontsize(10)
+    tbl.scale(1, 1.4)
 
+    color_map = {"PASS": _PASS_COLOR, "FAIL": _FAIL_COLOR,
+                 "INCONCLUSIVE": _INCONCLUSIVE_COLOR, "N/A": "#bdbdbd"}
     for (row, col), cell in tbl.get_celld().items():
         if row == 0:
             cell.set_facecolor("#37474f")
             cell.set_text_props(color="white", fontweight="bold")
-        elif col == 3 and row > 0:
+        elif col == 4:
             text = cell.get_text().get_text()
-            cell.set_facecolor(_PASS_COLOR if text == "PASS" else
-                               (_FAIL_COLOR if text == "FAIL" else "#bdbdbd"))
+            cell.set_facecolor(color_map.get(text, "#bdbdbd"))
             cell.set_text_props(color="white", fontweight="bold")
         else:
             cell.set_facecolor("#f5f5f5" if row % 2 == 0 else "white")
 
-    ax.set_title(title or "RISED Framework Scorecard", fontsize=14, pad=20, fontweight="bold")
+    ax.set_title(title or "RISED Framework Scorecard (CI-based decisions)",
+                 fontsize=12, pad=8, fontweight="bold")
     fig.tight_layout()
     return fig
