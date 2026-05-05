@@ -76,12 +76,14 @@ def evaluate_inclusivity(
     if len(subgroup_aucs) >= 2:
         auc_gap = max(subgroup_aucs.values()) - min(subgroup_aucs.values())
 
-    # Bootstrap 95% CI for AUC parity gap
+    # Bootstrap 95% CI for AUC parity gap and per-subgroup AUCs
     auc_gap_ci = None
+    subgroup_auc_cis: Dict[str, tuple] = {}
     if n_bootstrap > 0 and auc_gap is not None:
         rng = np.random.default_rng(random_state)
         n = len(X_arr)
         gap_boot = []
+        per_label_boot: Dict[str, List[float]] = {label: [] for label in subgroup_aucs}
         demo_arr = demographic_df.reset_index(drop=True)
         for _ in range(n_bootstrap):
             idx = rng.integers(0, n, size=n)
@@ -98,7 +100,11 @@ def evaluate_inclusivity(
                     n_neg_b = int(mask_b.sum()) - n_pos_b
                     if n_pos_b < 2 or n_neg_b < 2:
                         continue
-                    boot_aucs.append(roc_auc(y_b[mask_b], scores_b[mask_b]))
+                    a = roc_auc(y_b[mask_b], scores_b[mask_b])
+                    boot_aucs.append(a)
+                    label = f"{col}={grp_val}"
+                    if label in per_label_boot:
+                        per_label_boot[label].append(a)
             if len(boot_aucs) >= 2:
                 gap_boot.append(max(boot_aucs) - min(boot_aucs))
         if gap_boot:
@@ -106,11 +112,20 @@ def evaluate_inclusivity(
                 float(np.percentile(gap_boot, 2.5)),
                 float(np.percentile(gap_boot, 97.5)),
             )
+        for label, samples in per_label_boot.items():
+            if len(samples) >= 50:  # require enough valid resamples
+                subgroup_auc_cis[label] = (
+                    float(np.percentile(samples, 2.5)),
+                    float(np.percentile(samples, 97.5)),
+                )
 
     return InclusivityResult(
         subgroup_aucs=subgroup_aucs,
         auc_parity_gap=auc_gap,
         auc_gap_ci=auc_gap_ci,
         subgroup_calibration=subgroup_ece,
-        details={"small_group_flags": small_groups},
+        details={
+            "small_group_flags": small_groups,
+            "subgroup_auc_cis": subgroup_auc_cis,
+        },
     )
