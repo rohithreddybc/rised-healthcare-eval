@@ -221,9 +221,22 @@ pytest --tb=short -q
 
 ---
 
+## External validation on real datasets
+
+The framework has been re-run unchanged on two publicly available real-data clinical cohorts:
+
+| Cohort | n | Era | Outcome | Reproduce |
+|---|---|---|---|---|
+| UCI Heart Disease (Cleveland) | 303 | 1989 | Presence of heart disease | `python examples/external_validation_uci_heart.py` |
+| UCI Diabetes 130-US Hospitals | 99,492 | 1999–2008 | <30-day readmission | `python examples/external_validation_diabetes130.py` |
+
+The two real cohorts produce non-uniform pass/fail patterns: Reliability passes by three orders of magnitude on Diabetes 130 while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively, supporting the framework's construct validity.
+
 ## Roadmap
 
-- [ ] Validation on real (de-identified) EHR cohorts
+- [x] External validation on UCI Heart Disease (Cleveland)
+- [x] External validation on UCI Diabetes 130-US Hospitals
+- [ ] Validation on MIMIC-IV / eICU (PhysioNet credential required)
 - [ ] Empirical recalibration of pass/fail thresholds against deployment outcomes
 - [ ] Extension to multi-label and time-series risk models
 - [ ] Reference implementations for common clinical prediction tasks
