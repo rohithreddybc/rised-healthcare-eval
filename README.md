@@ -124,19 +124,20 @@ fig.savefig("scorecard.png", dpi=150)
 ## Reproducing the Paper's Results
 
 The paper applies RISED to an XGBoost classifier (AUROC 0.961, Brier 0.073) on
-the 2,000-patient held-out test split, using the CI-based decision rule.
+the 2,000-patient held-out test split, using BCa bootstrap CIs and Holm-Bonferroni
+family-wise error correction.
 
-| Dimension | Value | 95% CI | Status |
-|-----------|------:|:------:|:------:|
+| Dimension | Value | 95% BCa CI | Status |
+|-----------|------:|:----------:|:------:|
 | JSS                       | 0.064  | [0.058, 0.070]   | **FAIL** |
-| Δ_AUC                     | 0.059  | [0.052, 0.097]   | **INCONCLUSIVE**¹ |
+| Δ_AUC                     | 0.059  | [0.042, 0.066]   | **INCONCLUSIVE**¹ |
 | Max TFR                   | 19.9%  | [18.3%, 21.7%]   | **FAIL** |
-| ρ_need (outcome proxy)    | 0.732  | —                | PASS² |
-| ρ_need (CCI proxy)        | 0.599  | —                | FAIL² |
+| ρ_need (outcome proxy)    | 0.732  | —                | DIAGNOSTIC² |
+| ρ_need (CCI proxy)        | 0.599  | —                | DIAGNOSTIC² |
 | Λ (per cohort)            | ~1 ms  | —                | PASS |
 
-¹ CI [0.052, 0.097] overlaps the 0.05 threshold → INCONCLUSIVE.
-² Equity verdict flips under different proxies; recorded as INCONCLUSIVE pending
+¹ BCa CI [0.042, 0.066] spans the 0.05 threshold → INCONCLUSIVE under the CI rule.
+² Equity is reported as a proxy-dependence diagnostic, not a stand-alone gate; verdicts
    an externally validated need measure.
 
 Bootstrap CIs from 1,000 iterations with `random_state=42`. Hardware-dependent

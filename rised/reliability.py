@@ -79,21 +79,32 @@ def evaluate_reliability(
     mean_flip = float(np.mean(list(per_perturbation_flip.values())))
     mean_rho = float(np.mean(list(per_perturbation_rho.values())))
 
-    # Bootstrap 95% CI for JSS
+    # BCa 95% CI for JSS (bias-corrected accelerated bootstrap)
     jss_ci = None
     if n_bootstrap > 0:
+        from rised.bootstrap_ci import bca_interval
+
         rng = np.random.default_rng(random_state)
         n = len(X_arr)
-        jss_boot = []
-        for _ in range(n_bootstrap):
+        baseline_arr = np.asarray(baseline)
+        pert_arrs = [np.asarray(s) for s in perturbed_scores]
+
+        def _jss_on_idx(idx: np.ndarray) -> float:
+            return judge_sensitivity_score(baseline_arr[idx], [s[idx] for s in pert_arrs])
+
+        # Bootstrap replicates
+        jss_boot = np.empty(n_bootstrap, dtype=float)
+        for b in range(n_bootstrap):
             idx = rng.integers(0, n, size=n)
-            baseline_b = model.predict_proba(X_arr[idx])[:, 1]
-            pert_scores_b: List[np.ndarray] = []
-            for spec in perturbation_specs:
-                X_pert_b = apply_perturbation(X_arr[idx], spec)
-                pert_scores_b.append(model.predict_proba(X_pert_b)[:, 1])
-            jss_boot.append(judge_sensitivity_score(baseline_b, pert_scores_b))
-        jss_ci = (float(np.percentile(jss_boot, 2.5)), float(np.percentile(jss_boot, 97.5)))
+            jss_boot[b] = _jss_on_idx(idx)
+
+        # Jackknife replicates (leave-one-out)
+        full_idx = np.arange(n)
+        jss_jack = np.empty(n, dtype=float)
+        for i in range(n):
+            jss_jack[i] = _jss_on_idx(np.delete(full_idx, i))
+
+        jss_ci = bca_interval(jss, jss_boot, jss_jack, alpha=0.05)
 
     return ReliabilityResult(
         judge_sensitivity_score=jss,

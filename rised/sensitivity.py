@@ -73,25 +73,33 @@ def evaluate_sensitivity(
 
     decision_boundary_width = float(np.mean(np.abs(scores - tau_ref) <= boundary_delta))
 
-    # Bootstrap 95% CI for max TFR
+    # BCa 95% CI for max TFR
     max_tfr_ci = None
+    max_tfr_value = float(max(threshold_flip_rates.values())) if threshold_flip_rates else 0.0
     if n_bootstrap > 0:
+        from rised.bootstrap_ci import bca_interval
+
         rng = np.random.default_rng(random_state)
         n = len(X_arr)
-        max_tfr_boot = []
-        for _ in range(n_bootstrap):
+        scores_full = scores
+        thresholds = [float(round(float(tau), 8)) for tau in threshold_range]
+
+        def _max_tfr_on_idx(idx: np.ndarray) -> float:
+            sb = scores_full[idx]
+            ref_b = sb >= tau_ref
+            return float(max(float(np.mean(ref_b != (sb >= t))) for t in thresholds))
+
+        max_tfr_boot = np.empty(n_bootstrap, dtype=float)
+        for b in range(n_bootstrap):
             idx = rng.integers(0, n, size=n)
-            scores_b = model.predict_proba(X_arr[idx])[:, 1]
-            ref_b = scores_b >= tau_ref
-            flip_rates_b = [
-                float(np.mean(ref_b != (scores_b >= float(round(float(tau), 8)))))
-                for tau in threshold_range
-            ]
-            max_tfr_boot.append(max(flip_rates_b))
-        max_tfr_ci = (
-            float(np.percentile(max_tfr_boot, 2.5)),
-            float(np.percentile(max_tfr_boot, 97.5)),
-        )
+            max_tfr_boot[b] = _max_tfr_on_idx(idx)
+
+        full_idx = np.arange(n)
+        max_tfr_jack = np.empty(n, dtype=float)
+        for i in range(n):
+            max_tfr_jack[i] = _max_tfr_on_idx(np.delete(full_idx, i))
+
+        max_tfr_ci = bca_interval(max_tfr_value, max_tfr_boot, max_tfr_jack, alpha=0.05)
 
     return SensitivityResult(
         threshold_flip_rates=threshold_flip_rates,

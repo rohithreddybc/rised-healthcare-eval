@@ -107,7 +107,13 @@ class FrameworkReport:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def summary(self) -> Dict[str, Optional[bool]]:
-        """Return pass/fail status for each completed dimension."""
+        """Return pass/fail status for each completed dimension.
+
+        Note: Equity is reported as a proxy-dependence diagnostic (see
+        Section 4 of the RISED paper) rather than a stand-alone gate.
+        Its summary value reflects E1/E2 sub-criteria under the supplied
+        proxy and should be interpreted alongside diagnostic_status().
+        """
         return {
             "reliability": self.reliability.passed() if self.reliability else None,
             "inclusivity": self.inclusivity.passed() if self.inclusivity else None,
@@ -116,7 +122,26 @@ class FrameworkReport:
             "deployability": self.deployability.passed() if self.deployability else None,
         }
 
+    def diagnostic_status(self) -> Dict[str, str]:
+        """Equity-aware status: returns 'PASS', 'FAIL', or 'DIAGNOSTIC' per dimension.
+
+        Equity is always 'DIAGNOSTIC' to remind callers that its verdict is
+        proxy-dependent and should not be treated as a stand-alone gate.
+        """
+        s = self.summary()
+        out = {}
+        for k, v in s.items():
+            if k == "equity":
+                out[k] = "DIAGNOSTIC"
+            elif v is None:
+                out[k] = "NOT_EVALUATED"
+            else:
+                out[k] = "PASS" if v else "FAIL"
+        return out
+
     def all_passed(self) -> bool:
-        """Return True only if at least one dimension was evaluated and all evaluated passed."""
-        evaluated = [v for v in self.summary().values() if v is not None]
+        """Return True only if all gating dimensions passed (Equity is diagnostic, excluded)."""
+        gating = ["reliability", "inclusivity", "sensitivity", "deployability"]
+        s = self.summary()
+        evaluated = [s[k] for k in gating if s.get(k) is not None]
         return len(evaluated) > 0 and all(evaluated)

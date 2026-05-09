@@ -76,18 +76,19 @@ def evaluate_inclusivity(
     if len(subgroup_aucs) >= 2:
         auc_gap = max(subgroup_aucs.values()) - min(subgroup_aucs.values())
 
-    # Bootstrap 95% CI for AUC parity gap and per-subgroup AUCs
+    # BCa 95% CI for AUC parity gap; percentile CIs for per-subgroup AUCs
     auc_gap_ci = None
     subgroup_auc_cis: Dict[str, tuple] = {}
     if n_bootstrap > 0 and auc_gap is not None:
+        from rised.bootstrap_ci import bca_interval
+
         rng = np.random.default_rng(random_state)
         n = len(X_arr)
-        gap_boot = []
-        per_label_boot: Dict[str, List[float]] = {label: [] for label in subgroup_aucs}
+        scores_full = model.predict_proba(X_arr)[:, 1]
         demo_arr = demographic_df.reset_index(drop=True)
-        for _ in range(n_bootstrap):
-            idx = rng.integers(0, n, size=n)
-            scores_b = model.predict_proba(X_arr[idx])[:, 1]
+
+        def _gap_on_idx(idx: np.ndarray) -> float:
+            scores_b = scores_full[idx]
             y_b = y[idx]
             demo_b = demo_arr.iloc[idx]
             boot_aucs: List[float] = []
@@ -100,20 +101,47 @@ def evaluate_inclusivity(
                     n_neg_b = int(mask_b.sum()) - n_pos_b
                     if n_pos_b < 2 or n_neg_b < 2:
                         continue
-                    a = roc_auc(y_b[mask_b], scores_b[mask_b])
-                    boot_aucs.append(a)
+                    boot_aucs.append(roc_auc(y_b[mask_b], scores_b[mask_b]))
+            if len(boot_aucs) < 2:
+                return float("nan")
+            return float(max(boot_aucs) - min(boot_aucs))
+
+        gap_boot = np.empty(n_bootstrap, dtype=float)
+        per_label_boot: Dict[str, List[float]] = {label: [] for label in subgroup_aucs}
+        for b in range(n_bootstrap):
+            idx = rng.integers(0, n, size=n)
+            gap_boot[b] = _gap_on_idx(idx)
+            scores_b = scores_full[idx]
+            y_b = y[idx]
+            demo_b = demo_arr.iloc[idx]
+            for col in cols:
+                for grp_val in demo_b[col].unique():
+                    mask_b = (demo_b[col] == grp_val).values
+                    if mask_b.sum() < 30:
+                        continue
+                    n_pos_b = int(y_b[mask_b].sum())
+                    n_neg_b = int(mask_b.sum()) - n_pos_b
+                    if n_pos_b < 2 or n_neg_b < 2:
+                        continue
                     label = f"{col}={grp_val}"
                     if label in per_label_boot:
-                        per_label_boot[label].append(a)
-            if len(boot_aucs) >= 2:
-                gap_boot.append(max(boot_aucs) - min(boot_aucs))
-        if gap_boot:
-            auc_gap_ci = (
-                float(np.percentile(gap_boot, 2.5)),
-                float(np.percentile(gap_boot, 97.5)),
+                        per_label_boot[label].append(
+                            roc_auc(y_b[mask_b], scores_b[mask_b])
+                        )
+
+        # Jackknife for BCa on the parity gap
+        full_idx = np.arange(n)
+        gap_jack = np.empty(n, dtype=float)
+        for i in range(n):
+            gap_jack[i] = _gap_on_idx(np.delete(full_idx, i))
+
+        valid = ~np.isnan(gap_boot)
+        if valid.any() and not np.isnan(_gap_on_idx(full_idx)):
+            auc_gap_ci = bca_interval(
+                auc_gap, gap_boot[valid], gap_jack[~np.isnan(gap_jack)], alpha=0.05
             )
         for label, samples in per_label_boot.items():
-            if len(samples) >= 50:  # require enough valid resamples
+            if len(samples) >= 50:
                 subgroup_auc_cis[label] = (
                     float(np.percentile(samples, 2.5)),
                     float(np.percentile(samples, 97.5)),
