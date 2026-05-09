@@ -11,7 +11,7 @@ tags:
   - model-evaluation
 pretty_name: RISED Synthetic Clinical Cohort (10K)
 size_categories:
-  - 1K<n<10K
+  - 10K<n<100K
 task_categories:
   - tabular-classification
 configs:

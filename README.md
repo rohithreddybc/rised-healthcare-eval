@@ -24,7 +24,7 @@ Python library.
 📄 **Paper:** *Evaluating AI-Assisted Decision Support in High-Stakes Healthcare:
 A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability*
 — under review at *Artificial Intelligence in Medicine* (Elsevier, IF 7.5).
-arXiv: `ARXIV_ID_PLACEHOLDER`
+Dataset DOI: [10.57967/hf/8734](https://doi.org/10.57967/hf/8734)
 
 ---
 
@@ -105,6 +105,7 @@ print(report.summary())
 
 print(f"JSS = {report.reliability.judge_sensitivity_score:.4f} "
       f"95% CI {report.reliability.jss_ci}")
+# Expected output (random_state=42, B=1000):
 # JSS = 0.0644 95% CI (0.0576, 0.0704)
 ```
 
@@ -229,7 +230,7 @@ The framework has been re-run unchanged on three publicly available real-data cl
 |---|---|---|---|---|
 | UCI Heart Disease (Cleveland) | 303 | 1989 | Presence of heart disease | `python examples/external_validation_uci_heart.py` |
 | UCI Diabetes 130-US Hospitals | 99,492 | 1999–2008 | <30-day readmission | `python examples/external_validation_diabetes130.py` |
-| **NCHS NHIS 2024 (Sample Adult)** | **~29,000** | **2024** | **Coronary heart disease / MI** | **`python examples/external_validation_nhis2024.py`** |
+| **NCHS NHIS 2024 (Sample Adult)** | **9,747 analytic / 32,629 raw** | **2024** | **Coronary heart disease / MI** | **`python examples/external_validation_nhis2024.py`** |
 
 The three real cohorts produce non-uniform pass/fail patterns: Reliability passes by three orders of magnitude on Diabetes 130 while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively, supporting the framework's construct validity. The NHIS 2024 cohort, collected during calendar year 2024 and released by the National Center for Health Statistics in 2025, provides a contemporary nationally representative check on the same dimensions. (NHIS 2025 microdata had not yet been released at the time of submission; an alternative validation script targeting the CDC BRFSS 2024 release is also provided in `examples/external_validation_brfss2024.py`.)
 
@@ -245,8 +246,7 @@ The three real cohorts produce non-uniform pass/fail patterns: Reliability passe
 - [ ] Reference implementations for common clinical prediction tasks
 - [ ] Certification pathway aligned with FDA SaMD requirements
 
-Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) (forthcoming) or
-open an issue.
+Contributions welcome — please open an issue or pull request on GitHub.
 
 ---
 

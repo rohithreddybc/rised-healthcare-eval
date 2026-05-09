@@ -7,6 +7,7 @@ top-feature stability across the patient cohort.
 from __future__ import annotations
 
 import time
+import warnings
 from typing import List, Optional
 
 import numpy as np
@@ -130,6 +131,12 @@ def evaluate_deployability(
 
     except Exception as exc:
         shap_details["shap_error"] = str(exc)
+        warnings.warn(
+            f"SHAP explanation evaluation failed: {exc}. "
+            "explanation_faithfulness and top_feature_stability will be None.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
 
     return DeployabilityResult(
         mean_inference_latency_ms=mean_latency_ms,

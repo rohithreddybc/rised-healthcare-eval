@@ -55,7 +55,8 @@ dev = [
 Homepage = "https://github.com/rohithreddybc/rised-healthcare-eval"
 Documentation = "https://github.com/rohithreddybc/rised-healthcare-eval/blob/main/docs/index.md"
 "Bug Tracker" = "https://github.com/rohithreddybc/rised-healthcare-eval/issues"
-"arXiv Paper" = "https://arxiv.org/abs/ARXIV_ID_PLACEHOLDER"
+"Dataset (HuggingFace)" = "https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset"
+"Dataset DOI" = "https://doi.org/10.57967/hf/8734"
 
 [tool.setuptools.packages.find]
 include = ["rised*"]

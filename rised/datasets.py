@@ -54,7 +54,7 @@ def load_synthea_cohort(
     ----------
     csv_path : str or Path, optional
         Path to the cohort CSV. Defaults to
-        ``examples/synthetic_cohort_5k.csv`` relative to the repo root.
+        ``examples/synthetic_cohort_10k.csv`` relative to the repo root.
 
     Returns
     -------

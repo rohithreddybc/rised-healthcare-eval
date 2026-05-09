@@ -4,9 +4,9 @@ Framework for Healthcare AI Decision-Support Evaluation.
 
 Reference
 ---------
-[AUTHOR et al., 2025] "Evaluating AI-Assisted Decision Support in High-Stakes
-Healthcare: A Framework for Reliability, Sensitivity, and Equity."
-arXiv: ARXIV_ID_PLACEHOLDER
+Bellibatlu, R. R. (2026). "RISED: A Pre-Deployment Safety Evaluation Framework
+for Clinical AI Decision-Support Systems." Artificial Intelligence in Medicine
+(under review). https://github.com/rohithreddybc/rised-healthcare-eval
 """
 
 __version__ = "0.1.0"

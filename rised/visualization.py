@@ -7,7 +7,7 @@ in notebooks without side effects.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend for script use
