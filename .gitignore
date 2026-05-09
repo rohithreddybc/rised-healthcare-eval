@@ -29,6 +29,9 @@ htmlcov/
 data/
 *.csv
 !examples/synthetic_cohort_10k.csv
+*.zip
+*.xpt
+examples/readme.txt
 
 # LaTeX
 *.aux

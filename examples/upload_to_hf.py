@@ -7,7 +7,7 @@ Prereqs:
 3. Set env var: HF_TOKEN=<your_token>   OR   run `hf auth login` first.
 
 Usage:
-    python upload_to_hf.py [--repo-id rohithreddybc/rised-synthetic-cohort-10k]
+    python upload_to_hf.py [--repo-id rohithreddybc/rised-healthcare-eval-dataset]
                            [--private]
 """
 
@@ -19,7 +19,7 @@ from pathlib import Path
 from huggingface_hub import HfApi, create_repo, upload_file
 
 
-DEFAULT_REPO_ID = "rohithreddybc/rised-synthetic-cohort-10k"
+DEFAULT_REPO_ID = "rohithreddybc/rised-healthcare-eval-dataset"
 HERE = Path(__file__).parent
 
 
