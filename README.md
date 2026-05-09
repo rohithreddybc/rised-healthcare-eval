@@ -3,7 +3,8 @@
 **A pre-deployment evaluation framework for clinical AI decision-support systems
 spanning Reliability, Inclusivity, Sensitivity, Equity, and Deployability.**
 
-[![Dataset on HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-rised--synthetic--cohort--10k-yellow)](https://huggingface.co/datasets/Rohithreddybc/rised-synthetic-cohort-10k)
+[![Dataset on HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-rised--healthcare--eval--dataset-yellow)](https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset)
+[![DOI](https://img.shields.io/badge/DOI-10.57967%2Fhf%2F8734-blue)](https://doi.org/10.57967/hf/8734)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-81%20passing-brightgreen)](#tests)
@@ -155,11 +156,11 @@ operationally relevant boundaries (τ = 0.10 and τ ≥ 0.80):
 
 The 10,000-patient synthetic cohort is published as a HuggingFace dataset:
 
-🤗 **[Rohithreddybc/rised-synthetic-cohort-10k](https://huggingface.co/datasets/Rohithreddybc/rised-synthetic-cohort-10k)**
+🤗 **[Rohithreddybc/rised-healthcare-eval-dataset](https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset)**
 
 ```python
 from datasets import load_dataset
-ds = load_dataset("Rohithreddybc/rised-synthetic-cohort-10k")
+ds = load_dataset("Rohithreddybc/rised-healthcare-eval-dataset")
 df = ds["train"].to_pandas()  # (10000, 26)
 ```
 
@@ -172,7 +173,7 @@ df = generate_synthea_cohort(n=10000, random_state=42)
 
 The cohort is fully synthetic (Synthea-inspired), Medicare/Medicaid-weighted,
 with 30% high-need prevalence. **No real patient records were used at any
-stage.** See the [HuggingFace dataset card](https://huggingface.co/datasets/Rohithreddybc/rised-synthetic-cohort-10k)
+stage.** See the [HuggingFace dataset card](https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset)
 for the full feature schema and demographic breakdown.
 
 ---
@@ -207,13 +208,12 @@ pytest --tb=short -q
 ## Citation
 
 ```bibtex
-@article{bellibatlu2025rised,
+@article{bellibatlu2026rised,
   author  = {Bellibatlu, Rohith Reddy},
-  title   = {Evaluating {AI}-Assisted Decision Support in High-Stakes Healthcare:
-             A Framework for Reliability, Inclusivity, Sensitivity, Equity,
-             and Deployability},
+  title   = {{RISED}: A Pre-Deployment Safety Evaluation Framework for Clinical {AI}
+             Decision-Support Systems},
   journal = {Artificial Intelligence in Medicine},
-  year    = {2025},
+  year    = {2026},
   note    = {Under review},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
 }
@@ -223,20 +223,23 @@ pytest --tb=short -q
 
 ## External validation on real datasets
 
-The framework has been re-run unchanged on two publicly available real-data clinical cohorts:
+The framework has been re-run unchanged on three publicly available real-data clinical cohorts spanning three decades of vintage:
 
 | Cohort | n | Era | Outcome | Reproduce |
 |---|---|---|---|---|
 | UCI Heart Disease (Cleveland) | 303 | 1989 | Presence of heart disease | `python examples/external_validation_uci_heart.py` |
 | UCI Diabetes 130-US Hospitals | 99,492 | 1999–2008 | <30-day readmission | `python examples/external_validation_diabetes130.py` |
+| **NCHS NHIS 2024 (Sample Adult)** | **~29,000** | **2024** | **Coronary heart disease / MI** | **`python examples/external_validation_nhis2024.py`** |
 
-The two real cohorts produce non-uniform pass/fail patterns: Reliability passes by three orders of magnitude on Diabetes 130 while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively, supporting the framework's construct validity.
+The three real cohorts produce non-uniform pass/fail patterns: Reliability passes by three orders of magnitude on Diabetes 130 while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively, supporting the framework's construct validity. The NHIS 2024 cohort, collected during calendar year 2024 and released by the National Center for Health Statistics in 2025, provides a contemporary nationally representative check on the same dimensions. (NHIS 2025 microdata had not yet been released at the time of submission; an alternative validation script targeting the CDC BRFSS 2024 release is also provided in `examples/external_validation_brfss2024.py`.)
 
 ## Roadmap
 
 - [x] External validation on UCI Heart Disease (Cleveland)
 - [x] External validation on UCI Diabetes 130-US Hospitals
+- [x] External validation on NCHS NHIS 2024 (released 2025) and CDC BRFSS 2024 (released Aug 2025)
 - [ ] Validation on MIMIC-IV / eICU (PhysioNet credential required)
+- [ ] Re-run on NHIS 2025 / NHANES 2025–2026 once microdata is released
 - [ ] Empirical recalibration of pass/fail thresholds against deployment outcomes
 - [ ] Extension to multi-label and time-series risk models
 - [ ] Reference implementations for common clinical prediction tasks

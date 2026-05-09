@@ -113,7 +113,7 @@ clinical use.
 ```python
 from datasets import load_dataset
 
-ds = load_dataset("Rohithreddybc/rised-synthetic-cohort-10k")
+ds = load_dataset("Rohithreddybc/rised-healthcare-eval-dataset")
 df = ds["train"].to_pandas()
 print(df.shape)         # (10000, 26)
 print(df["high_need"].mean())  # 0.30
@@ -124,7 +124,7 @@ Or load directly with pandas:
 ```python
 import pandas as pd
 df = pd.read_csv(
-    "hf://datasets/Rohithreddybc/rised-synthetic-cohort-10k/synthetic_cohort_10k.csv"
+    "hf://datasets/Rohithreddybc/rised-healthcare-eval-dataset/synthetic_cohort_10k.csv"
 )
 ```
 
@@ -142,9 +142,8 @@ If you use this dataset, please cite the accompanying paper:
 ```bibtex
 @article{bellibatlu2026rised,
   author  = {Bellibatlu, Rohith Reddy},
-  title   = {{RISED}: A Pre-Deployment Evaluation Framework for Clinical {AI}
-             Decision-Support Systems Spanning Reliability, Inclusivity,
-             Sensitivity, Equity, and Deployability},
+  title   = {{RISED}: A Pre-Deployment Safety Evaluation Framework for Clinical {AI}
+             Decision-Support Systems},
   year    = {2026},
   journal = {Artificial Intelligence in Medicine (under review)},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
