@@ -22,16 +22,16 @@ thresholds and bootstrap 95% confidence intervals, packaged as an open-source
 Python library.
 
 📄 **Paper:** *Evaluating AI-Assisted Decision Support in High-Stakes Healthcare:
-A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability*
-— under review at *Artificial Intelligence in Medicine* (Elsevier, IF 7.5).
+A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability*,
+under review at *Artificial Intelligence in Medicine* (Elsevier, IF 7.5).
 Dataset DOI: [10.57967/hf/8734](https://doi.org/10.57967/hf/8734)
 
 ---
 
 ## Why RISED
 
-Standard model evaluation reports a single number — AUROC, Brier score,
-accuracy — on a held-out test set. That number cannot detect:
+Standard model evaluation reports a single number (AUROC, Brier score,
+accuracy) on a held-out test set. That number cannot detect:
 
 - A model that flips one in fifteen patient classifications under semantically
   equivalent input encodings (**Reliability**).
@@ -253,8 +253,8 @@ Contributions welcome — please open an issue or pull request on GitHub.
 
 ## Contact
 
-**Rohith Reddy Bellibatlu** —
-[rohithreddybc@gmail.com](mailto:rohithreddybc@gmail.com) —
+**Rohith Reddy Bellibatlu**
+[rohithreddybc@gmail.com](mailto:rohithreddybc@gmail.com) |
 ORCID [0009-0003-6083-0364](https://orcid.org/0009-0003-6083-0364)
 
 ## License
