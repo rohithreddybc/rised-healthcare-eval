@@ -1,7 +1,9 @@
 # RISED Framework
 
-**A pre-deployment evaluation framework for clinical AI decision-support systems
-spanning Reliability, Inclusivity, Sensitivity, Equity, and Deployability.**
+**A pre-deployment evaluation framework for high-stakes AI decision-support
+systems — Reliability, Inclusivity, Sensitivity, Equity, Deployability —
+with deep application to healthcare and cross-domain demonstrations on
+credit and hiring expert systems.**
 
 [![Dataset on HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-rised--healthcare--eval--dataset-yellow)](https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset)
 [![DOI](https://img.shields.io/badge/DOI-10.57967%2Fhf%2F8734-blue)](https://doi.org/10.57967/hf/8734)
@@ -12,19 +14,55 @@ spanning Reliability, Inclusivity, Sensitivity, Equity, and Deployability.**
 
 > An XGBoost classifier with **AUROC 0.961** can still fail three of five
 > RISED dimensions. Aggregate accuracy is necessary but not sufficient for safe
-> clinical deployment.
+> deployment of a high-stakes expert system.
 
 RISED — **R**eliability, **I**nclusivity, **S**ensitivity, **E**quity,
-**D**eployability — is a structured framework for testing healthcare AI systems
-*before* they are deployed in clinical settings. Each of the five dimensions is
-operationalized through formal sub-criteria with literature-grounded pass/fail
-thresholds and bootstrap 95% confidence intervals, packaged as an open-source
-Python library.
+**D**eployability — is a structured framework for testing high-stakes AI
+decision-support systems *before* they are deployed. Each of the five
+dimensions is operationalized through formal sub-criteria with
+literature-grounded pass/fail thresholds and bootstrap 95% confidence
+intervals, packaged as an open-source Python library. The framework was
+developed for clinical AI (where the empirical evidence is densest and the
+regulatory pressure is highest) and is demonstrated on credit-scoring and
+hiring expert systems via the cross-domain demos in `examples/`.
 
-📄 **Paper:** *Evaluating AI-Assisted Decision Support in High-Stakes Healthcare:
-A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability*,
-under review at *Artificial Intelligence in Medicine* (Elsevier, IF 7.5).
+📄 **Paper:** *RISED: A Pre-Deployment Evaluation Framework for High-Stakes
+AI Decision-Support Systems, with Application to Healthcare*, submitted to
+*Expert Systems with Applications* (Elsevier, IF 8.5, CiteScore 13.8, Q1).
 Dataset DOI: [10.57967/hf/8734](https://doi.org/10.57967/hf/8734)
+
+---
+
+## How to Cite
+
+If you use RISED in your own evaluation, please cite the paper:
+
+```bibtex
+@article{bellibatlu2026rised,
+  title  = {RISED: A Pre-Deployment Evaluation Framework for
+            High-Stakes AI Decision-Support Systems, with
+            Application to Healthcare},
+  author = {Bellibatlu, Rohith Reddy},
+  journal = {Expert Systems with Applications},
+  year   = {2026},
+  note   = {In press}
+}
+```
+
+## One-command reproduction
+
+```bash
+git clone https://github.com/rohithreddybc/rised-healthcare-eval.git
+cd rised-healthcare-eval
+conda env create -f environment.yml && conda activate rised
+python -m rised.reproduce_all
+```
+
+This runs the synthetic-cohort evaluation, all three real-data external
+validations, the multi-model robustness check, the Fairlearn comparison,
+and the two cross-domain demos (`adult_income_demo.py`,
+`german_credit_demo.py`) in sequence, reproducing every number in the
+paper.
 
 ---
 

@@ -146,3 +146,55 @@ def holm_bonferroni(p_values, alpha: float = 0.05):
         else:
             cutoff_reached = True
     return rejected, adjusted_alpha
+
+
+def empirical_coverage(
+    statistic_fn: Callable[[np.ndarray, np.ndarray], float],
+    X: np.ndarray,
+    y: np.ndarray,
+    bca_fn: Callable[[np.ndarray, np.ndarray], Tuple[float, float]],
+    n_resplits: int = 100,
+    test_size: float = 0.2,
+    random_state: int = 42,
+) -> float:
+    """Estimate empirical coverage of a bootstrap CI procedure.
+
+    Repeats `n_resplits` independent train/test splits, recomputes the
+    statistic on each test split, and reports the proportion of returned
+    confidence intervals that cover the statistic computed on a held-out
+    reference resampling. Intended as a sanity check for BCa coverage on
+    bounded statistics such as PSS and max TFR, as referenced in
+    Appendix A of the RISED paper.
+
+    Parameters
+    ----------
+    statistic_fn : (X_test, y_test) -> float
+        Point estimator under the resplit.
+    bca_fn : (X_test, y_test) -> (lo, hi)
+        CI procedure to be audited (must be deterministic given seed).
+    n_resplits : int, default 100
+    test_size : float, default 0.2
+    random_state : int, default 42
+
+    Returns
+    -------
+    coverage : float
+        Empirical proportion of CIs containing the reference statistic.
+    """
+    from sklearn.model_selection import train_test_split
+
+    rs = np.random.RandomState(random_state)
+    n = X.shape[0]
+    # Reference statistic: computed on full sample
+    theta_ref = statistic_fn(X, y)
+
+    covered = 0
+    for _ in range(n_resplits):
+        seed = int(rs.randint(0, 2 ** 31 - 1))
+        _, X_te, _, y_te = train_test_split(
+            X, y, test_size=test_size, random_state=seed,
+        )
+        lo, hi = bca_fn(X_te, y_te)
+        if lo <= theta_ref <= hi:
+            covered += 1
+    return covered / n_resplits
