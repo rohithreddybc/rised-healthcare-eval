@@ -5,11 +5,17 @@ Usage:
 
 This entry point runs, in sequence:
   1. Synthetic-cohort baseline RISED evaluation
-  2. Three external-validation cohorts (UCI Heart, Diabetes 130, NHIS 2024)
+  2. Four external-validation cohorts:
+       (a) UCI Heart Disease
+       (b) UCI Diabetes 130-US Hospitals
+       (c) NCHS NHIS 2024 Sample Adult (cardiovascular outcome)
+       (d) NCHS NHIS 2023 Sample Adult (diabetes outcome)
+       Files (c) and (d) are downloaded automatically from the CDC FTP
+       server (~4-5 MB each) on first run and cached locally.
   3. Multi-model robustness comparison (XGBoost / LR / RF)
   4. Fairlearn comparison on the same cohort
-  5. Two cross-domain demos (UCI Adult Income, German Credit) referenced
-     in Section 5 of the paper
+  5. Three cross-domain demos (UCI Adult Income, Folktables ACS-Income,
+     Statlog German Credit) referenced in Section 5 of the paper
 
 All scripts use random_state=42 and n_bootstrap=1000. Console output is
 the primary deliverable; figures are written to figures/ by
@@ -19,6 +25,14 @@ The script is deliberately written as a thin orchestrator that imports
 and calls each example's `main()` rather than re-implementing the
 evaluations, so that the published examples remain the single source
 of truth for the numerical results in the paper.
+
+Note on NHANES 2021-2023 (examples/external_validation_nhanes2122.py):
+  This script targets the NCHS NHANES 2021-2023 cycle (diabetes, with
+  lab-based HbA1c feature).  Due to periodic CDC URL reorganisation the
+  XPT files may not be auto-downloadable; set the NHANES_CACHE_DIR env
+  variable to a directory containing the pre-downloaded XPT files from
+  https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx
+  before adding that script to this list.
 """
 
 from __future__ import annotations
@@ -35,7 +49,9 @@ EXAMPLES = [
     ("examples.external_validation_diabetes130",
      "UCI Diabetes 130-US Hospitals external validation"),
     ("examples.external_validation_nhis2024",
-     "NCHS NHIS 2024 Sample Adult external validation"),
+     "NCHS NHIS 2024 Sample Adult external validation (cardiovascular)"),
+    ("examples.external_validation_nhis2023_diabetes",
+     "NCHS NHIS 2023 Sample Adult external validation (diabetes)"),
     ("examples.multi_model_robustness",
      "Multi-model robustness check (XGBoost / LR / RF)"),
     ("examples.fairlearn_comparison",
