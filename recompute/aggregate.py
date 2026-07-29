@@ -336,6 +336,103 @@ def _cohort_block(name: str, d: Dict[str, Any]) -> str:
     return "\n".join(L)
 
 
+#: AUROC at or above which a model "looks good on the aggregate number", i.e.
+#: the regime in which the paper's claim ("metrics detect what AUROC hides")
+#: has any bite. Below this an evaluator would already be suspicious.
+AUROC_LOOKS_GOOD = 0.80
+
+
+def build_findings(data: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Compute the answers to the three questions directly from the results."""
+    per: Dict[str, Dict[str, Any]] = {}
+    for name, d in data.items():
+        if d.get("status") != "ok":
+            continue
+        cs, o, n = d["cohort_stats"], d["old"], d["new"]
+        nr = d.get("null_reference", {})
+        gap_new = n.get("auc_gap_per_partition_max")
+        rec = {
+            "label": d["label"],
+            "auroc": cs["auroc"],
+            "looks_good_on_auroc": bool(cs["auroc"] >= AUROC_LOOKS_GOOD),
+
+            "rel_old_fail": _exceeds(o["jss"], THR_JSS),
+            "rel_new_fail": _exceeds(n["jss"], THR_JSS),
+            "inc_old_fail": _exceeds(o["auc_gap_pooled"], THR_GAP),
+            "inc_new_fail": _exceeds(gap_new, THR_GAP),
+            "sen_old_fail": _exceeds(o["max_tfr"], THR_TFR),
+            "sen_new_fail": _exceeds(n["max_tfr_narrow"], THR_TFR),
+
+            "gap_observed": gap_new,
+            "gap_null_mean": nr.get("null_mean_gap"),
+            "gap_null_p95": nr.get("null_p95_gap"),
+            "gap_p": nr.get("p_value_vs_null"),
+            "gap_above_null_p95": nr.get("exceeds_null_p95"),
+            "gap_above_generic_p2_mean": (
+                None if gap_new is None
+                else bool(gap_new > P2_MEAN)
+            ),
+        }
+        rec["inc_evaluable"] = gap_new is not None
+        # An Inclusivity failure counts as *evidence* only if it survives both
+        # the corrected estimand and its own equality null.
+        rec["inc_evidential"] = bool(
+            rec["inc_new_fail"] and rec["gap_above_null_p95"]
+            and rec["gap_p"] is not None and rec["gap_p"] < 0.05
+        )
+        # The gap being *below* its own null expectation is worth naming: the
+        # statistic is then not merely unproven, it is smaller than what pure
+        # selection over subgroups produces at this geometry.
+        rec["gap_below_null_mean"] = (
+            None if (gap_new is None or rec["gap_null_mean"] is None)
+            else bool(gap_new < rec["gap_null_mean"])
+        )
+        # TFR and JSS never read y_true, so any failure there is by
+        # construction invisible to a discrimination metric.
+        rec["auroc_blind_inclusivity"] = bool(
+            rec["looks_good_on_auroc"] and rec["inc_evidential"])
+        rec["auroc_blind_sensitivity"] = bool(
+            rec["looks_good_on_auroc"] and rec["sen_new_fail"])
+        rec["auroc_blind_reliability"] = bool(
+            rec["looks_good_on_auroc"] and rec["rel_new_fail"])
+        per[name] = rec
+
+    def _names(pred) -> List[str]:
+        return [per[k]["label"] for k in ORDER if k in per and pred(per[k])]
+
+    return {
+        "auroc_looks_good_threshold": AUROC_LOOKS_GOOD,
+        "per_cohort": per,
+        "reliability_persists": _names(
+            lambda r: r["rel_old_fail"] and r["rel_new_fail"]),
+        "reliability_artifact": _names(
+            lambda r: r["rel_old_fail"] and r["rel_new_fail"] is False),
+        "inclusivity_persists": _names(
+            lambda r: r["inc_old_fail"] and r["inc_new_fail"]),
+        "inclusivity_artifact": _names(
+            lambda r: r["inc_old_fail"] and r["inc_new_fail"] is False),
+        "inclusivity_not_evaluable": _names(
+            lambda r: r["inc_old_fail"] and not r["inc_evaluable"]),
+        "sensitivity_persists": _names(
+            lambda r: r["sen_old_fail"] and r["sen_new_fail"]),
+        "sensitivity_artifact": _names(
+            lambda r: r["sen_old_fail"] and r["sen_new_fail"] is False),
+        "inclusivity_evidential": _names(lambda r: r["inc_evidential"]),
+        "inclusivity_failing_but_within_null": _names(
+            lambda r: r["inc_new_fail"] and not r["inc_evidential"]),
+        "inclusivity_gap_below_its_own_null": _names(
+            lambda r: r["gap_below_null_mean"] is True),
+        "auroc_blind_inclusivity": _names(lambda r: r["auroc_blind_inclusivity"]),
+        "auroc_blind_sensitivity": _names(lambda r: r["auroc_blind_sensitivity"]),
+        "auroc_blind_reliability": _names(lambda r: r["auroc_blind_reliability"]),
+    }
+
+
+#: p2 headline cell, 10 subgroups of 500.
+P2_MEAN = 0.08887413961480663
+P2_P95 = 0.1304391085449873
+
+
 def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
                    nulldf: pd.DataFrame, excl: pd.DataFrame) -> str:
     ok = summary[summary["status"] == "ok"] if len(summary) else summary
@@ -358,6 +455,86 @@ def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
              "against\": JSS ≥ 0.05, max per-partition ΔAUC > 0.05, max TFR > 10%. "
              "None of those cut-points has been calibrated against deployment "
              "outcomes.")
+    L.append("")
+
+    # ── the three answers ────────────────────────────────────────────────────
+    f = build_findings(data)
+    L.append("## The three questions, answered")
+    L.append("")
+
+    def _lst(key: str) -> str:
+        v = f[key]
+        return ", ".join(v) if v else "*none*"
+
+    L.append("### 1. Which failures persist under correct measurement, and "
+             "which were artifacts?")
+    L.append("")
+    L.append("| Dimension | Failed under 0.1.0 and still fails | "
+             "Failed under 0.1.0, passes under 0.2.0 (artifact) | "
+             "Failed under 0.1.0, no longer evaluable |")
+    L.append("|---|---|---|---|")
+    L.append(f"| Reliability (JSS ≥ 0.05) | {_lst('reliability_persists')} | "
+             f"{_lst('reliability_artifact')} | — |")
+    L.append(f"| Inclusivity (ΔAUC > 0.05) | {_lst('inclusivity_persists')} | "
+             f"{_lst('inclusivity_artifact')} | "
+             f"{_lst('inclusivity_not_evaluable')} |")
+    L.append(f"| Sensitivity (max TFR > 10%) | {_lst('sensitivity_persists')} | "
+             f"{_lst('sensitivity_artifact')} | — |")
+    L.append("")
+    L.append("\"No longer evaluable\" is not a pass. It means the n ≥ 30 rule, "
+             "now applied in the point estimate as well as the intervals, leaves "
+             "fewer than two estimable subgroups in every partition, so the "
+             "parity gap has no value at all. The 0.1.0 figure for such a cohort "
+             "was computed over subgroups the same release already knew were too "
+             "small to trust.")
+    L.append("")
+
+    L.append("### 2. For persistent failures, is the effect large relative to "
+             "the null?")
+    L.append("")
+    L.append(f"The generic reference from `verification/results/p2_summary.json` "
+             f"is mean **{P2_MEAN:.4f}** and p95 **{P2_P95:.4f}** at 10 subgroups "
+             f"of 500 under exact equality. Each cohort is additionally measured "
+             f"against a null built from its *own* partition geometry, which is "
+             f"the fairer comparison: a cohort of two-level partitions has a much "
+             f"smaller null than that grid cell, and a cohort with seven small "
+             f"race levels has a larger one.")
+    L.append("")
+    L.append(f"* Inclusivity gaps that clear both the 0.05 cut-point **and** "
+             f"their own cohort null (above p95, one-sided p < 0.05): "
+             f"**{_lst('inclusivity_evidential')}**.")
+    L.append(f"* Inclusivity gaps above 0.05 but **not** separable from the "
+             f"equality null: {_lst('inclusivity_failing_but_within_null')}. "
+             f"For these the number is consistent with selection bias over "
+             f"subgroups and is not evidence of disparity.")
+    L.append(f"* Cohorts whose measured gap is *below* its own null mean — "
+             f"i.e. smaller than what pure selection over subgroups produces at "
+             f"that geometry: {_lst('inclusivity_gap_below_its_own_null')}.")
+    L.append("")
+
+    L.append("### 3. Does any cohort still show a failure that aggregate AUROC "
+             "would miss?")
+    L.append("")
+    L.append(f"Taking \"AUROC would miss it\" to mean the model looks good on the "
+             f"aggregate number (AUROC ≥ {AUROC_LOOKS_GOOD:.2f}) while some "
+             f"dimension still exceeds its cut-point — and, for Inclusivity, "
+             f"survives its own equality null:")
+    L.append("")
+    L.append(f"* **Inclusivity**, evidential and AUROC-invisible: "
+             f"{_lst('auroc_blind_inclusivity')}")
+    L.append(f"* **Sensitivity** (max TFR > 10% on the narrow band): "
+             f"{_lst('auroc_blind_sensitivity')}")
+    L.append(f"* **Reliability** (JSS ≥ 0.05 on semantics-preserving "
+             f"perturbations only): {_lst('auroc_blind_reliability')}")
+    L.append("")
+    L.append("Threshold flip rate and JSS never read `y_true` at all — TFR is a "
+             "functional of the score CDF alone — so a failure on either is "
+             "*by construction* invisible to a discrimination metric. That is "
+             "the strongest form the claim can take, but it cuts both ways: the "
+             "same independence makes TFR gameable, since a constant predictor "
+             "scores a perfect 0 while being useless. TFR must be read next to "
+             "AUROC, never instead of it, and a TFR finding is weaker evidence "
+             "for the paper's thesis than an Inclusivity finding would be.")
     L.append("")
 
     # ── headline table ───────────────────────────────────────────────────────
@@ -488,11 +665,19 @@ def main() -> int:
             "cohorts": data,
         }, fh, indent=2)
 
+    findings = build_findings(data)
+    with open(RESULTS / "findings.json", "w", encoding="utf-8") as fh:
+        json.dump(findings, fh, indent=2)
+
     md = build_markdown(data, summary, nulldf, excl)
-    (RESULTS / "report_body.md").write_text(md, encoding="utf-8")
+    (REPO / "RECOMPUTED_RESULTS.md").write_text(md, encoding="utf-8")
     print(f"Wrote {RESULTS}/summary.csv, excluded_subgroups.csv, "
-          f"null_comparison.csv, summary.json, report_body.md")
+          f"null_comparison.csv, summary.json, findings.json")
+    print(f"Wrote {REPO / 'RECOMPUTED_RESULTS.md'}")
     print(f"Cohorts aggregated: {len(data)}")
+    missing = [c for c in ORDER if c not in data]
+    if missing:
+        print(f"MISSING cohorts (not yet run): {', '.join(missing)}")
     return 0
 
 
