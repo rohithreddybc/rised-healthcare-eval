@@ -226,16 +226,15 @@ def main():
     tfr_ci = (tuple(round(x*100, 1) for x in report.sensitivity.max_tfr_ci)
               if report.sensitivity.max_tfr_ci else None)
     print(f"  Sensitivity max TFR = {max_tfr*100:.1f}%  95% CI {tfr_ci}")
-    print(f"  Equity rho_need (y_true)        = "
-          f"{report.equity.need_prediction_correlation:.4f}  "
-          f"95% CI [{rho_y_ci[0]:.4f}, {rho_y_ci[1]:.4f}]")
+    # Equity against y_true is withdrawn: with a binary outcome proxy the
+    # statistic is an affine reparameterisation of AUROC (see rised.equity).
     print(f"  Equity rho_need (physhlth)      = "
           f"{eq_independent.need_prediction_correlation:.4f}  "
           f"95% CI [{rho_phys_ci[0]:.4f}, {rho_phys_ci[1]:.4f}]")
-    print(f"  Deployability latency = "
-          f"{report.deployability.mean_inference_latency_ms:.3f} ms")
-    f_top3 = report.deployability.explanation_faithfulness
-    print(f"  Deployability F_top3 = "
+    print(f"  Deployability batch scoring time (whole cohort) = "
+          f"{report.deployability.batch_scoring_time_ms:.3f} ms")
+    f_top3 = report.deployability.local_global_topk_agreement
+    print(f"  Deployability local-top1-in-global-topk = "
           f"{f_top3:.4f}" if f_top3 is not None else "  Deployability F_top3 = N/A (SHAP error)")
 
     return report, eq_independent

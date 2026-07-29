@@ -263,14 +263,13 @@ def main():
     tfr_ci = (tuple(round(x*100, 1) for x in report.sensitivity.max_tfr_ci)
               if report.sensitivity.max_tfr_ci else None)
     print(f"  Sensitivity max TFR = {max_tfr*100:.1f}%  95% CI {tfr_ci}")
-    print(f"  Equity rho_need (y_true)        = "
-          f"{report.equity.need_prediction_correlation:.4f}  "
-          f"95% CI [{rho_y_ci[0]:.4f}, {rho_y_ci[1]:.4f}]")
+    # Equity against y_true is withdrawn: with a binary outcome proxy the
+    # statistic is an affine reparameterisation of AUROC (see rised.equity).
     print(f"  Equity rho_need (gen-health)    = "
           f"{eq_independent.need_prediction_correlation:.4f}  "
           f"95% CI [{rho_gh_ci[0]:.4f}, {rho_gh_ci[1]:.4f}]")
-    print(f"  Deployability latency = "
-          f"{report.deployability.mean_inference_latency_ms:.3f} ms")
+    print(f"  Deployability batch scoring time (whole cohort) = "
+          f"{report.deployability.batch_scoring_time_ms:.3f} ms")
 
     return report, eq_independent
 

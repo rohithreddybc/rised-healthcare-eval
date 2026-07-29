@@ -109,8 +109,7 @@ def main():
             "DeltaAUC_CI": tuple(round(x, 4) for x in report.inclusivity.auc_gap_ci) if report.inclusivity.auc_gap_ci else None,
             "MaxTFR_pct": round(max_tfr * 100, 1),
             "MaxTFR_CI_pct": tuple(round(x*100, 1) for x in report.sensitivity.max_tfr_ci) if report.sensitivity.max_tfr_ci else None,
-            "rho_need(y_true)": round(report.equity.need_prediction_correlation, 3),
-            "latency_ms": round(report.deployability.mean_inference_latency_ms, 2),
+            "batch_scoring_ms": round(report.deployability.batch_scoring_time_ms, 2),
             "rised_eval_time_s": round(elapsed, 1),
         })
 

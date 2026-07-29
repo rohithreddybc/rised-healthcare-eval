@@ -22,13 +22,18 @@ systems.**
 RISED — **R**eliability, **I**nclusivity, **S**ensitivity, **E**quity,
 **D**eployability — is a measurement toolkit for high-stakes AI
 decision-support systems. Each of the five dimensions is operationalized
-as a metric, computed with bootstrap 95% confidence intervals and compared
-against a literature-derived reference threshold, packaged as an
-open-source Python library. A configurable advisory policy layer turns
-each metric/threshold comparison into a pass/fail flag for convenience —
-this is a configurable convention supplied by the library, not an
-empirically validated deployment-readiness determination, and RISED does
-not certify that a model is safe or cleared to deploy. The framework was
+as a metric computed with bootstrap 95% confidence intervals, packaged as an
+open-source Python library.
+
+The library is explicitly two-layered. The **measurement layer**
+(`rised.evaluate_all` and the `evaluate_*` functions) returns metrics and
+intervals and contains no thresholds. The **policy layer** (`rised.policy`)
+applies thresholds *you supply* and returns advisory verdicts. RISED ships no
+default cut-points, does not certify that a model is safe or cleared to deploy,
+and returns `INDETERMINATE` rather than a positive verdict whenever a dimension
+is missing, unconfigured, or its confidence interval straddles your threshold.
+The former `report.all_passed()` gate was withdrawn in 0.2.0 and now raises.
+The framework was
 developed for clinical AI (where the empirical evidence is densest and the
 regulatory discussion is most active) and is demonstrated on
 credit-scoring and hiring expert systems via the cross-domain demos in
@@ -106,18 +111,24 @@ part of a single, reproducible measurement pass.
 
 ## The Five Dimensions
 
-| Dimension | Primary metric | Pass threshold | Basis |
-|-----------|----------------|----------------|-------|
-| **R**eliability   | Judge Sensitivity Score (JSS) | < 0.05 | Steyerberg 2010; JudgeSense 2025 |
-| **I**nclusivity   | AUC parity gap Δ_AUC          | ≤ 0.05 | FDA AI/ML Action Plan 2021; AIF360 |
-| **S**ensitivity   | Max threshold flip rate (TFR) | ≤ 10%  | Wynants 2019 |
-| **E**quity        | Need-prediction ρ (Spearman)  | ≥ 0.70 | Cohen 1988; Obermeyer 2019 |
-| **D**eployability | Mean inference latency Λ      | ≤ 500 ms | Sutton 2020 |
+| Dimension | Primary measurement | Illustrative threshold (you supply) | Basis |
+|-----------|---------------------|-------------------------------------|-------|
+| **R**eliability   | Judge Sensitivity Score (JSS), and the **minimum** per-perturbation rank correlation | JSS < 0.05; min ρ ≥ 0.95 | Steyerberg 2010; JudgeSense 2025 |
+| **I**nclusivity   | Maximum **per-partition** AUC parity gap Δ_AUC | ≤ 0.05 | FDA AI/ML Action Plan 2021; AIF360 |
+| **S**ensitivity   | Max threshold flip rate (TFR) over the **narrow [0.30, 0.70] band** | ≤ 10%  | Wynants 2019 |
+| **E**quity        | Need-prediction ρ (Spearman) against an **independent** proxy, reported against its attainable ceiling | *no threshold* — diagnostic only | Cohen 1988; Obermeyer 2019 |
+| **D**eployability | Single-row latency; batch scoring time | ≤ 500 ms | Sutton 2020 |
 
-> The thresholds above are literature-derived conventions used as defaults
-> by the advisory policy layer. They are configurable, and RISED does not
-> assert that they have been empirically validated against observed
-> deployment outcomes.
+> **These are illustrative, not defaults.** `PolicyThresholds` fields default to
+> `None`; a dimension with no threshold configured is `NOT_CONFIGURED` and makes
+> the roll-up `INDETERMINATE`. None of these cut-points has been calibrated
+> against observed deployment outcomes.
+>
+> Equity carries no threshold at all. With a binary need proxy of prevalence
+> `p`, ρ is provably `√(12p(1−p))·(n/√(n²−1))·(AUC−0.5)` and is bounded by
+> `√(3p(1−p))`, so a fixed 0.70 target is **unattainable at any model quality**
+> outside `p ∈ [0.2056, 0.7944]`. The library reports the cohort's ceiling
+> instead, and **raises** if the supplied proxy is derived from `y_true`.
 
 ---
 
@@ -140,7 +151,12 @@ X_tr, X_te, y_tr, y_te, d_tr, d_te = train_test_split(
     X, y, demo, test_size=0.20, random_state=42, stratify=y)
 model = train_baseline_model(X_tr, y_tr)
 
-# 2. Define perturbations for the Reliability dimension
+# 2. Define perturbations for the Reliability dimension.
+#    Binary and categorical columns never receive continuous noise: the column
+#    types are inferred, or pass your own rised.perturbations.FeatureSchema.
+#    unit_rescaling is classified as covariate shift, not reliability, unless
+#    the factor is a documented unit conversion — so the two entries below are
+#    reported separately and excluded from JSS.
 specs = [
     {"type": "gaussian_noise", "scale": 0.05, "random_state": 0, "label": "noise_5pct"},
     {"type": "gaussian_noise", "scale": 0.10, "random_state": 1, "label": "noise_10pct"},
@@ -148,29 +164,43 @@ specs = [
     {"type": "unit_rescaling", "feature_index": 0, "factor": 1.06, "label": "age_+6pct"},
 ]
 
-# 3. Run all five dimensions with bootstrap CIs
+# 3. MEASUREMENT LAYER: run all five dimensions with bootstrap CIs.
+#    need_column is required for Equity; omit it and Equity is skipped with a
+#    recorded reason rather than silently falling back to y_true.
+#    Pass groups=<patient ids> when rows are repeated encounters.
 report = rised.evaluate_all(
     model, X_te, y_te, d_te,
     perturbation_specs=specs,
+    tau_ref=0.5,             # see rised.sensitivity.suggest_tau_ref
     random_state=42, n_bootstrap=1000,
 )
 
-# 4. Inspect the results
-print(report.summary())
-# {'reliability': False, 'inclusivity': False, 'sensitivity': False,
-#  'equity': True,  'deployability': True}
-
+print(report.measurement_summary())
 print(f"JSS = {report.reliability.judge_sensitivity_score:.4f} "
       f"95% CI {report.reliability.jss_ci}")
 # Expected output (random_state=42, B=1000):
-# JSS = 0.0644 95% CI (0.0576, 0.0704)
+# JSS = 0.0108 95% CI (0.0074, 0.0145)
+
+# 4. POLICY LAYER: your thresholds, advisory verdicts.
+from rised.policy import PolicyThresholds, evaluate_policy
+
+policy = evaluate_policy(report, PolicyThresholds(
+    max_judge_sensitivity_score=0.05,
+    min_rank_correlation=0.95,        # applied to the MINIMUM, not the mean
+    max_partition_auc_gap=0.05,
+    max_subgroup_ece=0.10,
+    max_threshold_flip_rate=0.10,
+    max_single_row_latency_ms=500.0,
+))
+print(policy.verdict_table())
+print(policy.explain())   # includes the advisory notice and every criterion
 ```
 
 A scorecard visualization is one call away:
 
 ```python
 from rised.visualization import plot_framework_dashboard
-fig = plot_framework_dashboard(report)
+fig = plot_framework_dashboard(report, thresholds)  # thresholds optional
 fig.savefig("scorecard.png", dpi=150)
 ```
 
@@ -183,39 +213,56 @@ fig.savefig("scorecard.png", dpi=150)
 The paper applies RISED's metric and bootstrap-CI functions to an XGBoost
 classifier (AUROC 0.961, Brier 0.073) on the 2,000-patient held-out test
 split. The table below reports BCa bootstrap confidence intervals computed
-from the library's estimator functions; the Status column follows the
-manuscript's own decision rule for that analysis (a metric whose CI
-excludes the reference threshold is marked PASS/FAIL, one whose CI spans
-it is marked INCONCLUSIVE). That decision rule is applied in the paper's
-analysis scripts — it is **not** the same computation as `report.summary()`
-above, which compares point estimates against the reference thresholds
-directly and does not apply a multiple-comparisons correction.
+from the library's estimator functions. The Status column is an **advisory**
+verdict under the illustrative thresholds above, using the CI rule (a metric
+whose CI excludes the threshold is MEETS / DOES NOT MEET; one whose CI spans it
+is INDETERMINATE). It is not a deployment determination.
 
-| Dimension | Value | 95% BCa CI | Status |
-|-----------|------:|:----------:|:------:|
-| JSS                       | 0.064  | [0.058, 0.070]   | **FAIL** |
-| Δ_AUC                     | 0.059  | [0.042, 0.066]   | **INCONCLUSIVE**¹ |
-| Max TFR                   | 19.9%  | [18.3%, 21.7%]   | **FAIL** |
-| ρ_need (outcome proxy)    | 0.732  | —                | DIAGNOSTIC² |
-| ρ_need (CCI proxy)        | 0.599  | —                | DIAGNOSTIC² |
-| Λ (per cohort)            | ~1 ms  | —                | PASS |
+> **Several of these numbers changed in 0.2.0, and the changes are not
+> cosmetic.** Both columns are shown so the difference is auditable.
 
-¹ BCa CI [0.042, 0.066] spans the 0.05 threshold → INCONCLUSIVE under the
-  manuscript's CI decision rule.
-² Equity is reported as a proxy-dependence diagnostic, not a stand-alone
-  gate: the two rows show how the verdict depends on which need proxy is
-  chosen, since no independently validated need measure was available for
-  this cohort.
+| Measurement | 0.1.0 value | 0.2.0 value | 95% BCa CI (0.2.0) | Advisory status |
+|-------------|------------:|------------:|:------------------:|:---------------:|
+| JSS (semantics-preserving only) | 0.064 | **0.011** | [0.007, 0.014] | MEETS |
+| Δ_AUC (max per-partition)       | 0.059 | **0.046** | [0.030, 0.056] | INDETERMINATE¹ |
+| Δ_AUC (pooled, diagnostic only) | 0.059 | 0.059 | — | — |
+| Max TFR (narrow band 0.30–0.70) | 19.9% | **7.9%** | [6.8%, 9.1%] | INDETERMINATE² |
+| Max TFR (wide band 0.10–0.90)   | 19.9% | 19.9% | — | secondary |
+| ρ_need (outcome proxy)          | 0.732 | **withdrawn**³ | — | — |
+| ρ_need (CCI proxy)              | 0.599 | 0.599 | — | DIAGNOSTIC |
+| Batch scoring time (10k rows)   | ~1 ms | 1.15 ms | — | — |
+| Single-row latency              | *not measured* | **0.38 ms** | — | MEETS |
+
+¹ CI [0.030, 0.056] spans 0.05.
+² CI [6.8%, 9.1%] lies below 10%; reported INDETERMINATE only if your threshold
+  falls inside it.
+³ Withdrawn under F8: with a binary outcome proxy the statistic is an affine
+  reparameterisation of AUROC and carries no independent information.
+
+**What changed and why.** The JSS drop from 0.064 to 0.011 is entirely due to
+reclassifying `age × 1.05` and `age × 1.06` as covariate shift: multiplying age
+by 5% produces a different patient, not a different encoding of the same
+patient. Those two perturbations, not the Gaussian noise, were driving the
+former Reliability failure — the earlier claim that the failure was "dominated
+by Gaussian noise perturbations" was wrong. The Δ_AUC drop reflects computing
+the range within each demographic column rather than pooling every level of
+every column. The Max TFR drop reflects reporting the narrow band as primary;
+the wide-band figure is unchanged and still reported. One subgroup
+(`age_group=18-44`, 1 positive of 371) is now explicitly listed in
+`excluded_subgroups` instead of being silently skipped.
 
 Bootstrap CIs from 1,000 iterations with `random_state=42`. Hardware-dependent
-latency reported on a single test machine.
+timings reported on a single test machine.
 
-The **Reliability** failure is dominated by Gaussian noise perturbations:
+Per-perturbation flip rates (semantics-preserving set):
 
 ![Reliability flip rates](docs/img/reliability.png)
 
-The **Sensitivity** failure spans the full threshold sweep, with peaks at
-operationally relevant boundaries (τ = 0.10 and τ ≥ 0.80):
+Threshold flip rate across the sweep. The peaks sit at τ = 0.10 and τ ≥ 0.80 —
+i.e. **outside** the narrow [0.30, 0.70] band that 0.2.0 reports as primary, so
+the headline Max TFR falls from 19.9% to 7.9%. Read TFR alongside a
+discrimination metric: it is a functional of the score CDF alone and never
+reads `y_true`, so a constant predictor attains a perfect TFR of 0.
 
 ![Threshold sweep](docs/img/threshold_sweep.png)
 
@@ -309,6 +356,13 @@ The framework has been re-run unchanged on six publicly available real-data clin
 | *Cross-domain:* Statlog German Credit | 1,000 | — | Credit risk | `python examples/german_credit_demo.py` |
 | *Cross-domain:* UCI Adult Income | 45,222 | 1994 | Income > $50k | `python examples/adult_income_demo.py` |
 | *Cross-domain:* Folktables ACS-Income | 20,000 | 2018 | Income > $50k | `python examples/folktables_acs_income_demo.py` |
+
+> **Note.** The external-cohort figures in this section were produced under
+> 0.1.0 and have not been recomputed under the 0.2.0 measurement changes. Every
+> quantity affected by F1 (per-partition gaps), F2 (consistent n≥30 exclusion),
+> F5 (narrow threshold band) and F6 (covariate shift excluded from JSS) will
+> move, in the same directions shown for the synthetic cohort above. Treat them
+> as 0.1.0 results pending a re-run of `python -m rised.reproduce_all`.
 
 The cohorts produce non-uniform pass/fail patterns across these within-cohort evaluations. On Diabetes 130, Reliability passes by three orders of magnitude (PSS = 0.0004) while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively; both NHIS cohorts and BRFSS 2024 reproduce the Inclusivity/Sensitivity failure, while NHANES 2021–2023 — with a complete laboratory feature set — reaches INCONCLUSIVE rather than outright failure. The same Reliability-pass / Sensitivity-fail / Inclusivity-fail pattern recurs on the three non-clinical cohorts, showing the protocol runs beyond healthcare data as well. The MIMIC-IV-ED integration (`examples/external_validation_mimic_ed.py`) runs end-to-end on the public MIMIC-IV-ED demo (again a within-cohort split); the full credentialed cohort is the priority next step.
 

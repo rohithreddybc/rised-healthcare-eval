@@ -162,12 +162,12 @@ def main():
     max_tfr = max(report.sensitivity.threshold_flip_rates.values())
     print(f"  Sensitivity max TFR = {max_tfr*100:.1f}%  "
           f"95% CI {tuple(round(x*100,1) for x in report.sensitivity.max_tfr_ci) if report.sensitivity.max_tfr_ci else None}")
-    print(f"  Equity rho_need (y_true)       = "
-          f"{report.equity.need_prediction_correlation:.4f}")
+    # Equity against y_true is withdrawn: with a binary outcome proxy the
+    # statistic is an affine reparameterisation of AUROC (see rised.equity).
     print(f"  Equity rho_need (education-num)= "
           f"{eq_independent.need_prediction_correlation:.4f}")
-    print(f"  Deployability latency = "
-          f"{report.deployability.mean_inference_latency_ms:.3f} ms")
+    print(f"  Deployability batch scoring time (whole cohort) = "
+          f"{report.deployability.batch_scoring_time_ms:.3f} ms")
 
     return report, eq_independent
 
