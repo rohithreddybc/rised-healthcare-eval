@@ -1,0 +1,485 @@
+{
+  "cohort": "brfss2024",
+  "label": "CDC BRFSS 2024 (CHD/MI)",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 35.101333800004795,
+  "cohort_stats": {
+    "n_total": 44888,
+    "n_train": 35910,
+    "n_test": 8978,
+    "n_features": 19,
+    "feature_names": [
+      "age_numeric",
+      "sex_male",
+      "bmi",
+      "genhlth",
+      "physhlth",
+      "menthlth",
+      "smoker",
+      "heavy_drink",
+      "phys_active",
+      "diabetes",
+      "asthma",
+      "stroke",
+      "kidney",
+      "copd",
+      "arthritis",
+      "depression",
+      "medcost",
+      "any_insurance",
+      "checkup_recent"
+    ],
+    "subgroup_columns": [
+      "age_group",
+      "sex",
+      "race",
+      "income",
+      "health_plan"
+    ],
+    "auroc": 0.767387074474338,
+    "brier": 0.14003660769259982,
+    "prevalence": 0.21073735798618845
+  },
+  "subgroup_counts": {
+    "age_group=45-54": {
+      "n": 1219,
+      "n_pos": 138,
+      "n_neg": 1081
+    },
+    "age_group=55-64": {
+      "n": 2049,
+      "n_pos": 383,
+      "n_neg": 1666
+    },
+    "age_group=65+": {
+      "n": 4821,
+      "n_pos": 1330,
+      "n_neg": 3491
+    },
+    "age_group=35-44": {
+      "n": 611,
+      "n_pos": 32,
+      "n_neg": 579
+    },
+    "age_group=25-34": {
+      "n": 234,
+      "n_pos": 9,
+      "n_neg": 225
+    },
+    "age_group=18-24": {
+      "n": 44,
+      "n_pos": 0,
+      "n_neg": 44
+    },
+    "sex=F": {
+      "n": 4484,
+      "n_pos": 744,
+      "n_neg": 3740
+    },
+    "sex=M": {
+      "n": 4494,
+      "n_pos": 1148,
+      "n_neg": 3346
+    },
+    "race=Black": {
+      "n": 970,
+      "n_pos": 162,
+      "n_neg": 808
+    },
+    "race=White": {
+      "n": 6510,
+      "n_pos": 1483,
+      "n_neg": 5027
+    },
+    "race=Asian": {
+      "n": 185,
+      "n_pos": 15,
+      "n_neg": 170
+    },
+    "race=AIAN": {
+      "n": 177,
+      "n_pos": 35,
+      "n_neg": 142
+    },
+    "race=Hispanic": {
+      "n": 818,
+      "n_pos": 126,
+      "n_neg": 692
+    },
+    "race=Multiracial": {
+      "n": 188,
+      "n_pos": 39,
+      "n_neg": 149
+    },
+    "race=NHPI": {
+      "n": 59,
+      "n_pos": 12,
+      "n_neg": 47
+    },
+    "race=Other": {
+      "n": 71,
+      "n_pos": 20,
+      "n_neg": 51
+    },
+    "income=$35-50K": {
+      "n": 1396,
+      "n_pos": 322,
+      "n_neg": 1074
+    },
+    "income=$15-25K": {
+      "n": 1179,
+      "n_pos": 299,
+      "n_neg": 880
+    },
+    "income=$50-100K": {
+      "n": 2634,
+      "n_pos": 531,
+      "n_neg": 2103
+    },
+    "income=>=$200K": {
+      "n": 398,
+      "n_pos": 42,
+      "n_neg": 356
+    },
+    "income=$25-35K": {
+      "n": 1212,
+      "n_pos": 291,
+      "n_neg": 921
+    },
+    "income=$100-200K": {
+      "n": 1500,
+      "n_pos": 230,
+      "n_neg": 1270
+    },
+    "income=<$15K": {
+      "n": 659,
+      "n_pos": 177,
+      "n_neg": 482
+    },
+    "health_plan=Insured": {
+      "n": 8765,
+      "n_pos": 1861,
+      "n_neg": 6904
+    },
+    "health_plan=Uninsured": {
+      "n": 213,
+      "n_pos": 31,
+      "n_neg": 182
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.06,
+      "label": "Age +6%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "physhlth_proxy (days of poor physical health)",
+    "class": "model_input",
+    "note": "A model input feature."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 591.0257833000505,
+    "jss": 0.03594898641122744,
+    "jss_ci": [
+      0.03316645143164937,
+      0.03855040942377763
+    ],
+    "rank_correlation_mean": 0.9208258299964545,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.05869904210291824,
+      "Noise +10%": 0.0598128759189129,
+      "Age +5%": 0.011583871686344397,
+      "Age +6%": 0.013700155936734239
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.8467724531220996,
+      "Noise +10%": 0.8459272565025688,
+      "Age +5%": 0.995602128314412,
+      "Age +6%": 0.9950014820467373
+    },
+    "auc_gap_pooled": 0.23344259342261564,
+    "auc_gap_ci": [
+      0.16422455946507852,
+      0.27221487176164944
+    ],
+    "subgroup_aucs": {
+      "age_group=45-54": 0.7676031318290901,
+      "age_group=55-64": 0.7599909415463314,
+      "age_group=65+": 0.7169120165064624,
+      "age_group=35-44": 0.7852979274611398,
+      "age_group=25-34": 0.7664197530864197,
+      "sex=F": 0.7656821416249786,
+      "sex=M": 0.752117042347095,
+      "race=Black": 0.7266226622662266,
+      "race=White": 0.7603314321141895,
+      "race=Asian": 0.7843137254901961,
+      "race=AIAN": 0.7692152917505031,
+      "race=Hispanic": 0.792744747224516,
+      "race=Multiracial": 0.8403028738599208,
+      "race=NHPI": 0.950354609929078,
+      "race=Other": 0.8813725490196078,
+      "income=$35-50K": 0.7430413384688342,
+      "income=$15-25K": 0.7567687747035574,
+      "income=$50-100K": 0.7656343328023011,
+      "income=>=$200K": 0.7834403424291065,
+      "income=$25-35K": 0.7400964885769613,
+      "income=$100-200K": 0.7862752482026704,
+      "income=<$15K": 0.783986215626978,
+      "health_plan=Insured": 0.7671663756823447,
+      "health_plan=Uninsured": 0.7562920950017724
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.11439153454187563,
+    "max_tfr": 0.6421251949209178,
+    "max_tfr_ci": [
+      0.6315437736689686,
+      0.6518123737519856
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.6421251949209178,
+      "0.15": 0.4878592114056583,
+      "0.2": 0.3658944085542437,
+      "0.25": 0.2682111828915126,
+      "0.3": 0.18300289596792157,
+      "0.35": 0.12241033637781243,
+      "0.4": 0.06593896190688349,
+      "0.45": 0.028736912452662064,
+      "0.5": 0.0,
+      "0.55": 0.022276676319893073,
+      "0.6": 0.03720204945422143,
+      "0.65": 0.049342838048563153,
+      "0.7": 0.05702829137892627,
+      "0.75": 0.061038093116507014,
+      "0.8": 0.06371129427489419,
+      "0.85": 0.06460236132768991,
+      "0.9": 0.06460236132768991
+    },
+    "equity_rho": 0.3777570468406232,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 3.8821810006629676,
+    "amortised_time_per_row_ms": 0.0004324104478350376,
+    "single_row_latency_ms": null,
+    "explanation_agreement": 0.86
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 414.12179070001,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "unclosed file <_io.BufferedReader name='C:\\\\Users\\\\rohit\\\\AppData\\\\Local\\\\Temp\\\\tmpzljjeo7m\\\\model.ubj'>"
+    ],
+    "jss": 0.009857429271552684,
+    "jss_ci": [
+      0.008353753619959901,
+      0.011695255067943864
+    ],
+    "rank_correlation_min": 0.994124479676944,
+    "rank_correlation_mean": 0.9955804762649909,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.008353753619959901,
+      "Noise +10%": 0.011361104923145467
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9970364728530378,
+      "Noise +10%": 0.994124479676944
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Age +6%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.011583871686344397,
+      "Age +6%": 0.013700155936734239
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.22373194766285143,
+    "auc_gap_ci": [
+      0.1425244999517884,
+      0.27874755189211525
+    ],
+    "auc_gap_pooled_diagnostic": 0.23344259342261564,
+    "per_partition_auc_gaps": {
+      "age_group": 0.06838591095467739,
+      "sex": 0.01356509927788363,
+      "race": 0.22373194766285143,
+      "income": 0.046178759625709054,
+      "health_plan": 0.01087428068057228
+    },
+    "worst_partition": "race",
+    "subgroup_aucs": {
+      "age_group=45-54": 0.7676031318290901,
+      "age_group=55-64": 0.7599909415463314,
+      "age_group=65+": 0.7169120165064624,
+      "age_group=35-44": 0.7852979274611398,
+      "age_group=25-34": 0.7664197530864197,
+      "sex=F": 0.7656821416249786,
+      "sex=M": 0.752117042347095,
+      "race=Black": 0.7266226622662266,
+      "race=White": 0.7603314321141895,
+      "race=Asian": 0.7843137254901961,
+      "race=AIAN": 0.7692152917505031,
+      "race=Hispanic": 0.792744747224516,
+      "race=Multiracial": 0.8403028738599208,
+      "race=NHPI": 0.950354609929078,
+      "race=Other": 0.8813725490196078,
+      "income=$35-50K": 0.7430413384688342,
+      "income=$15-25K": 0.7567687747035574,
+      "income=$50-100K": 0.7656343328023011,
+      "income=>=$200K": 0.7834403424291065,
+      "income=$25-35K": 0.7400964885769613,
+      "income=$100-200K": 0.7862752482026704,
+      "income=<$15K": 0.783986215626978,
+      "health_plan=Insured": 0.7671663756823447,
+      "health_plan=Uninsured": 0.7562920950017724
+    },
+    "excluded_subgroups": {
+      "age_group=18-24": "degenerate labels (n_pos=0, n_neg=44); AUC undefined"
+    },
+    "max_subgroup_ece": 0.11439153454187563,
+    "resampling": {
+      "clustered": false,
+      "n_rows": 8978,
+      "n_units": 8978
+    },
+    "max_tfr_narrow": 0.18300289596792157,
+    "max_tfr_narrow_ci": [
+      0.17555728880738455,
+      0.19124526620628202
+    ],
+    "max_tfr_wide": 0.6421251949209178,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.18300289596792157,
+      "0.35": 0.12241033637781243,
+      "0.4": 0.06593896190688349,
+      "0.45": 0.028736912452662064,
+      "0.5": 0.0,
+      "0.55": 0.022276676319893073,
+      "0.6": 0.03720204945422143,
+      "0.65": 0.049342838048563153,
+      "0.7": 0.05702829137892627
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.6421251949209178,
+      "0.15": 0.4878592114056583,
+      "0.2": 0.3658944085542437,
+      "0.25": 0.2682111828915126,
+      "0.3": 0.18300289596792157,
+      "0.35": 0.12241033637781243,
+      "0.4": 0.06593896190688349,
+      "0.45": 0.028736912452662064,
+      "0.5": 0.0,
+      "0.55": 0.022276676319893073,
+      "0.6": 0.03720204945422143,
+      "0.65": 0.049342838048563153,
+      "0.7": 0.05702829137892627,
+      "0.75": 0.061038093116507014,
+      "0.8": 0.06371129427489419,
+      "0.85": 0.06460236132768991,
+      "0.9": 0.06460236132768991
+    },
+    "batch_scoring_time_ms": 3.771700998186134,
+    "amortised_time_per_row_ms": 0.00042010481156005053,
+    "single_row_latency_ms": 0.4566000425256789,
+    "explanation_agreement": 0.78,
+    "explanation_chance_level": 0.15789473684210525,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": 0.40938607048555,
+    "equity_need_source": "physhlth_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 30,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "age_group",
+      "sex",
+      "race",
+      "income",
+      "health_plan"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.32936032594086784,
+    "youden_j": 0.20441192388534546
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.32936032594086784,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.2031632880374248,
+    "max_tfr_wide": 0.49599019826241925,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.14704815002970723,
+    "null_sd_gap": 0.046467274029333205,
+    "null_median_gap": 0.14145896856529272,
+    "null_p95_gap": 0.2337157604724026,
+    "null_p99_gap": 0.2814592943675236,
+    "observed_gap": 0.22373194766285143,
+    "p_value_vs_null": 0.06646676661669165,
+    "excess_over_null_mean": 0.0766837976331442,
+    "exceeds_null_p95": false,
+    "runtime_s": 14.188751800043974
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.16516386618711232,
+    "null_p95_gap": 0.25239463681453667,
+    "observed_gap": 0.23344259342261564,
+    "p_value_vs_null": 0.08995502248875563,
+    "excess_over_null_mean": 0.06827872723550332
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 1069.1586431000032,
+  "status": "ok"
+}

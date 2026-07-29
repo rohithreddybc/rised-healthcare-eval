@@ -1,0 +1,358 @@
+{
+  "cohort": "adult_income",
+  "label": "Cross-domain: UCI Adult Income",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 0.3393973999773152,
+  "cohort_stats": {
+    "n_total": 45222,
+    "n_train": 36177,
+    "n_test": 9045,
+    "n_features": 10,
+    "feature_names": [
+      "age",
+      "fnlwgt",
+      "education-num",
+      "capital-gain",
+      "capital-loss",
+      "hours-per-week",
+      "sex_bin",
+      "white_bin",
+      "married_bin",
+      "us_native_bin"
+    ],
+    "subgroup_columns": [
+      "sex",
+      "race",
+      "age_group"
+    ],
+    "auroc": 0.8901892734262303,
+    "brier": 0.11193002754534362,
+    "prevalence": 0.2478717523493643
+  },
+  "subgroup_counts": {
+    "sex=Male": {
+      "n": 6127,
+      "n_pos": 1879,
+      "n_neg": 4248
+    },
+    "sex=Female": {
+      "n": 2918,
+      "n_pos": 363,
+      "n_neg": 2555
+    },
+    "race=White": {
+      "n": 7779,
+      "n_pos": 2037,
+      "n_neg": 5742
+    },
+    "race=Asian-Pac-Islander": {
+      "n": 258,
+      "n_pos": 72,
+      "n_neg": 186
+    },
+    "race=Black": {
+      "n": 838,
+      "n_pos": 111,
+      "n_neg": 727
+    },
+    "race=Other": {
+      "n": 80,
+      "n_pos": 9,
+      "n_neg": 71
+    },
+    "race=Amer-Indian-Eskimo": {
+      "n": 90,
+      "n_pos": 13,
+      "n_neg": 77
+    },
+    "age_group=40+": {
+      "n": 3989,
+      "n_pos": 1430,
+      "n_neg": 2559
+    },
+    "age_group=<40": {
+      "n": 5056,
+      "n_pos": 812,
+      "n_neg": 4244
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 3,
+      "factor": 1.05,
+      "label": "Capital-gain +5%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "education_proxy (education-num)",
+    "class": "model_input",
+    "note": "A model input feature."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 279.06001319998177,
+    "jss": 0.011940298507462688,
+    "jss_ci": [
+      0.010668877833056938,
+      0.013349917081260366
+    ],
+    "rank_correlation_mean": 0.9964345418644381,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.01337755666113875,
+      "Noise +10%": 0.02863460475400774,
+      "Age +5%": 0.005417357656163626,
+      "Capital-gain +5%": 0.0003316749585406302
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9969999692738221,
+      "Noise +10%": 0.9887973439985785,
+      "Age +5%": 0.9999648161656879,
+      "Capital-gain +5%": 0.999976038019664
+    },
+    "auc_gap_pooled": 0.10805696843211499,
+    "auc_gap_ci": [
+      0.06769563588601374,
+      0.13622783153731494
+    ],
+    "subgroup_aucs": {
+      "sex=Male": 0.8649674166548902,
+      "sex=Female": 0.9226526068369157,
+      "race=White": 0.884937947860095,
+      "race=Asian-Pac-Islander": 0.87223715651135,
+      "race=Black": 0.9200465940493452,
+      "race=Other": 0.9311424100156493,
+      "race=Amer-Indian-Eskimo": 0.9530469530469531,
+      "age_group=40+": 0.8449899846148381,
+      "age_group=<40": 0.9122577571117497
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.07958821957244716,
+    "max_tfr": 0.33864013266998344,
+    "max_tfr_ci": [
+      0.32894053062557016,
+      0.3481833349469913
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.33864013266998344,
+      "0.15": 0.286677722498618,
+      "0.2": 0.23471531232725262,
+      "0.25": 0.18286346047540078,
+      "0.3": 0.1310116086235489,
+      "0.35": 0.08756218905472637,
+      "0.4": 0.049087893864013264,
+      "0.45": 0.020342730790491984,
+      "0.5": 0.0,
+      "0.55": 0.023327805417357655,
+      "0.6": 0.04776119402985075,
+      "0.65": 0.07352128247650636,
+      "0.7": 0.09463792150359314,
+      "0.75": 0.11597567716970703,
+      "0.8": 0.13178551686014373,
+      "0.85": 0.1482587064676617,
+      "0.9": 0.1589828634604754
+    },
+    "equity_rho": 0.5836136222624374,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 1.6368599981069565,
+    "amortised_time_per_row_ms": 0.00018096849066964694,
+    "single_row_latency_ms": null,
+    "explanation_agreement": null
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 238.66929700004403,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "SHAP explanation evaluation failed: Model type not yet supported by TreeExplainer: <class 'sklearn.pipeline.Pipeline'>. Explanation agreement metrics will be None."
+    ],
+    "jss": 0.018518518518518517,
+    "jss_ci": [
+      0.016417910447761194,
+      0.021006080707573243
+    ],
+    "rank_correlation_min": 0.9905511335108821,
+    "rank_correlation_mean": 0.9940297178010279,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.01205085682697623,
+      "Noise +10%": 0.024986180210060806
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9975083020911737,
+      "Noise +10%": 0.9905511335108821
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Capital-gain +5%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.005417357656163626,
+      "Capital-gain +5%": 0.0003316749585406302
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.08080979653560305,
+    "auc_gap_ci": [
+      0.05483308606118996,
+      0.11204419745439614
+    ],
+    "auc_gap_pooled_diagnostic": 0.10805696843211499,
+    "per_partition_auc_gaps": {
+      "sex": 0.05768519018202556,
+      "race": 0.08080979653560305,
+      "age_group": 0.06726777249691163
+    },
+    "worst_partition": "race",
+    "subgroup_aucs": {
+      "sex=Male": 0.8649674166548902,
+      "sex=Female": 0.9226526068369157,
+      "race=White": 0.884937947860095,
+      "race=Asian-Pac-Islander": 0.87223715651135,
+      "race=Black": 0.9200465940493452,
+      "race=Other": 0.9311424100156493,
+      "race=Amer-Indian-Eskimo": 0.9530469530469531,
+      "age_group=40+": 0.8449899846148381,
+      "age_group=<40": 0.9122577571117497
+    },
+    "excluded_subgroups": {},
+    "max_subgroup_ece": 0.07958821957244716,
+    "resampling": {
+      "clustered": false,
+      "n_rows": 9045,
+      "n_units": 9045
+    },
+    "max_tfr_narrow": 0.1310116086235489,
+    "max_tfr_narrow_ci": [
+      0.12384385632027717,
+      0.13797678275290215
+    ],
+    "max_tfr_wide": 0.33864013266998344,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.1310116086235489,
+      "0.35": 0.08756218905472637,
+      "0.4": 0.049087893864013264,
+      "0.45": 0.020342730790491984,
+      "0.5": 0.0,
+      "0.55": 0.023327805417357655,
+      "0.6": 0.04776119402985075,
+      "0.65": 0.07352128247650636,
+      "0.7": 0.09463792150359314
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.33864013266998344,
+      "0.15": 0.286677722498618,
+      "0.2": 0.23471531232725262,
+      "0.25": 0.18286346047540078,
+      "0.3": 0.1310116086235489,
+      "0.35": 0.08756218905472637,
+      "0.4": 0.049087893864013264,
+      "0.45": 0.020342730790491984,
+      "0.5": 0.0,
+      "0.55": 0.023327805417357655,
+      "0.6": 0.04776119402985075,
+      "0.65": 0.07352128247650636,
+      "0.7": 0.09463792150359314,
+      "0.75": 0.11597567716970703,
+      "0.8": 0.13178551686014373,
+      "0.85": 0.1482587064676617,
+      "0.9": 0.1589828634604754
+    },
+    "batch_scoring_time_ms": 1.8977729993639514,
+    "amortised_time_per_row_ms": 0.00020981459362785532,
+    "single_row_latency_ms": 0.1579000090714544,
+    "explanation_agreement": null,
+    "explanation_chance_level": 0.3,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": 0.5196082312686005,
+    "equity_need_source": "education_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 16,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "sex",
+      "race",
+      "age_group"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.39054240560181946,
+    "youden_j": 0.20146600996184733
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.39054240560181946,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.15046987285793256,
+    "max_tfr_wide": 0.282808181315644,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.07171586468473523,
+    "null_sd_gap": 0.03392955095318981,
+    "null_median_gap": 0.0673071267401662,
+    "null_p95_gap": 0.13597444801255829,
+    "null_p99_gap": 0.17707802115514515,
+    "observed_gap": 0.08080979653560305,
+    "p_value_vs_null": 0.3458270864567716,
+    "excess_over_null_mean": 0.00909393185086782,
+    "exceeds_null_p95": false,
+    "runtime_s": 9.408765800006222
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.07241449218183026,
+    "null_p95_gap": 0.13610652422509037,
+    "observed_gap": 0.10805696843211499,
+    "p_value_vs_null": 0.127936031984008,
+    "excess_over_null_mean": 0.03564247625028473
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 536.7166444999748,
+  "status": "ok"
+}

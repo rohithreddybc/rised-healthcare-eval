@@ -433,6 +433,15 @@ P2_MEAN = 0.08887413961480663
 P2_P95 = 0.1304391085449873
 
 
+def _max_jss(data: Dict[str, Dict[str, Any]]) -> float:
+    """Largest 0.2.0 JSS across all cohorts that ran."""
+    vals = [
+        d["new"]["jss"] for d in data.values()
+        if d.get("status") == "ok" and d["new"].get("jss") is not None
+    ]
+    return max(vals) if vals else float("nan")
+
+
 def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
                    nulldf: pd.DataFrame, excl: pd.DataFrame) -> str:
     ok = summary[summary["status"] == "ok"] if len(summary) else summary
@@ -459,13 +468,71 @@ def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
 
     # ── the three answers ────────────────────────────────────────────────────
     f = build_findings(data)
-    L.append("## The three questions, answered")
-    L.append("")
 
     def _lst(key: str) -> str:
         v = f[key]
         return ", ".join(v) if v else "*none*"
 
+    n_evid = len(f["inclusivity_evidential"])
+    n_clin_evid = len([
+        c for c in f["per_cohort"]
+        if f["per_cohort"][c]["inc_evidential"]
+        and c not in ("adult_income", "acs_income", "german_credit")
+    ])
+
+    L.append("## Bottom line")
+    L.append("")
+    L.append("**The corrections do not leave the empirical case standing in the "
+             "form the paper states it.**")
+    L.append("")
+    L.append("Under the corrected pipeline, on ten cohorts:")
+    L.append("")
+    L.append("* **Reliability fails nowhere.** Every 0.1.0 Reliability failure "
+             "was driven by the multiplicative age rescalings now reclassified as "
+             "covariate shift, plus Gaussian noise applied to binary and "
+             "categorical columns. With semantics-preserving perturbations only "
+             "and a typed schema, the highest JSS across all ten cohorts is "
+             f"{_max_jss(data):.4f}, against a 0.05 cut-point. The dimension "
+             "does not discriminate between these models at all.")
+    L.append(f"* **Inclusivity fails in name on {len(f['inclusivity_persists'])} "
+             f"cohorts, but only {n_evid} survives its own equality null.** "
+             f"That one is {_lst('inclusivity_evidential')} — a non-clinical "
+             f"cross-domain demo, at ΔAUC 0.053 against a 0.05 cut-point. "
+             f"**No clinical cohort produces an Inclusivity gap distinguishable "
+             f"from chance.** Two cohorts measure a gap *smaller* than what pure "
+             f"selection over their subgroups produces.")
+    L.append("* **Sensitivity still fails on several cohorts**, but max TFR "
+             "never reads `y_true`, so it cannot be read as a performance "
+             "failure at all, and a constant predictor scores a perfect 0 on it. "
+             "It is the weakest of the three as evidence.")
+    L.append("* **Equity is effectively unmeasured.** Nine of the ten proxies "
+             "are model input features and one is the outcome's own diagnostic "
+             "criterion. The single genuinely independent proxy in the whole "
+             "study — German Credit's savings status — gives ρ = −0.019, i.e. "
+             "nothing.")
+    L.append("")
+    L.append(f"The synthetic cohort's collapse (JSS 0.064→0.011, TFR "
+             f"19.9%→7.9%, ΔAUC 0.059→0.046) was not special to the synthetic "
+             f"cohort. The same three corrections, plus the equality null, "
+             f"remove {'all' if n_clin_evid == 0 else 'most'} of the clinical "
+             f"evidence too. The Diabetes 130 result the README calls "
+             f"\"decisive\" — ΔAUC 0.262, max TFR 49.1% — becomes ΔAUC 0.216 "
+             f"(p = 0.15 against its own null) and max TFR 1.4% once the patient "
+             f"identity is restored, the band is narrowed and the exclusion rule "
+             f"is applied consistently.")
+    L.append("")
+    L.append("What survives is narrower and worth stating precisely: **the "
+             "metrics do measure quantities that AUROC cannot see** — TFR and "
+             "JSS are functionals that never touch the labels. What the data no "
+             "longer supports is that those quantities **detect deployment-"
+             "relevant failures** in these cohorts. The instrument reads "
+             "something real; the readings on this evidence base are not "
+             "distinguishable from what an equal-performance model would "
+             "produce.")
+    L.append("")
+
+    L.append("## The three questions, answered")
+    L.append("")
     L.append("### 1. Which failures persist under correct measurement, and "
              "which were artifacts?")
     L.append("")
@@ -599,12 +666,22 @@ def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
              "above null p95? |")
     L.append("|---|---:|---:|---:|---:|---:|---:|---|")
     for _, r in nulldf.iterrows():
+        exc = r["excess_over_null_mean"]
+        exc_s = "—" if exc is None or not np.isfinite(exc) else f"{exc:+.4f}"
+        obs = r["observed_gap_per_partition"]
+        verdict = ("not evaluable" if obs is None or not np.isfinite(obs)
+                   else ("**yes**" if r["exceeds_null_p95"] else "no"))
         L.append(
             f"| {r['cohort']} | {int(r['n_included_subgroups'])} | "
-            f"{_fmt(r['observed_gap_per_partition'])} | "
+            f"{_fmt(obs)} | "
             f"{_fmt(r['cohort_null_mean'])} | {_fmt(r['cohort_null_p95'])} | "
-            f"{r['excess_over_null_mean']:+.4f} | {_fmt(r['p_value'], 3)} | "
-            f"{'**yes**' if r['exceeds_null_p95'] else 'no'} |")
+            f"{exc_s} | {_fmt(r['p_value'], 3)} | {verdict} |")
+    L.append("")
+    L.append("Read the p-value column first. Only one cohort is below 0.05. "
+             "Six measure a gap above the 0.05 cut-point that a model with "
+             "*identical* subgroup performance would produce at least 6.6% of "
+             "the time at that cohort's own geometry, and two measure a gap "
+             "smaller than the null average.")
     L.append("")
 
     # ── excluded subgroups ───────────────────────────────────────────────────
@@ -628,6 +705,112 @@ def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
             L.append(f"| {r['cohort']} | `{r['subgroup']}` | {r['n']} | "
                      f"{r['n_pos']} | {r['n_neg']} | {r['rule']} | "
                      f"{'**yes**' if r['in_old_point_estimate'] else 'no'} |")
+    L.append("")
+
+    # ── equity ───────────────────────────────────────────────────────────────
+    L.append("## Equity: what a valid proxy costs")
+    L.append("")
+    L.append("0.2.0 refuses `y_true` as the need proxy, because with a binary "
+             "outcome proxy ρ = √(12p(1−p))·(n/√(n²−1))·(AUROC−0.5) exactly, so "
+             "the statistic is an affine reparameterisation of discrimination "
+             "and cannot fail independently of it. Every 0.1.0 equity number in "
+             "the study was computed that way.")
+    L.append("")
+    L.append("Replacing it requires a proxy that is genuinely independent. Of "
+             "the ten cohorts, one has one.")
+    L.append("")
+    L.append("| Cohort | Proxy | Class | ρ (0.1.0, `y_true`) | ρ (0.2.0, proxy) | Note |")
+    L.append("|---|---|---|---:|---:|---|")
+    for name in ORDER:
+        d = data.get(name)
+        if d is None or d.get("status") != "ok":
+            continue
+        pv = d.get("proxy_validity") or {}
+        n = d["new"]
+        L.append(f"| {d['label']} | `{pv.get('column', '—')}` | "
+                 f"**{pv.get('class', '—')}** | {_fmt(d['old']['equity_rho'], 3)} | "
+                 f"{_fmt(n.get('equity_rho'), 3)} | {pv.get('note', '')} |")
+    L.append("")
+    L.append("`model_input` means the proxy is a legitimate measurement but also "
+             "one of the model's own predictors, so ρ partly measures the model "
+             "against its own input rather than against need. "
+             "`outcome_defining` means the proxy is part of the diagnostic "
+             "criterion for the outcome; the library's structural guard does not "
+             "reject it, but it is not outcome-independent in the sense F8 "
+             "requires, and Equity should be treated as **not evaluable** there. "
+             "Only `independent` supports the dimension as specified.")
+    L.append("")
+
+    # ── methodology and caveats ──────────────────────────────────────────────
+    L.append("## Method, and what would change the answer")
+    L.append("")
+    L.append("* **Both columns come from the same fitted model on the same "
+             "split.** Data preparation, split, seed and hyperparameters are "
+             "transcribed from the `examples/` scripts unchanged, so AUROC and "
+             "Brier are identical in both columns by construction and every "
+             "difference is a measurement difference.")
+    L.append("* **Diabetes 130 is the one deliberate departure.** `patient_nbr` "
+             "is retained and the split is a `GroupShuffleSplit` on it, with the "
+             "clustered bootstrap and delete-one-patient jackknife. Both the "
+             "0.1.0 and the 0.2.0 columns are computed on that group split so the "
+             "comparison still isolates the measurement change; the published "
+             "0.1.0 figures, which came from a row-level split that leaks 42.1% "
+             "of test rows, are reported separately in the per-cohort section.")
+    L.append("* **τ₀ = 0.5 is used for the headline** so the before/after "
+             "difference is attributable to the band change alone. Several "
+             "cohorts have prevalence near 0.1, where 0.5 is not an operating "
+             "point anyone would deploy; the prevalence-matched alternative is "
+             "reported per cohort as a point estimate.")
+    L.append("* **The equality null conditions on the observed scores.** It "
+             "permutes subgroup labels within outcome classes, so it holds every "
+             "subgroup's size and prevalence fixed and asks only whether the "
+             "measured spread exceeds what pure selection over that many groups "
+             "of those sizes produces. It reproduces the published p2 headline "
+             "cell to within 0.001 (`python -m recompute.null_reference`).")
+    L.append("* **No bootstrap replicates were reduced.** B = 1000 everywhere, "
+             "with the full delete-one-unit jackknife the BCa acceleration "
+             "requires. Nothing here is a shortened run.")
+    L.append("")
+
+    # ── offline availability and runtime ─────────────────────────────────────
+    L.append("### Offline availability and runtime")
+    L.append("")
+    ran = [n for n in ORDER if n in data and data[n].get("status") == "ok"]
+    failed = [n for n in ORDER if n in data and data[n].get("status") != "ok"]
+    notrun = [n for n in ORDER if n not in data]
+    L.append(f"All {len(ran)} cohorts ran offline from caches already in the "
+             f"working tree: the sklearn OpenML cache (UCI Heart, Diabetes 130, "
+             f"Adult, German Credit), `examples/adult24.csv`, "
+             f"`nhis_cache/adult23.csv`, `nhanes_cache/*.xpt`, "
+             f"`brfss_cache/LLCP2024.XPT` and `data/2018/1-Year/psam_p06.csv`. "
+             f"No cohort required network access.")
+    if failed:
+        L.append("")
+        L.append(f"**Did not complete:** {', '.join(failed)}.")
+    if notrun:
+        L.append("")
+        L.append(f"**Not run:** {', '.join(notrun)}.")
+    L.append("")
+    L.append("MIMIC-IV-ED is absent by necessity, not oversight: the full cohort "
+             "needs PhysioNet credentials, and only the public demo is present.")
+    L.append("")
+    L.append("| Cohort | test rows | wall clock |")
+    L.append("|---|---:|---:|")
+    tot = 0.0
+    for name in ORDER:
+        d = data.get(name)
+        if d is None or d.get("status") != "ok":
+            continue
+        rt = d.get("total_runtime_s") or 0.0
+        tot += rt
+        L.append(f"| {d['label']} | {d['cohort_stats']['n_test']:,} | "
+                 f"{rt/60:.1f} min |")
+    L.append(f"| **total CPU** | | **{tot/60:.0f} min** |")
+    L.append("")
+    L.append("Runtime is dominated by the BCa jackknife, which is delete-one-unit "
+             "and so costs O(n_test) replicates of an O(n_test) statistic — "
+             "quadratic in the test split. Run with `--jobs 5` the wall clock is "
+             "roughly the longest single cohort.")
     L.append("")
 
     # ── per-cohort detail ────────────────────────────────────────────────────

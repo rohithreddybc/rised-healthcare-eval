@@ -1,0 +1,314 @@
+{
+  "cohort": "uci_heart",
+  "label": "UCI Heart Disease (Cleveland)",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 1.8182259000022896,
+  "cohort_stats": {
+    "n_total": 303,
+    "n_train": 242,
+    "n_test": 61,
+    "n_features": 13,
+    "feature_names": [
+      "age",
+      "sex",
+      "cp",
+      "trestbps",
+      "chol",
+      "fbs",
+      "restecg",
+      "thalach",
+      "exang",
+      "oldpeak",
+      "slope",
+      "ca",
+      "thal"
+    ],
+    "subgroup_columns": [
+      "sex",
+      "age_group"
+    ],
+    "auroc": 0.8668831168831168,
+    "brier": 0.15034533349113555,
+    "prevalence": 0.5409836065573771
+  },
+  "subgroup_counts": {
+    "sex=M": {
+      "n": 42,
+      "n_pos": 17,
+      "n_neg": 25
+    },
+    "sex=F": {
+      "n": 19,
+      "n_pos": 16,
+      "n_neg": 3
+    },
+    "age_group=51-60": {
+      "n": 28,
+      "n_pos": 15,
+      "n_neg": 13
+    },
+    "age_group=>60": {
+      "n": 15,
+      "n_pos": 6,
+      "n_neg": 9
+    },
+    "age_group=<=50": {
+      "n": 18,
+      "n_pos": 12,
+      "n_neg": 6
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.06,
+      "label": "Age +6%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "chol_proxy (serum cholesterol)",
+    "class": "model_input",
+    "note": "A model input feature. Not outcome-derived, but not independent of the score either."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 11.425461900013033,
+    "jss": 0.0778688524590164,
+    "jss_ci": [
+      0.04098360655737705,
+      0.12295081967213115
+    ],
+    "rank_correlation_mean": 0.9351797990481225,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.08196721311475409,
+      "Noise +10%": 0.13114754098360656,
+      "Age +5%": 0.03278688524590164,
+      "Age +6%": 0.06557377049180328
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.8794288736118455,
+      "Noise +10%": 0.890111052353252,
+      "Age +5%": 0.9860920148069802,
+      "Age +6%": 0.9850872554204123
+    },
+    "auc_gap_pooled": 0.11833333333333329,
+    "auc_gap_ci": null,
+    "subgroup_aucs": {
+      "sex=M": 0.8400000000000001,
+      "sex=F": 0.9375,
+      "age_group=51-60": 0.8461538461538463,
+      "age_group=>60": 0.8518518518518519,
+      "age_group=<=50": 0.9583333333333334
+    },
+    "small_group_flags": [
+      "sex=F",
+      "age_group=51-60",
+      "age_group=>60",
+      "age_group=<=50"
+    ],
+    "max_subgroup_ece": 0.2501259687667091,
+    "max_tfr": 0.3442622950819672,
+    "max_tfr_ci": [
+      0.22826728958131998,
+      0.45901639344262296
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.11475409836065574,
+      "0.15": 0.08196721311475409,
+      "0.2": 0.04918032786885246,
+      "0.25": 0.03278688524590164,
+      "0.3": 0.03278688524590164,
+      "0.35": 0.01639344262295082,
+      "0.4": 0.01639344262295082,
+      "0.45": 0.01639344262295082,
+      "0.5": 0.0,
+      "0.55": 0.03278688524590164,
+      "0.6": 0.06557377049180328,
+      "0.65": 0.09836065573770492,
+      "0.7": 0.11475409836065574,
+      "0.75": 0.13114754098360656,
+      "0.8": 0.14754098360655737,
+      "0.85": 0.18032786885245902,
+      "0.9": 0.3442622950819672
+    },
+    "equity_rho": 0.6334070103184599,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 0.6110700021963567,
+    "amortised_time_per_row_ms": 0.010017541019612403,
+    "single_row_latency_ms": null,
+    "explanation_agreement": 0.76
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 0.394503400020767,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "unclosed file <_io.BufferedReader name='C:\\\\Users\\\\rohit\\\\AppData\\\\Local\\\\Temp\\\\tmpmry1o50h\\\\model.ubj'>"
+    ],
+    "jss": 0.03278688524590164,
+    "jss_ci": [
+      0.00819672131147541,
+      0.09016393442622951
+    ],
+    "rank_correlation_min": 0.9912215758857745,
+    "rank_correlation_mean": 0.9932046536224217,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.01639344262295082,
+      "Noise +10%": 0.04918032786885246
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.995187731359069,
+      "Noise +10%": 0.9912215758857745
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Age +6%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.03278688524590164,
+      "Age +6%": 0.06557377049180328
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": null,
+    "auc_gap_ci": null,
+    "auc_gap_pooled_diagnostic": null,
+    "per_partition_auc_gaps": {},
+    "worst_partition": null,
+    "subgroup_aucs": {
+      "sex=M": 0.8400000000000001
+    },
+    "excluded_subgroups": {
+      "sex=F": "n=19 < min_subgroup_n=30",
+      "age_group=51-60": "n=28 < min_subgroup_n=30",
+      "age_group=>60": "n=15 < min_subgroup_n=30",
+      "age_group=<=50": "n=18 < min_subgroup_n=30"
+    },
+    "max_subgroup_ece": 0.21357443515166996,
+    "resampling": {},
+    "max_tfr_narrow": 0.11475409836065574,
+    "max_tfr_narrow_ci": [
+      0.03278688524590164,
+      0.19672131147540983
+    ],
+    "max_tfr_wide": 0.3442622950819672,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.03278688524590164,
+      "0.35": 0.01639344262295082,
+      "0.4": 0.01639344262295082,
+      "0.45": 0.01639344262295082,
+      "0.5": 0.0,
+      "0.55": 0.03278688524590164,
+      "0.6": 0.06557377049180328,
+      "0.65": 0.09836065573770492,
+      "0.7": 0.11475409836065574
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.11475409836065574,
+      "0.15": 0.08196721311475409,
+      "0.2": 0.04918032786885246,
+      "0.25": 0.03278688524590164,
+      "0.3": 0.03278688524590164,
+      "0.35": 0.01639344262295082,
+      "0.4": 0.01639344262295082,
+      "0.45": 0.01639344262295082,
+      "0.5": 0.0,
+      "0.55": 0.03278688524590164,
+      "0.6": 0.06557377049180328,
+      "0.65": 0.09836065573770492,
+      "0.7": 0.11475409836065574,
+      "0.75": 0.13114754098360656,
+      "0.8": 0.14754098360655737,
+      "0.85": 0.18032786885245902,
+      "0.9": 0.3442622950819672
+    },
+    "batch_scoring_time_ms": 0.6401670008199289,
+    "amortised_time_per_row_ms": 0.010494540997048015,
+    "single_row_latency_ms": 0.4288500058464706,
+    "explanation_agreement": 0.6774193548387096,
+    "explanation_chance_level": 0.23076923076923078,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": -0.38334104664974916,
+    "equity_need_source": "chol_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 56,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "sex",
+      "age_group"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.8091410085803172,
+    "youden_j": 0.5149956345558167
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.8091410085803172,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.18032786885245902,
+    "max_tfr_wide": 0.26229508196721313,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 0,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": false,
+    "runtime_s": 0.27390039997408167
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.19964445031003852,
+    "null_p95_gap": 0.35185185185185186,
+    "observed_gap": 0.11833333333333329,
+    "p_value_vs_null": 0.8600699650174912,
+    "excess_over_null_mean": -0.08131111697670523
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 14.937030599976424,
+  "status": "ok"
+}

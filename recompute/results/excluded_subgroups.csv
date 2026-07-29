@@ -1,0 +1,11 @@
+cohort,subgroup,n,n_pos,n_neg,reason,rule,in_old_point_estimate
+synthetic,age_group=18-44,371,1,370,"degenerate labels (n_pos=1, n_neg=370); AUC undefined",degenerate labels,False
+uci_heart,age_group=51-60,28,15,13,n=28 < min_subgroup_n=30,n < 30,True
+uci_heart,age_group=<=50,18,12,6,n=18 < min_subgroup_n=30,n < 30,True
+uci_heart,age_group=>60,15,6,9,n=15 < min_subgroup_n=30,n < 30,True
+uci_heart,sex=F,19,16,3,n=19 < min_subgroup_n=30,n < 30,True
+diabetes130,age_group=[0-10),31,0,31,"degenerate labels (n_pos=0, n_neg=31); AUC undefined",degenerate labels,False
+nhis2024,race=NH-AIAN,23,0,23,n=23 < min_subgroup_n=30,n < 30,False
+nhis2024,race=NH-AIAN+other,17,1,16,n=17 < min_subgroup_n=30,n < 30,False
+nhis2024,race=NH-Other/Multi,18,0,18,n=18 < min_subgroup_n=30,n < 30,False
+brfss2024,age_group=18-24,44,0,44,"degenerate labels (n_pos=0, n_neg=44); AUC undefined",degenerate labels,False

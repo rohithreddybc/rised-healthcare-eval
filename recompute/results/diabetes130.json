@@ -1,0 +1,508 @@
+{
+  "cohort": "diabetes130",
+  "label": "UCI Diabetes 130-US Hospitals (grouped on patient_nbr)",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 4.217553200025577,
+  "cohort_stats": {
+    "n_total": 99492,
+    "n_train": 79602,
+    "n_test": 19890,
+    "n_features": 14,
+    "feature_names": [
+      "age_numeric",
+      "time_in_hospital",
+      "num_lab_procedures",
+      "num_procedures",
+      "num_medications",
+      "number_outpatient",
+      "number_emergency",
+      "number_inpatient",
+      "number_diagnoses",
+      "A1Cresult_encoded",
+      "max_glu_serum_encoded",
+      "change_encoded",
+      "diabetesMed_encoded",
+      "insulin_used"
+    ],
+    "subgroup_columns": [
+      "race",
+      "gender",
+      "age_group"
+    ],
+    "auroc": 0.6391657548413878,
+    "brier": 0.09938419898659913,
+    "prevalence": 0.1159376571141277,
+    "n_patients": 69667,
+    "n_test_patients": 13934,
+    "group_split_test_row_leakage": 0.0
+  },
+  "subgroup_counts": {
+    "race=Caucasian": {
+      "n": 15275,
+      "n_pos": 1803,
+      "n_neg": 13472
+    },
+    "race=AfricanAmerican": {
+      "n": 3809,
+      "n_pos": 437,
+      "n_neg": 3372
+    },
+    "race=Asian": {
+      "n": 96,
+      "n_pos": 8,
+      "n_neg": 88
+    },
+    "race=Other": {
+      "n": 308,
+      "n_pos": 32,
+      "n_neg": 276
+    },
+    "race=Hispanic": {
+      "n": 402,
+      "n_pos": 26,
+      "n_neg": 376
+    },
+    "gender=Male": {
+      "n": 9300,
+      "n_pos": 1072,
+      "n_neg": 8228
+    },
+    "gender=Female": {
+      "n": 10590,
+      "n_pos": 1234,
+      "n_neg": 9356
+    },
+    "age_group=[70-80)": {
+      "n": 5109,
+      "n_pos": 631,
+      "n_neg": 4478
+    },
+    "age_group=[60-70)": {
+      "n": 4392,
+      "n_pos": 505,
+      "n_neg": 3887
+    },
+    "age_group=[50-60)": {
+      "n": 3384,
+      "n_pos": 322,
+      "n_neg": 3062
+    },
+    "age_group=[20-30)": {
+      "n": 381,
+      "n_pos": 65,
+      "n_neg": 316
+    },
+    "age_group=[40-50)": {
+      "n": 1815,
+      "n_pos": 218,
+      "n_neg": 1597
+    },
+    "age_group=[30-40)": {
+      "n": 751,
+      "n_pos": 72,
+      "n_neg": 679
+    },
+    "age_group=[80-90)": {
+      "n": 3273,
+      "n_pos": 416,
+      "n_neg": 2857
+    },
+    "age_group=[0-10)": {
+      "n": 31,
+      "n_pos": 0,
+      "n_neg": 31
+    },
+    "age_group=[90-100)": {
+      "n": 624,
+      "n_pos": 66,
+      "n_neg": 558
+    },
+    "age_group=[10-20)": {
+      "n": 130,
+      "n_pos": 11,
+      "n_neg": 119
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.06,
+      "label": "Age +6%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "n_inpatient_proxy (prior inpatient visits)",
+    "class": "model_input",
+    "note": "A model input feature and the dominant predictor of readmission; rho largely re-expresses that dependence."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 947.0998890999472,
+    "jss": 0.0008044243338360985,
+    "jss_ci": [
+      0.0005530417295123177,
+      0.0010558069381598793
+    ],
+    "rank_correlation_mean": 0.9439022341719369,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.0017094017094017094,
+      "Noise +10%": 0.0015082956259426848,
+      "Age +5%": 0.0,
+      "Age +6%": 0.0
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.8899276925200422,
+      "Noise +10%": 0.8856812441677053,
+      "Age +5%": 1.0,
+      "Age +6%": 1.0
+    },
+    "auc_gap_pooled": 0.21604857190810633,
+    "auc_gap_ci": [
+      0.13397698213419132,
+      0.2584206844203733
+    ],
+    "subgroup_aucs": {
+      "race=Caucasian": 0.6410663130069572,
+      "race=AfricanAmerican": 0.6261065009731508,
+      "race=Asian": 0.7244318181818181,
+      "race=Other": 0.683990036231884,
+      "race=Hispanic": 0.6008592471358429,
+      "gender=Male": 0.631968378815693,
+      "gender=Female": 0.6454490934149504,
+      "age_group=[70-80)": 0.6113273273315785,
+      "age_group=[60-70)": 0.6155410138389706,
+      "age_group=[50-60)": 0.652951831912727,
+      "age_group=[20-30)": 0.7872444011684517,
+      "age_group=[40-50)": 0.7074043648354427,
+      "age_group=[30-40)": 0.6990877106856488,
+      "age_group=[80-90)": 0.5880769399046876,
+      "age_group=[90-100)": 0.5711958292603454,
+      "age_group=[10-20)": 0.744079449961803
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.0349524095793491,
+    "max_tfr": 0.4838109602815485,
+    "max_tfr_ci": [
+      0.47685707578088044,
+      0.49072628338548036
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.4838109602815485,
+      "0.15": 0.16334841628959276,
+      "0.2": 0.06209150326797386,
+      "0.25": 0.02473604826546003,
+      "0.3": 0.014228255404725993,
+      "0.35": 0.00889894419306184,
+      "0.4": 0.005128205128205128,
+      "0.45": 0.002212166918049271,
+      "0.5": 0.0,
+      "0.55": 0.000955253896430367,
+      "0.6": 0.001558572146807441,
+      "0.65": 0.0020613373554550026,
+      "0.7": 0.0024132730015082957,
+      "0.75": 0.00261437908496732,
+      "0.8": 0.00261437908496732,
+      "0.85": 0.00261437908496732,
+      "0.9": 0.00261437908496732
+    },
+    "equity_rho": 0.1543393649883723,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 7.4811800016323105,
+    "amortised_time_per_row_ms": 0.00037612770244506335,
+    "single_row_latency_ms": null,
+    "explanation_agreement": 0.98
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 687.9326696000062,
+    "tau_ref": 0.5,
+    "clustered_resampling": true,
+    "warnings": [
+      "unclosed file <_io.BufferedReader name='C:\\\\Users\\\\rohit\\\\AppData\\\\Local\\\\Temp\\\\tmpx1v176a1\\\\model.ubj'>"
+    ],
+    "jss": 0.0008295625942684767,
+    "jss_ci": [
+      0.0003984974109360682,
+      0.0018177539381675893
+    ],
+    "rank_correlation_min": 0.9217271887248438,
+    "rank_correlation_mean": 0.9217673720787367,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.0007541478129713424,
+      "Noise +10%": 0.0009049773755656109
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9218075554326296,
+      "Noise +10%": 0.9217271887248438
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Age +6%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.0,
+      "Age +6%": 0.0
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.21604857190810633,
+    "auc_gap_ci": [
+      0.1285768266594016,
+      0.2980791295798432
+    ],
+    "auc_gap_pooled_diagnostic": 0.21604857190810633,
+    "per_partition_auc_gaps": {
+      "race": 0.12357257104597519,
+      "gender": 0.01348071459925737,
+      "age_group": 0.21604857190810633
+    },
+    "worst_partition": "age_group",
+    "subgroup_aucs": {
+      "race=Caucasian": 0.6410663130069572,
+      "race=AfricanAmerican": 0.6261065009731508,
+      "race=Asian": 0.7244318181818181,
+      "race=Other": 0.683990036231884,
+      "race=Hispanic": 0.6008592471358429,
+      "gender=Male": 0.631968378815693,
+      "gender=Female": 0.6454490934149504,
+      "age_group=[70-80)": 0.6113273273315785,
+      "age_group=[60-70)": 0.6155410138389706,
+      "age_group=[50-60)": 0.652951831912727,
+      "age_group=[20-30)": 0.7872444011684517,
+      "age_group=[40-50)": 0.7074043648354427,
+      "age_group=[30-40)": 0.6990877106856488,
+      "age_group=[80-90)": 0.5880769399046876,
+      "age_group=[90-100)": 0.5711958292603454,
+      "age_group=[10-20)": 0.744079449961803
+    },
+    "excluded_subgroups": {
+      "age_group=[0-10)": "degenerate labels (n_pos=0, n_neg=31); AUC undefined"
+    },
+    "max_subgroup_ece": 0.0349524095793491,
+    "resampling": {
+      "clustered": true,
+      "n_rows": 19890,
+      "n_units": 13934,
+      "mean_rows_per_group": 1.4274436629826324,
+      "max_rows_per_group": 40
+    },
+    "max_tfr_narrow": 0.014228255404725993,
+    "max_tfr_narrow_ci": [
+      0.011520352283382333,
+      0.018558675579599972
+    ],
+    "max_tfr_wide": 0.4838109602815485,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.014228255404725993,
+      "0.35": 0.00889894419306184,
+      "0.4": 0.005128205128205128,
+      "0.45": 0.002212166918049271,
+      "0.5": 0.0,
+      "0.55": 0.000955253896430367,
+      "0.6": 0.001558572146807441,
+      "0.65": 0.0020613373554550026,
+      "0.7": 0.0024132730015082957
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.4838109602815485,
+      "0.15": 0.16334841628959276,
+      "0.2": 0.06209150326797386,
+      "0.25": 0.02473604826546003,
+      "0.3": 0.014228255404725993,
+      "0.35": 0.00889894419306184,
+      "0.4": 0.005128205128205128,
+      "0.45": 0.002212166918049271,
+      "0.5": 0.0,
+      "0.55": 0.000955253896430367,
+      "0.6": 0.001558572146807441,
+      "0.65": 0.0020613373554550026,
+      "0.7": 0.0024132730015082957,
+      "0.75": 0.00261437908496732,
+      "0.8": 0.00261437908496732,
+      "0.85": 0.00261437908496732,
+      "0.9": 0.00261437908496732
+    },
+    "batch_scoring_time_ms": 5.4072659969097,
+    "amortised_time_per_row_ms": 0.0002718585217149171,
+    "single_row_latency_ms": 0.467999983811751,
+    "explanation_agreement": 1.0,
+    "explanation_chance_level": 0.21428571428571427,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": 0.7574416863799052,
+    "equity_need_source": "n_inpatient_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 15,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "race",
+      "gender",
+      "age_group"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.1686272434684246,
+    "youden_j": 0.10971331596374512
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.1686272434684246,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.11573655103066868,
+    "max_tfr_wide": 0.37048768225238815,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.1547456716909847,
+    "null_sd_gap": 0.05855471877301035,
+    "null_median_gap": 0.14646460996411853,
+    "null_p95_gap": 0.26109372540569553,
+    "null_p99_gap": 0.3306478993081387,
+    "observed_gap": 0.21604857190810633,
+    "p_value_vs_null": 0.15342328835582209,
+    "excess_over_null_mean": 0.06130290021712165,
+    "exceeds_null_p95": false,
+    "runtime_s": 16.335493999999017
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.1732858028955187,
+    "null_p95_gap": 0.2926387032085561,
+    "observed_gap": 0.21604857190810633,
+    "p_value_vs_null": 0.2413793103448276,
+    "excess_over_null_mean": 0.04276276901258763
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "row_split_reference": {
+    "purpose": "Traceability for the published 0.1.0 figures, which were produced on a row-level split that puts the same patient in train and test.",
+    "row_leakage_fraction": 0.4211769435650033,
+    "n_test": 19899,
+    "auroc": 0.6362441499903329,
+    "brier": 0.09646314030759266,
+    "prevalence": 0.11226694808784361,
+    "old": {
+      "version": "0.1.0",
+      "runtime_s": 721.5911160000251,
+      "jss": 0.0003517764711794563,
+      "jss_ci": [
+        0.00020101512638826072,
+        0.0005402281521684506
+      ],
+      "rank_correlation_mean": 0.9431041047806389,
+      "per_perturbation_flip_rate": {
+        "Noise +5%": 0.0007035529423589126,
+        "Noise +10%": 0.0007035529423589126,
+        "Age +5%": 0.0,
+        "Age +6%": 0.0
+      },
+      "per_perturbation_rank_correlation": {
+        "Noise +5%": 0.8875189091687562,
+        "Noise +10%": 0.8848975099537992,
+        "Age +5%": 1.0,
+        "Age +6%": 1.0
+      },
+      "auc_gap_pooled": 0.26168049355181355,
+      "auc_gap_ci": [
+        0.10991970192723505,
+        0.34564405822122196
+      ],
+      "subgroup_aucs": {
+        "race=Caucasian": 0.6402561213606285,
+        "race=AfricanAmerican": 0.6172372681778039,
+        "race=Hispanic": 0.6856442577030812,
+        "race=Other": 0.5414034296028881,
+        "race=Asian": 0.7112299465240642,
+        "gender=Male": 0.6379402007420488,
+        "gender=Female": 0.6344147741260595,
+        "age_group=[40-50)": 0.6537548460490668,
+        "age_group=[70-80)": 0.6244380688167182,
+        "age_group=[60-70)": 0.6172566442014242,
+        "age_group=[80-90)": 0.5742732200793987,
+        "age_group=[50-60)": 0.651425006152124,
+        "age_group=[30-40)": 0.69129132810311,
+        "age_group=[90-100)": 0.6128823338926669,
+        "age_group=[10-20)": 0.7575757575757576,
+        "age_group=[20-30)": 0.8030839231547017
+      },
+      "small_group_flags": [],
+      "max_subgroup_ece": 0.03838366267199699,
+      "max_tfr": 0.49148198401929744,
+      "max_tfr_ci": [
+        0.48465826559159986,
+        0.49840002884105233
+      ],
+      "threshold_flip_rates": {
+        "0.1": 0.49148198401929744,
+        "0.15": 0.16714407759183877,
+        "0.2": 0.06849590431679983,
+        "0.25": 0.026835519372832805,
+        "0.3": 0.014824865571134228,
+        "0.35": 0.007337052113171517,
+        "0.4": 0.0035177647117945626,
+        "0.45": 0.0010553294135383687,
+        "0.5": 0.0,
+        "0.55": 0.0006532991607618473,
+        "0.6": 0.0010050756319413036,
+        "0.65": 0.0015578672295090206,
+        "0.7": 0.0017086285743002161,
+        "0.75": 0.0017086285743002161,
+        "0.8": 0.0017086285743002161,
+        "0.85": 0.0017086285743002161,
+        "0.9": 0.0017086285743002161
+      },
+      "equity_rho": 0.14899635379536724,
+      "equity_need_source": "y_true",
+      "batch_scoring_time_ms": 5.049700000672601,
+      "amortised_time_per_row_ms": 0.0002537665209645008,
+      "single_row_latency_ms": null,
+      "explanation_agreement": 1.0
+    }
+  },
+  "total_runtime_s": 2393.728950400022,
+  "status": "ok"
+}

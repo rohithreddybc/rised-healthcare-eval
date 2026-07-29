@@ -1,0 +1,337 @@
+{
+  "cohort": "acs_income",
+  "label": "Cross-domain: Folktables ACS-Income (CA 2018)",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 12.858454099972732,
+  "cohort_stats": {
+    "n_total": 20000,
+    "n_train": 16000,
+    "n_test": 4000,
+    "n_features": 10,
+    "feature_names": [
+      "AGEP",
+      "COW",
+      "SCHL",
+      "MAR",
+      "OCCP",
+      "POBP",
+      "RELP",
+      "WKHP",
+      "SEX",
+      "RAC1P"
+    ],
+    "subgroup_columns": [
+      "sex",
+      "race",
+      "age_group"
+    ],
+    "auroc": 0.8655797921192941,
+    "brier": 0.1456893189087324,
+    "prevalence": 0.4105
+  },
+  "subgroup_counts": {
+    "sex=Female": {
+      "n": 1898,
+      "n_pos": 669,
+      "n_neg": 1229
+    },
+    "sex=Male": {
+      "n": 2102,
+      "n_pos": 973,
+      "n_neg": 1129
+    },
+    "race=Non-White": {
+      "n": 1484,
+      "n_pos": 527,
+      "n_neg": 957
+    },
+    "race=White": {
+      "n": 2516,
+      "n_pos": 1115,
+      "n_neg": 1401
+    },
+    "age_group=40+": {
+      "n": 2179,
+      "n_pos": 1130,
+      "n_neg": 1049
+    },
+    "age_group=<40": {
+      "n": 1821,
+      "n_pos": 512,
+      "n_neg": 1309
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 7,
+      "factor": 1.05,
+      "label": "Hours-per-week +5%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "schl_proxy (educational attainment)",
+    "class": "model_input",
+    "note": "A model input feature."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 98.60246289998759,
+    "jss": 0.020749999999999998,
+    "jss_ci": [
+      0.017812500000000002,
+      0.0243125
+    ],
+    "rank_correlation_mean": 0.9988063255187917,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.011,
+      "Noise +10%": 0.0265,
+      "Age +5%": 0.01775,
+      "Hours-per-week +5%": 0.02775
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9990948447244234,
+      "Noise +10%": 0.9963891978045595,
+      "Age +5%": 0.9999077814941847,
+      "Hours-per-week +5%": 0.9998334780519991
+    },
+    "auc_gap_pooled": 0.052729798215596646,
+    "auc_gap_ci": [
+      0.02904471921924034,
+      0.07608440212578238
+    ],
+    "subgroup_aucs": {
+      "sex=Female": 0.8667752775781105,
+      "sex=Male": 0.8627727199488038,
+      "race=Non-White": 0.8580220843519933,
+      "race=White": 0.8677606962355524,
+      "age_group=40+": 0.8328408007626311,
+      "age_group=<40": 0.8855705989782278
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.0366390695918637,
+    "max_tfr": 0.39375,
+    "max_tfr_ci": [
+      0.37875,
+      0.40775
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.39375,
+      "0.15": 0.32675,
+      "0.2": 0.26525,
+      "0.25": 0.21875,
+      "0.3": 0.17575,
+      "0.35": 0.13275,
+      "0.4": 0.088,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.04075,
+      "0.6": 0.08075,
+      "0.65": 0.1185,
+      "0.7": 0.1575,
+      "0.75": 0.202,
+      "0.8": 0.24225,
+      "0.85": 0.28925,
+      "0.9": 0.335
+    },
+    "equity_rho": 0.6229759825335169,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 1.0465490003116429,
+    "amortised_time_per_row_ms": 0.00026163725007791075,
+    "single_row_latency_ms": null,
+    "explanation_agreement": null
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 72.78623550001066,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "SHAP explanation evaluation failed: Model type not yet supported by TreeExplainer: <class 'sklearn.pipeline.Pipeline'>. Explanation agreement metrics will be None."
+    ],
+    "jss": 0.018625,
+    "jss_ci": [
+      0.0155,
+      0.02225
+    ],
+    "rank_correlation_min": 0.9968424684892663,
+    "rank_correlation_mean": 0.9980121682345765,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.011,
+      "Noise +10%": 0.02625
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9991818679798867,
+      "Noise +10%": 0.9968424684892663
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Hours-per-week +5%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.01775,
+      "Hours-per-week +5%": 0.02775
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.052729798215596646,
+    "auc_gap_ci": [
+      0.027010843633697445,
+      0.07608440212578238
+    ],
+    "auc_gap_pooled_diagnostic": 0.052729798215596646,
+    "per_partition_auc_gaps": {
+      "sex": 0.00400255762930668,
+      "race": 0.009738611883559067,
+      "age_group": 0.052729798215596646
+    },
+    "worst_partition": "age_group",
+    "subgroup_aucs": {
+      "sex=Female": 0.8667752775781105,
+      "sex=Male": 0.8627727199488038,
+      "race=Non-White": 0.8580220843519933,
+      "race=White": 0.8677606962355524,
+      "age_group=40+": 0.8328408007626311,
+      "age_group=<40": 0.8855705989782278
+    },
+    "excluded_subgroups": {},
+    "max_subgroup_ece": 0.0366390695918637,
+    "resampling": {
+      "clustered": false,
+      "n_rows": 4000,
+      "n_units": 4000
+    },
+    "max_tfr_narrow": 0.17575,
+    "max_tfr_narrow_ci": [
+      0.16408174602510883,
+      0.18776613442306406
+    ],
+    "max_tfr_wide": 0.39375,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.17575,
+      "0.35": 0.13275,
+      "0.4": 0.088,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.04075,
+      "0.6": 0.08075,
+      "0.65": 0.1185,
+      "0.7": 0.1575
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.39375,
+      "0.15": 0.32675,
+      "0.2": 0.26525,
+      "0.25": 0.21875,
+      "0.3": 0.17575,
+      "0.35": 0.13275,
+      "0.4": 0.088,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.04075,
+      "0.6": 0.08075,
+      "0.65": 0.1185,
+      "0.7": 0.1575,
+      "0.75": 0.202,
+      "0.8": 0.24225,
+      "0.85": 0.28925,
+      "0.9": 0.335
+    },
+    "batch_scoring_time_ms": 1.061015001614578,
+    "amortised_time_per_row_ms": 0.0002652537504036445,
+    "single_row_latency_ms": 0.3346000157762319,
+    "explanation_agreement": null,
+    "explanation_chance_level": 0.3,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": 0.6373275101622573,
+    "equity_need_source": "schl_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 22,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "sex",
+      "race",
+      "age_group"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.477562096612527,
+    "youden_j": 0.39293981594406774
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.477562096612527,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.176,
+    "max_tfr_wide": 0.37525,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.015502212693115362,
+    "null_sd_gap": 0.006914242931705295,
+    "null_median_gap": 0.014736344399766954,
+    "null_p95_gap": 0.027716888162658573,
+    "null_p99_gap": 0.03399449599010634,
+    "observed_gap": 0.052729798215596646,
+    "p_value_vs_null": 0.0004997501249375312,
+    "excess_over_null_mean": 0.03722758552248129,
+    "exceeds_null_p95": true,
+    "runtime_s": 4.538864400004968
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.016013363999535877,
+    "null_p95_gap": 0.02805641297295623,
+    "observed_gap": 0.052729798215596646,
+    "p_value_vs_null": 0.0004997501249375312,
+    "excess_over_null_mean": 0.03671643421606077
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 193.3181414999999,
+  "status": "ok"
+}

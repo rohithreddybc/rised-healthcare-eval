@@ -1,0 +1,393 @@
+{
+  "cohort": "nhanes2123",
+  "label": "NCHS NHANES 2021-2023 (diabetes, with lab HbA1c)",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 0.3729049999965355,
+  "cohort_stats": {
+    "n_total": 4096,
+    "n_train": 3276,
+    "n_test": 820,
+    "n_features": 14,
+    "feature_names": [
+      "age",
+      "sex_male",
+      "bmi",
+      "hba1c",
+      "chol",
+      "sbp",
+      "dbp",
+      "htn_dx",
+      "ever_smoked",
+      "heavy_drink",
+      "inactive",
+      "chd_dx",
+      "stroke_dx",
+      "insured_num"
+    ],
+    "subgroup_columns": [
+      "age_group",
+      "sex",
+      "race",
+      "insured"
+    ],
+    "auroc": 0.9638882699138823,
+    "brier": 0.03983207078899879,
+    "prevalence": 0.13048780487804879
+  },
+  "subgroup_counts": {
+    "age_group=65+": {
+      "n": 219,
+      "n_pos": 37,
+      "n_neg": 182
+    },
+    "age_group=50-64": {
+      "n": 254,
+      "n_pos": 49,
+      "n_neg": 205
+    },
+    "age_group=18-34": {
+      "n": 198,
+      "n_pos": 9,
+      "n_neg": 189
+    },
+    "age_group=35-49": {
+      "n": 149,
+      "n_pos": 12,
+      "n_neg": 137
+    },
+    "sex=Female": {
+      "n": 427,
+      "n_pos": 50,
+      "n_neg": 377
+    },
+    "sex=Male": {
+      "n": 393,
+      "n_pos": 57,
+      "n_neg": 336
+    },
+    "race=NH-White": {
+      "n": 517,
+      "n_pos": 51,
+      "n_neg": 466
+    },
+    "race=NH-Black": {
+      "n": 93,
+      "n_pos": 24,
+      "n_neg": 69
+    },
+    "race=NH-Other": {
+      "n": 79,
+      "n_pos": 10,
+      "n_neg": 69
+    },
+    "race=Other-Hispanic": {
+      "n": 80,
+      "n_pos": 14,
+      "n_neg": 66
+    },
+    "race=Mexican-American": {
+      "n": 51,
+      "n_pos": 8,
+      "n_neg": 43
+    },
+    "insured=Insured": {
+      "n": 752,
+      "n_pos": 101,
+      "n_neg": 651
+    },
+    "insured=Uninsured": {
+      "n": 68,
+      "n_pos": 6,
+      "n_neg": 62
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 0,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 3,
+      "factor": 1.08,
+      "label": "HbA1c +8%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "hba1c_proxy (HbA1c)",
+    "class": "outcome_defining",
+    "note": "HbA1c >= 6.5% is the diagnostic criterion for the outcome (diabetes) and is also a model input. The proxy is not outcome-INDEPENDENT in the sense F8 requires, even though the library's structural guard does not reject it. Equity should be treated as not evaluable on this cohort."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 67.85181670001475,
+    "jss": 0.026524390243902442,
+    "jss_ci": [
+      0.019817073170731708,
+      0.03323170731707317
+    ],
+    "rank_correlation_mean": 0.9645816962449438,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.01707317073170732,
+      "Noise +10%": 0.020731707317073172,
+      "Age +5%": 0.006097560975609756,
+      "HbA1c +8%": 0.06219512195121951
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9703451119451831,
+      "Noise +10%": 0.9473934520368079,
+      "Age +5%": 0.9842549550242814,
+      "HbA1c +8%": 0.9563332659735024
+    },
+    "auc_gap_pooled": 0.07484407484407485,
+    "auc_gap_ci": [
+      0.03738937371757251,
+      0.14072391363823317
+    ],
+    "subgroup_aucs": {
+      "age_group=65+": 0.9251559251559252,
+      "age_group=50-64": 0.9630662020905923,
+      "age_group=18-34": 1.0,
+      "age_group=35-49": 0.9653284671532847,
+      "sex=Female": 0.9527320954907162,
+      "sex=Male": 0.9730576441102756,
+      "race=NH-White": 0.952453084237987,
+      "race=NH-Black": 0.946256038647343,
+      "race=NH-Other": 0.9927536231884058,
+      "race=Other-Hispanic": 0.9805194805194805,
+      "race=Mexican-American": 0.9912790697674418,
+      "insured=Insured": 0.9617800489726394,
+      "insured=Uninsured": 0.9946236559139785
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.06994396081427112,
+    "max_tfr": 0.0975609756097561,
+    "max_tfr_ci": [
+      0.07804878048780488,
+      0.11621817295568473
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.0975609756097561,
+      "0.15": 0.07073170731707316,
+      "0.2": 0.05609756097560976,
+      "0.25": 0.041463414634146344,
+      "0.3": 0.02926829268292683,
+      "0.35": 0.02195121951219512,
+      "0.4": 0.018292682926829267,
+      "0.45": 0.00853658536585366,
+      "0.5": 0.0,
+      "0.55": 0.006097560975609756,
+      "0.6": 0.00975609756097561,
+      "0.65": 0.01951219512195122,
+      "0.7": 0.02195121951219512,
+      "0.75": 0.026829268292682926,
+      "0.8": 0.03170731707317073,
+      "0.85": 0.036585365853658534,
+      "0.9": 0.054878048780487805
+    },
+    "equity_rho": 0.5412864284296152,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 0.8798270020633936,
+    "amortised_time_per_row_ms": 0.0010729597586138946,
+    "single_row_latency_ms": null,
+    "explanation_agreement": 1.0
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 36.113373500003945,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "unclosed file <_io.BufferedReader name='C:\\\\Users\\\\rohit\\\\AppData\\\\Local\\\\Temp\\\\tmpt355r9en\\\\model.ubj'>"
+    ],
+    "jss": 0.010365853658536586,
+    "jss_ci": [
+      0.0060975609756097554,
+      0.015853658536585366
+    ],
+    "rank_correlation_min": 0.9615988895095279,
+    "rank_correlation_mean": 0.9713334623943339,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.006097560975609756,
+      "Noise +10%": 0.014634146341463415
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.98106803527914,
+      "Noise +10%": 0.9615988895095279
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "HbA1c +8%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.006097560975609756,
+      "HbA1c +8%": 0.06219512195121951
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.07484407484407485,
+    "auc_gap_ci": [
+      0.03771781373233712,
+      0.14309906526575988
+    ],
+    "auc_gap_pooled_diagnostic": 0.07484407484407485,
+    "per_partition_auc_gaps": {
+      "age_group": 0.07484407484407485,
+      "sex": 0.020325548619559375,
+      "race": 0.046497584541062786,
+      "insured": 0.03284360694133914
+    },
+    "worst_partition": "age_group",
+    "subgroup_aucs": {
+      "age_group=65+": 0.9251559251559252,
+      "age_group=50-64": 0.9630662020905923,
+      "age_group=18-34": 1.0,
+      "age_group=35-49": 0.9653284671532847,
+      "sex=Female": 0.9527320954907162,
+      "sex=Male": 0.9730576441102756,
+      "race=NH-White": 0.952453084237987,
+      "race=NH-Black": 0.946256038647343,
+      "race=NH-Other": 0.9927536231884058,
+      "race=Other-Hispanic": 0.9805194805194805,
+      "race=Mexican-American": 0.9912790697674418,
+      "insured=Insured": 0.9617800489726394,
+      "insured=Uninsured": 0.9946236559139785
+    },
+    "excluded_subgroups": {},
+    "max_subgroup_ece": 0.06994396081427112,
+    "resampling": {
+      "clustered": false,
+      "n_rows": 820,
+      "n_units": 820
+    },
+    "max_tfr_narrow": 0.02926829268292683,
+    "max_tfr_narrow_ci": [
+      0.01951219512195122,
+      0.04024390243902439
+    ],
+    "max_tfr_wide": 0.0975609756097561,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.02926829268292683,
+      "0.35": 0.02195121951219512,
+      "0.4": 0.018292682926829267,
+      "0.45": 0.00853658536585366,
+      "0.5": 0.0,
+      "0.55": 0.006097560975609756,
+      "0.6": 0.00975609756097561,
+      "0.65": 0.01951219512195122,
+      "0.7": 0.02195121951219512
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.0975609756097561,
+      "0.15": 0.07073170731707316,
+      "0.2": 0.05609756097560976,
+      "0.25": 0.041463414634146344,
+      "0.3": 0.02926829268292683,
+      "0.35": 0.02195121951219512,
+      "0.4": 0.018292682926829267,
+      "0.45": 0.00853658536585366,
+      "0.5": 0.0,
+      "0.55": 0.006097560975609756,
+      "0.6": 0.00975609756097561,
+      "0.65": 0.01951219512195122,
+      "0.7": 0.02195121951219512,
+      "0.75": 0.026829268292682926,
+      "0.8": 0.03170731707317073,
+      "0.85": 0.036585365853658534,
+      "0.9": 0.054878048780487805
+    },
+    "batch_scoring_time_ms": 0.823546999017708,
+    "amortised_time_per_row_ms": 0.0010043256085581806,
+    "single_row_latency_ms": 0.44239999260753393,
+    "explanation_agreement": 1.0,
+    "explanation_chance_level": 0.21428571428571427,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": 0.8256992781512542,
+    "equity_need_source": "hba1c_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 62,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "age_group",
+      "sex",
+      "race",
+      "insured"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.4506258489518631,
+    "youden_j": 0.24808426201343536
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.4506258489518631,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.02926829268292683,
+    "max_tfr_wide": 0.09024390243902439,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.06850226152356599,
+    "null_sd_gap": 0.025210182938182023,
+    "null_median_gap": 0.06253496503684702,
+    "null_p95_gap": 0.11773719245028645,
+    "null_p99_gap": 0.15192226833068043,
+    "observed_gap": 0.07484407484407485,
+    "p_value_vs_null": 0.3118440779610195,
+    "excess_over_null_mean": 0.006341813320508857,
+    "exceeds_null_p95": false,
+    "runtime_s": 2.801485900010448
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.07625370267496191,
+    "null_p95_gap": 0.1263754606777047,
+    "observed_gap": 0.07484407484407485,
+    "p_value_vs_null": 0.42828585707146427,
+    "excess_over_null_mean": -0.0014096278308870641
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 109.98896329995478,
+  "status": "ok"
+}

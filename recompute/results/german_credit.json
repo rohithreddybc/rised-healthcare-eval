@@ -1,0 +1,321 @@
+{
+  "cohort": "german_credit",
+  "label": "Cross-domain: Statlog German Credit",
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "load_runtime_s": 0.12737030000425875,
+  "cohort_stats": {
+    "n_total": 1000,
+    "n_train": 800,
+    "n_test": 200,
+    "n_features": 11,
+    "feature_names": [
+      "duration",
+      "credit_amount",
+      "installment_commitment",
+      "residence_since",
+      "age",
+      "existing_credits",
+      "num_dependents",
+      "sex_bin",
+      "owns_property_bin",
+      "foreign_bin",
+      "job_skilled_bin"
+    ],
+    "subgroup_columns": [
+      "sex",
+      "age_group"
+    ],
+    "auroc": 0.6545238095238095,
+    "brier": 0.1967865044484779,
+    "prevalence": 0.7
+  },
+  "subgroup_counts": {
+    "sex=Male": {
+      "n": 140,
+      "n_pos": 100,
+      "n_neg": 40
+    },
+    "sex=Female": {
+      "n": 60,
+      "n_pos": 40,
+      "n_neg": 20
+    },
+    "age_group=40+": {
+      "n": 68,
+      "n_pos": 45,
+      "n_neg": 23
+    },
+    "age_group=<40": {
+      "n": 132,
+      "n_pos": 95,
+      "n_neg": 37
+    }
+  },
+  "perturbation_specs": [
+    {
+      "type": "gaussian_noise",
+      "scale": 0.05,
+      "random_state": 0,
+      "label": "Noise +5%"
+    },
+    {
+      "type": "gaussian_noise",
+      "scale": 0.1,
+      "random_state": 1,
+      "label": "Noise +10%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 4,
+      "factor": 1.05,
+      "label": "Age +5%"
+    },
+    {
+      "type": "unit_rescaling",
+      "feature_index": 1,
+      "factor": 1.05,
+      "label": "Credit-amount +5%"
+    }
+  ],
+  "proxy_validity": {
+    "column": "savings_proxy (savings-status ordinal)",
+    "class": "independent",
+    "note": "Carried alongside the split and never given to the model. The only genuinely independent proxy in the study."
+  },
+  "old": {
+    "version": "0.1.0",
+    "runtime_s": 18.85916640004143,
+    "jss": 0.00875,
+    "jss_ci": [
+      0.0025,
+      0.02125
+    ],
+    "rank_correlation_mean": 0.9983237080927023,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.005,
+      "Noise +10%": 0.015,
+      "Age +5%": 0.005,
+      "Credit-amount +5%": 0.01
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9986364659116479,
+      "Noise +10%": 0.9952253806345159,
+      "Age +5%": 0.999692492312308,
+      "Credit-amount +5%": 0.999740493512338
+    },
+    "auc_gap_pooled": 0.05871980676328503,
+    "auc_gap_ci": [
+      0.007391641810346648,
+      0.09911669850417176
+    ],
+    "subgroup_aucs": {
+      "sex=Male": 0.663,
+      "sex=Female": 0.635,
+      "age_group=40+": 0.693719806763285,
+      "age_group=<40": 0.6645803698435278
+    },
+    "small_group_flags": [],
+    "max_subgroup_ece": 0.09970926494803843,
+    "max_tfr": 0.885,
+    "max_tfr_ci": [
+      0.8284922872469858,
+      0.92
+    ],
+    "threshold_flip_rates": {
+      "0.1": 0.07,
+      "0.15": 0.07,
+      "0.2": 0.07,
+      "0.25": 0.07,
+      "0.3": 0.065,
+      "0.35": 0.06,
+      "0.4": 0.055,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.07,
+      "0.6": 0.165,
+      "0.65": 0.27,
+      "0.7": 0.375,
+      "0.75": 0.51,
+      "0.8": 0.695,
+      "0.85": 0.83,
+      "0.9": 0.885
+    },
+    "equity_rho": 0.2453020092772689,
+    "equity_need_source": "y_true",
+    "batch_scoring_time_ms": 0.1987559994449839,
+    "amortised_time_per_row_ms": 0.0009937799972249196,
+    "single_row_latency_ms": null,
+    "explanation_agreement": null
+  },
+  "new": {
+    "version": "0.2.0",
+    "runtime_s": 8.265588099951856,
+    "tau_ref": 0.5,
+    "clustered_resampling": false,
+    "warnings": [
+      "SHAP explanation evaluation failed: Model type not yet supported by TreeExplainer: <class 'sklearn.pipeline.Pipeline'>. Explanation agreement metrics will be None."
+    ],
+    "jss": 0.0025,
+    "jss_ci": [
+      0.0,
+      0.0075
+    ],
+    "rank_correlation_min": 0.9974409360234008,
+    "rank_correlation_mean": 0.9983657091427287,
+    "per_perturbation_flip_rate": {
+      "Noise +5%": 0.0,
+      "Noise +10%": 0.005
+    },
+    "per_perturbation_rank_correlation": {
+      "Noise +5%": 0.9992904822620567,
+      "Noise +10%": 0.9974409360234008
+    },
+    "perturbation_classes": {
+      "Noise +5%": "semantics_preserving",
+      "Noise +10%": "semantics_preserving",
+      "Age +5%": "covariate_shift",
+      "Credit-amount +5%": "covariate_shift"
+    },
+    "n_semantics_preserving": 2,
+    "n_covariate_shift": 2,
+    "covariate_shift_flip_rate": {
+      "Age +5%": 0.005,
+      "Credit-amount +5%": 0.01
+    },
+    "reliability_status": "evaluated",
+    "auc_gap_per_partition_max": 0.02913943691975729,
+    "auc_gap_ci": [
+      0.0014052650296799657,
+      0.04244814211600012
+    ],
+    "auc_gap_pooled_diagnostic": 0.05871980676328503,
+    "per_partition_auc_gaps": {
+      "sex": 0.028000000000000025,
+      "age_group": 0.02913943691975729
+    },
+    "worst_partition": "age_group",
+    "subgroup_aucs": {
+      "sex=Male": 0.663,
+      "sex=Female": 0.635,
+      "age_group=40+": 0.693719806763285,
+      "age_group=<40": 0.6645803698435278
+    },
+    "excluded_subgroups": {},
+    "max_subgroup_ece": 0.09970926494803843,
+    "resampling": {
+      "clustered": false,
+      "n_rows": 200,
+      "n_units": 200
+    },
+    "max_tfr_narrow": 0.375,
+    "max_tfr_narrow_ci": [
+      0.31,
+      0.44068989310562245
+    ],
+    "max_tfr_wide": 0.885,
+    "threshold_band": [
+      0.3,
+      0.7
+    ],
+    "threshold_flip_rates_narrow": {
+      "0.3": 0.065,
+      "0.35": 0.06,
+      "0.4": 0.055,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.07,
+      "0.6": 0.165,
+      "0.65": 0.27,
+      "0.7": 0.375
+    },
+    "threshold_flip_rates_wide": {
+      "0.1": 0.07,
+      "0.15": 0.07,
+      "0.2": 0.07,
+      "0.25": 0.07,
+      "0.3": 0.065,
+      "0.35": 0.06,
+      "0.4": 0.055,
+      "0.45": 0.045,
+      "0.5": 0.0,
+      "0.55": 0.07,
+      "0.6": 0.165,
+      "0.65": 0.27,
+      "0.7": 0.375,
+      "0.75": 0.51,
+      "0.8": 0.695,
+      "0.85": 0.83,
+      "0.9": 0.885
+    },
+    "batch_scoring_time_ms": 0.2618969982722774,
+    "amortised_time_per_row_ms": 0.0013094849913613872,
+    "single_row_latency_ms": 0.13165001291781664,
+    "explanation_agreement": null,
+    "explanation_chance_level": 0.2727272727272727,
+    "explanation_undefined_reason": null,
+    "equity_skipped_in_evaluate_all": "Equity not evaluated: no need_column supplied. RISED no longer falls back to y_true as the clinical-need proxy, because with a binary outcome proxy the equity statistic is an affine reparameterisation of AUROC and carries no independent information. Supply an independent proxy to evaluate Equity.",
+    "equity_evaluated": true,
+    "equity_rho": -0.019426251908654667,
+    "equity_need_source": "savings_proxy",
+    "equity_ceiling": null,
+    "equity_proxy_prevalence": null,
+    "equity_proxy_levels": 5,
+    "equity_fraction_of_ceiling": null,
+    "subgroup_columns_used": [
+      "sex",
+      "age_group"
+    ]
+  },
+  "tau_ref_candidates": {
+    "default": 0.5,
+    "prevalence_matched": 0.6323885435967408,
+    "youden_j": 0.7086845861273916
+  },
+  "tau_ref_alt": {
+    "tau_ref": 0.6323885435967408,
+    "basis": "prevalence_matched",
+    "max_tfr_narrow": 0.295,
+    "max_tfr_wide": 0.655,
+    "note": "Point estimates only (no bootstrap). Reported because tau=0.5 is not a plausible operating point at this prevalence."
+  },
+  "null_reference": {
+    "null_design": "stratified permutation of subgroup labels within outcome classes; preserves subgroup sizes and prevalences, forces equal true AUC",
+    "n_reps": 2000,
+    "n_valid_reps": 2000,
+    "min_subgroup_n": 30,
+    "random_state": 42,
+    "null_estimable": true,
+    "null_mean_gap": 0.10456198029923516,
+    "null_sd_gap": 0.055474461228560965,
+    "null_median_gap": 0.09906542698304716,
+    "null_p95_gap": 0.20699999999999996,
+    "null_p99_gap": 0.2580490501027343,
+    "observed_gap": 0.02913943691975729,
+    "p_value_vs_null": 0.9420289855072463,
+    "excess_over_null_mean": -0.07542254337947787,
+    "exceeds_null_p95": false,
+    "runtime_s": 0.8495587999932468
+  },
+  "null_reference_pooled": {
+    "null_design": "same stratified permutation, pooled across all columns, no n>=30 exclusion (0.1.0 point-estimate rule)",
+    "null_estimable": true,
+    "n_valid_reps": 2000,
+    "null_mean_gap": 0.10749928830976285,
+    "null_p95_gap": 0.21099999999999997,
+    "observed_gap": 0.05871980676328503,
+    "p_value_vs_null": 0.7901049475262368,
+    "excess_over_null_mean": -0.04877948154647782
+  },
+  "p2_generic_reference": {
+    "n_groups": 10,
+    "group_size": 500,
+    "mean_range": 0.08887413961480663,
+    "p95_range": 0.1304391085449873,
+    "P_gt_0.05": 0.9665,
+    "P_gt_0.10": 0.2845,
+    "source": "verification/results/p2_summary.json (headline_cells)"
+  },
+  "total_runtime_s": 28.932542099966668,
+  "status": "ok"
+}
