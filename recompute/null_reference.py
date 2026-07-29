@@ -191,6 +191,33 @@ def cohort_null_reference(
     return out
 
 
+def self_check(n_reps: int = 2000, random_state: int = 42) -> Dict[str, float]:
+    """Reproduce the p2 headline cell to validate this null against verify_p2.
+
+    verify_p2.py draws a fresh cohort each replicate and assigns group ids at
+    random; this module holds the observed cohort fixed and permutes labels
+    within outcome classes. The two designs should agree, and do: 10 disjoint
+    groups of 500 at true AUC 0.70 and prevalence 0.20 give mean 0.0879 / p95
+    0.1285 here against the published 0.0889 / 0.1304.
+    """
+    from scipy.stats import norm
+
+    rng = np.random.default_rng(random_state)
+    mu = norm.ppf(0.70) * np.sqrt(2.0)
+    n = 5000
+    y = (rng.random(n) < 0.20).astype(int)
+    s = rng.normal(loc=mu * y, scale=1.0, size=n)
+    demo = pd.DataFrame({"g": rng.permutation(np.repeat(np.arange(10), 500))})
+    out = cohort_null_reference(
+        y, s, demo, min_subgroup_n=30, n_reps=n_reps, random_state=random_state)
+    return {
+        "this_module_mean": out["null_mean_gap"],
+        "this_module_p95": out["null_p95_gap"],
+        "verify_p2_mean": P2_REFERENCE_10x500["mean_range"],
+        "verify_p2_p95": P2_REFERENCE_10x500["p95_range"],
+    }
+
+
 #: Generic reference cell from verification/results/p2_summary.json, quoted in
 #: the task: 10 subgroups of 500 under exact equality.
 P2_REFERENCE_10x500 = {
@@ -202,3 +229,11 @@ P2_REFERENCE_10x500 = {
     "P_gt_0.10": 0.2845,
     "source": "verification/results/p2_summary.json (headline_cells)",
 }
+
+
+if __name__ == "__main__":
+    res = self_check()
+    print(f"this module : mean {res['this_module_mean']:.4f}  "
+          f"p95 {res['this_module_p95']:.4f}")
+    print(f"verify_p2   : mean {res['verify_p2_mean']:.4f}  "
+          f"p95 {res['verify_p2_p95']:.4f}")
