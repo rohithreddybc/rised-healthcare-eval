@@ -2,10 +2,9 @@ cff-version: 1.2.0
 message: "If you use RISED in your research, please cite both the software and the paper."
 title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems"
 version: 0.1.0
-date-released: "2026-01-01"
+date-released: "2026-07-28"
 license: MIT
 repository-code: "https://github.com/rohithreddybc/rised-healthcare-eval"
-doi: "ZENODO_DOI_PLACEHOLDER"
 authors:
   - family-names: "Bellibatlu"
     given-names: "Rohith Reddy"
@@ -30,7 +29,7 @@ keywords:
   - algorithmic fairness
   - model robustness
 preferred-citation:
-  type: article
+  type: unpublished
   title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems, with Application to Healthcare"
   authors:
     - family-names: "Bellibatlu"
@@ -43,6 +42,5 @@ preferred-citation:
       given-names: "Shyamal"
     - family-names: "Israni"
       given-names: "Abhishek"
-  journal: "Expert Systems with Applications"
   year: 2026
-  notes: "Under review"
+  notes: "Manuscript in preparation for submission to the Journal of Biomedical Informatics. Not currently under review anywhere."
