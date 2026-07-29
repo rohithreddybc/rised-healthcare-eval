@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rised"
-version = "0.1.0"
+version = "0.2.0"
 description = "RISED Framework: Reliability, Inclusivity, Sensitivity, Equity, and Deployability evaluation for healthcare AI decision-support systems"
 readme = "README.md"
 license = { text = "MIT" }
