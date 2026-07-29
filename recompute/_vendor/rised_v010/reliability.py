@@ -1,0 +1,119 @@
+"""
+Reliability dimension: output stability under semantically equivalent
+but differently encoded inputs, perturbation variants, and temporal re-encodings.
+
+Formally extends the Judge Sensitivity Score (JudgeSense, 2025) to the
+clinical decision-support context.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+
+from rised_v010.metrics import decision_flip_rate, judge_sensitivity_score, rank_correlation
+from rised_v010.perturbations import apply_perturbation
+from rised_v010.results import ReliabilityResult
+
+
+def evaluate_reliability(
+    model,
+    X,
+    perturbation_specs: Optional[List[Dict[str, Any]]] = None,
+    feature_names: Optional[List[str]] = None,
+    n_bootstrap: int = 0,
+    random_state: Optional[int] = None,
+) -> ReliabilityResult:
+    """
+    Evaluate the Reliability dimension.
+
+    Computes the Judge Sensitivity Score (JSS), mean perturbation flip rate,
+    and mean rank correlation across all perturbation variants.
+
+    Parameters
+    ----------
+    model : sklearn-compatible estimator
+        Fitted model with predict_proba method.
+    X : array-like of shape (n_samples, n_features)
+        Original (unperturbed) feature matrix.
+    perturbation_specs : list of dict, optional
+        Each dict specifies one perturbation: ``{"type": str, ...}``.
+        If None or empty, returns perfect-stability scores (JSS=0, rho=1).
+    feature_names : list of str, optional
+        Feature names corresponding to columns of X. Not used in computation
+        but stored in details for downstream reporting.
+    n_bootstrap : int
+        Number of bootstrap iterations for JSS confidence interval. 0 disables.
+    random_state : int, optional
+        Seed for the bootstrap RNG for reproducibility.
+
+    Returns
+    -------
+    ReliabilityResult
+    """
+    X_arr = np.asarray(X, dtype=float)
+    baseline = model.predict_proba(X_arr)[:, 1]
+
+    if not perturbation_specs:
+        return ReliabilityResult(
+            judge_sensitivity_score=0.0,
+            perturbation_flip_rate=0.0,
+            rank_correlation_mean=1.0,
+            details={"feature_names": feature_names},
+        )
+
+    per_perturbation_flip: Dict[str, float] = {}
+    per_perturbation_rho: Dict[str, float] = {}
+    perturbed_scores: List[np.ndarray] = []
+
+    for spec in perturbation_specs:
+        label = spec.get("label", spec["type"])
+        X_pert = apply_perturbation(X_arr, spec)
+        scores = model.predict_proba(X_pert)[:, 1]
+        perturbed_scores.append(scores)
+        per_perturbation_flip[label] = decision_flip_rate(baseline, scores)
+        per_perturbation_rho[label] = rank_correlation(baseline, scores)
+
+    jss = judge_sensitivity_score(baseline, perturbed_scores)
+    mean_flip = float(np.mean(list(per_perturbation_flip.values())))
+    mean_rho = float(np.mean(list(per_perturbation_rho.values())))
+
+    # BCa 95% CI for JSS (bias-corrected accelerated bootstrap)
+    jss_ci = None
+    if n_bootstrap > 0:
+        from rised_v010.bootstrap_ci import bca_interval
+
+        rng = np.random.default_rng(random_state)
+        n = len(X_arr)
+        baseline_arr = np.asarray(baseline)
+        pert_arrs = [np.asarray(s) for s in perturbed_scores]
+
+        def _jss_on_idx(idx: np.ndarray) -> float:
+            return judge_sensitivity_score(baseline_arr[idx], [s[idx] for s in pert_arrs])
+
+        # Bootstrap replicates
+        jss_boot = np.empty(n_bootstrap, dtype=float)
+        for b in range(n_bootstrap):
+            idx = rng.integers(0, n, size=n)
+            jss_boot[b] = _jss_on_idx(idx)
+
+        # Jackknife replicates (leave-one-out)
+        full_idx = np.arange(n)
+        jss_jack = np.empty(n, dtype=float)
+        for i in range(n):
+            jss_jack[i] = _jss_on_idx(np.delete(full_idx, i))
+
+        jss_ci = bca_interval(jss, jss_boot, jss_jack, alpha=0.05)
+
+    return ReliabilityResult(
+        judge_sensitivity_score=jss,
+        perturbation_flip_rate=mean_flip,
+        rank_correlation_mean=mean_rho,
+        jss_ci=jss_ci,
+        details={
+            "per_perturbation_flip_rate": per_perturbation_flip,
+            "per_perturbation_rank_correlation": per_perturbation_rho,
+            "feature_names": feature_names,
+        },
+    )

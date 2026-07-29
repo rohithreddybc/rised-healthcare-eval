@@ -53,3 +53,6 @@ paper.pdf
 # OS
 .DS_Store
 Thumbs.db
+
+# Recomputation outputs are small and are tracked deliberately
+!recompute/results/*.csv
