@@ -31,6 +31,12 @@ data/
 !examples/synthetic_cohort_10k.csv
 *.zip
 *.xpt
+*.gz
+brfss_cache/
+nhanes_cache/
+nhis_cache/
+mimic_ed_demo/
+examples/adult24.csv
 examples/readme.txt
 
 # LaTeX

@@ -80,16 +80,25 @@ def evaluate_deployability(
         if hasattr(model, "coef_"):
             # sklearn linear models (LogisticRegression, LinearSVC, etc.)
             explainer = shap.LinearExplainer(model, X_bg)
-        elif hasattr(model, "estimators_") or hasattr(model, "tree_"):
-            # sklearn ensemble / single-tree models
-            explainer = shap.TreeExplainer(model)
-        elif "xgb" in type(model).__module__ or "lgbm" in type(model).__module__:
-            explainer = shap.TreeExplainer(model)
         else:
-            raise ValueError(
-                f"No fast SHAP explainer available for {type(model).__name__}. "
-                "Add explicit support or use shap.Explainer with a smaller background."
-            )
+            # Tree-based models (sklearn ensembles, XGBoost, LightGBM).
+            # XGBoost >=2.x serialises base_score with brackets (e.g. '[5E-1]')
+            # which older SHAP versions cannot parse via TreeExplainer.
+            # Workaround: temporarily patch builtins.float to strip brackets.
+            import builtins as _builtins
+            _orig_float = _builtins.float
+
+            def _safe_float(x):
+                try:
+                    return _orig_float(x)
+                except (ValueError, TypeError):
+                    return _orig_float(str(x).strip("[]"))
+
+            _builtins.float = _safe_float
+            try:
+                explainer = shap.TreeExplainer(model)
+            finally:
+                _builtins.float = _orig_float
 
         shap_raw = explainer.shap_values(X_bg)
 

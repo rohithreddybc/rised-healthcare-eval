@@ -4,8 +4,9 @@ Framework for Healthcare AI Decision-Support Evaluation.
 
 Reference
 ---------
-Bellibatlu, R. R. (2026). "RISED: A Pre-Deployment Safety Evaluation Framework
-for Clinical AI Decision-Support Systems." Artificial Intelligence in Medicine
+Bellibatlu, R. R., Singh, M., Jajoo, Y., Lakhanpal, S., & Israni, A. (2026).
+"RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support
+Systems, with Application to Healthcare." Expert Systems with Applications
 (under review). https://github.com/rohithreddybc/rised-healthcare-eval
 """
 

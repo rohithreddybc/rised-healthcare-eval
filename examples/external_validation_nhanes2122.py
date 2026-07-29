@@ -58,21 +58,21 @@ from rised.equity import evaluate_equity
 # ---------------------------------------------------------------------------
 # Paths and URLs
 # ---------------------------------------------------------------------------
-BASE_URL = "https://wwwn.cdc.gov/Nchs/Nhanes/2021-2023/"
+BASE_URL = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/"
 
 FILES = {
-    "DEMO":  "DEMO_L.XPT",    # Demographics
-    "DIQ":   "DIQ_L.XPT",     # Diabetes questionnaire (outcome)
-    "GHB":   "GHB_L.XPT",     # HbA1c lab
-    "TCHOL": "TCHOL_L.XPT",   # Total cholesterol lab
-    "BMX":   "BMX_L.XPT",     # Body measures (BMI)
-    "BPQ":   "BPQ_L.XPT",     # Blood pressure questionnaire
-    "BPXO":  "BPXO_L.XPT",    # Blood pressure exam (oscillometric)
-    "SMQ":   "SMQ_L.XPT",     # Smoking
-    "ALQ":   "ALQ_L.XPT",     # Alcohol
-    "PAQ":   "PAQ_L.XPT",     # Physical activity
-    "MCQ":   "MCQ_L.XPT",     # Medical conditions
-    "HIQ":   "HIQ_L.XPT",     # Health insurance
+    "DEMO":  "DEMO_L.xpt",    # Demographics
+    "DIQ":   "DIQ_L.xpt",     # Diabetes questionnaire (outcome)
+    "GHB":   "GHB_L.xpt",     # HbA1c lab
+    "TCHOL": "TCHOL_L.xpt",   # Total cholesterol lab
+    "BMX":   "BMX_L.xpt",     # Body measures (BMI)
+    "BPQ":   "BPQ_L.xpt",     # Blood pressure questionnaire
+    "BPXO":  "BPXO_L.xpt",    # Blood pressure exam (oscillometric)
+    "SMQ":   "SMQ_L.xpt",     # Smoking
+    "ALQ":   "ALQ_L.xpt",     # Alcohol
+    "PAQ":   "PAQ_L.xpt",     # Physical activity
+    "MCQ":   "MCQ_L.xpt",     # Medical conditions
+    "HIQ":   "HIQ_L.xpt",     # Health insurance
 }
 
 CACHE_DIR = Path(os.environ.get("NHANES_CACHE_DIR", "nhanes_cache"))
@@ -133,7 +133,7 @@ def main():
           .merge(smq[["SEQN", "SMQ020"]], on="SEQN", how="left")
           .merge(alq[["SEQN", "ALQ151"]], on="SEQN", how="left")
           .merge(paq[["SEQN", "PAD680"]], on="SEQN", how="left")
-          .merge(mcq[["SEQN", "MCQ160C", "MCQ160F", "MCQ160K"]], on="SEQN", how="left")
+          .merge(mcq[["SEQN", "MCQ160C", "MCQ160F"]], on="SEQN", how="left")  # MCQ160K removed in L-cycle
           .merge(hiq[["SEQN", "HIQ011"]], on="SEQN", how="left")
     )
 
@@ -184,13 +184,13 @@ def main():
     df["inactive"]    = (df["PAD680"] >= 480).astype(float)  # >=8h sedentary
     df["chd_dx"]      = _yn(df["MCQ160C"])   # coronary heart disease ever
     df["stroke_dx"]   = _yn(df["MCQ160F"])   # stroke ever
-    df["kidney_dx"]   = _yn(df["MCQ160K"])   # kidney failure / transplant ever
+    # MCQ160K (kidney failure) removed from NHANES 2021-2023 MCQ; dropped from feature set
     df["insured_num"] = (df["HIQ011"] == 1).astype(float)
 
     feature_cols = [
         "age", "sex_male", "bmi", "hba1c", "chol", "sbp", "dbp",
         "htn_dx", "ever_smoked", "heavy_drink", "inactive",
-        "chd_dx", "stroke_dx", "kidney_dx", "insured_num",
+        "chd_dx", "stroke_dx", "insured_num",
     ]
     demo_cols = ["age_group", "sex", "race", "insured"]
 
@@ -242,7 +242,7 @@ def main():
         {"type": "unit_rescaling", "feature_index": 0, "factor": 1.05,
          "label": "Age +5%"},
         {"type": "unit_rescaling", "feature_index": 3, "factor": 1.08,
-         "label": "HbA1c +8%"},   # POCT vs lab-calibrated offset
+         "label": "HbA1c +8%"},   # POCT vs lab-calibrated offset (feature_index 3 = hba1c)
     ]
 
     print("\nRunning RISED evaluation (B=1000 bootstrap, ~1-3 min) ...")
@@ -303,6 +303,10 @@ def main():
           f"95% CI [{rho_hba_ci[0]:.4f}, {rho_hba_ci[1]:.4f}]")
     print(f"  Deployability latency = "
           f"{report.deployability.mean_inference_latency_ms:.3f} ms")
+    f_top3 = report.deployability.explanation_faithfulness
+    print(f"  Deployability F_top3 = "
+          f"{f_top3:.4f}" if f_top3 is not None else "  Deployability F_top3 = N/A (SHAP error)")
+    print(f"  SHAP error: {report.deployability.details.get('shap_error', 'none')}")
 
     return report, eq_independent
 

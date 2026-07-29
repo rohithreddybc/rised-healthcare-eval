@@ -64,7 +64,7 @@ INCOME_LABELS = {
     1: "<$15K", 2: "$15-25K", 3: "$25-35K", 4: "$35-50K",
     5: "$50-100K", 6: "$100-200K", 7: ">=$200K", 9: None,
 }
-HEALTHPLAN_LABELS = {1: "Insured", 2: "Uninsured", 7: None, 9: None}
+HEALTHPLAN_LABELS = {1: "Insured", 2: "Uninsured", 9: None}  # _HLTHPL2 coding (2024)
 
 
 def _yes_no_to_int(s):
@@ -92,7 +92,7 @@ def main():
     df["sex"] = df["SEXVAR"].map({1: "M", 2: "F"})
     df["race"] = df["_RACE"].map(RACE_LABELS)
     df["income"] = df["_INCOMG1"].map(INCOME_LABELS)
-    df["health_plan"] = df["_HLTHPLN"].map(HEALTHPLAN_LABELS)
+    df["health_plan"] = df["_HLTHPL2"].map(HEALTHPLAN_LABELS)  # renamed in 2024
 
     # 4. Numeric/binary feature matrix (~22 standardized predictors)
     df["bmi"] = df["_BMI5"] / 100.0  # _BMI5 is BMI * 100
@@ -100,14 +100,13 @@ def main():
     df["genhlth"] = df["GENHLTH"].where(df["GENHLTH"] <= 5)  # 1=excellent..5=poor
     df["physhlth"] = df["PHYSHLTH"].replace({77: np.nan, 88: 0, 99: np.nan})
     df["menthlth"] = df["MENTHLTH"].replace({77: np.nan, 88: 0, 99: np.nan})
-    df["sleep"] = df["SLEPTIM1"].where(df["SLEPTIM1"] <= 24)
+    # Note: SLEPTIM1, _RFHYPE6 (hypertension), _RFCHOL3 (cholesterol) are absent
+    # from the 2024 BRFSS core questionnaire (dropped/rotated); excluded from features.
     df["sex_male"] = (df["SEXVAR"] == 1).astype(float)
 
     df["smoker"] = _yes_no_to_int(df["_RFSMOK3"])  # current smoker
-    df["heavy_drink"] = _yes_no_to_int(df["_RFDRHV8"])
+    df["heavy_drink"] = _yes_no_to_int(df["_RFDRHV9"])  # _RFDRHV8 renamed to _RFDRHV9
     df["phys_active"] = _yes_no_to_int(df["_TOTINDA"])  # any leisure activity
-    df["hypertension"] = _yes_no_to_int(df["_RFHYPE6"])
-    df["high_chol"] = _yes_no_to_int(df["_RFCHOL3"])
     df["diabetes"] = _yes_no_to_int(df["DIABETE4"].map(
         {1: 1, 2: 1, 3: 0, 4: 0, 7: np.nan, 9: np.nan}))
     df["asthma"] = _yes_no_to_int(df["_LTASTH1"])
@@ -117,13 +116,13 @@ def main():
     df["arthritis"] = _yes_no_to_int(df["_DRDXAR2"])
     df["depression"] = _yes_no_to_int(df["ADDEPEV3"])
     df["medcost"] = _yes_no_to_int(df["MEDCOST1"])  # cost barrier to care
-    df["any_insurance"] = _yes_no_to_int(df["_HLTHPLN"])
+    df["any_insurance"] = _yes_no_to_int(df["_HLTHPL2"])  # _HLTHPLN renamed to _HLTHPL2
     df["checkup_recent"] = (df["CHECKUP1"].isin([1, 2])).astype(float)
 
     feature_cols = [
         "age_numeric", "sex_male", "bmi", "genhlth", "physhlth", "menthlth",
-        "sleep", "smoker", "heavy_drink", "phys_active",
-        "hypertension", "high_chol", "diabetes", "asthma", "stroke",
+        "smoker", "heavy_drink", "phys_active",
+        "diabetes", "asthma", "stroke",
         "kidney", "copd", "arthritis", "depression",
         "medcost", "any_insurance", "checkup_recent",
     ]
@@ -235,6 +234,9 @@ def main():
           f"95% CI [{rho_phys_ci[0]:.4f}, {rho_phys_ci[1]:.4f}]")
     print(f"  Deployability latency = "
           f"{report.deployability.mean_inference_latency_ms:.3f} ms")
+    f_top3 = report.deployability.explanation_faithfulness
+    print(f"  Deployability F_top3 = "
+          f"{f_top3:.4f}" if f_top3 is not None else "  Deployability F_top3 = N/A (SHAP error)")
 
     return report, eq_independent
 

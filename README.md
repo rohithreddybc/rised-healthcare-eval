@@ -39,13 +39,15 @@ If you use RISED in your own evaluation, please cite the paper:
 
 ```bibtex
 @article{bellibatlu2026rised,
-  title  = {RISED: A Pre-Deployment Evaluation Framework for
-            High-Stakes AI Decision-Support Systems, with
-            Application to Healthcare},
-  author = {Bellibatlu, Rohith Reddy},
+  title   = {RISED: A Pre-Deployment Evaluation Framework for
+             High-Stakes AI Decision-Support Systems, with
+             Application to Healthcare},
+  author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
+             Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
   journal = {Expert Systems with Applications},
-  year   = {2026},
-  note   = {In press}
+  year    = {2026},
+  note    = {Under review},
+  url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
 }
 ```
 
@@ -241,7 +243,8 @@ by the FDA AI/ML Action Plan, the ONC HTI-1 rule, and the EU AI Act.
 pytest --tb=short -q
 ```
 
-81 tests, ~93% line coverage across the rised package.
+81 tests passing, 82% overall line coverage (>90% on the core evaluation
+modules: reliability, sensitivity, equity, inclusivity, metrics).
 
 ---
 
@@ -249,10 +252,11 @@ pytest --tb=short -q
 
 ```bibtex
 @article{bellibatlu2026rised,
-  author  = {Bellibatlu, Rohith Reddy},
-  title   = {{RISED}: A Pre-Deployment Safety Evaluation Framework for Clinical {AI}
-             Decision-Support Systems},
-  journal = {Artificial Intelligence in Medicine},
+  title   = {{RISED}: A Pre-Deployment Evaluation Framework for High-Stakes {AI}
+             Decision-Support Systems, with Application to Healthcare},
+  author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
+             Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
+  journal = {Expert Systems with Applications},
   year    = {2026},
   note    = {Under review},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
@@ -263,22 +267,30 @@ pytest --tb=short -q
 
 ## External validation on real datasets
 
-The framework has been re-run unchanged on three publicly available real-data clinical cohorts spanning three decades of vintage:
+The framework has been re-run unchanged on six publicly available real-data clinical cohorts spanning 35 years of vintage, plus three non-clinical cohorts that demonstrate the protocol is domain-agnostic:
 
 | Cohort | n | Era | Outcome | Reproduce |
 |---|---|---|---|---|
-| UCI Heart Disease (Cleveland) | 303 | 1989 | Presence of heart disease | `python examples/external_validation_uci_heart.py` |
+| UCI Heart Disease (Cleveland) | 303 | 1989 | Heart disease presence | `python examples/external_validation_uci_heart.py` |
 | UCI Diabetes 130-US Hospitals | 99,492 | 1999–2008 | <30-day readmission | `python examples/external_validation_diabetes130.py` |
-| **NCHS NHIS 2024 (Sample Adult)** | **9,747 analytic / 32,629 raw** | **2024** | **Coronary heart disease / MI** | **`python examples/external_validation_nhis2024.py`** |
+| NCHS NHIS 2024 (Sample Adult) | 9,747 | 2024 | Coronary heart disease / MI | `python examples/external_validation_nhis2024.py` |
+| NCHS NHIS 2023 (Sample Adult) | 27,114 | 2023 | Physician-diagnosed diabetes | `python examples/external_validation_nhis2023_diabetes.py` |
+| NCHS NHANES 2021–2023 | 4,096 | 2021–2023 | Diabetes (with lab HbA1c) | `python examples/external_validation_nhanes2122.py` |
+| CDC BRFSS 2024 | 44,888 | 2024 | Coronary heart disease / MI | `python examples/external_validation_brfss2024.py` |
+| *Cross-domain:* Statlog German Credit | 1,000 | — | Credit risk | `python examples/german_credit_demo.py` |
+| *Cross-domain:* UCI Adult Income | 45,222 | 1994 | Income > $50k | `python examples/adult_income_demo.py` |
+| *Cross-domain:* Folktables ACS-Income | 20,000 | 2018 | Income > $50k | `python examples/folktables_acs_income_demo.py` |
 
-The three real cohorts produce non-uniform pass/fail patterns: Reliability passes by three orders of magnitude on Diabetes 130 while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively, supporting the framework's construct validity. The NHIS 2024 cohort, collected during calendar year 2024 and released by the National Center for Health Statistics in 2025, provides a contemporary nationally representative check on the same dimensions. (NHIS 2025 microdata had not yet been released at the time of submission; an alternative validation script targeting the CDC BRFSS 2024 release is also provided in `examples/external_validation_brfss2024.py`.)
+The cohorts produce non-uniform pass/fail patterns that support the framework's construct validity. On Diabetes 130, Reliability passes by three orders of magnitude (PSS = 0.0004) while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively; both NHIS cohorts and BRFSS 2024 reproduce the Inclusivity/Sensitivity failure, while NHANES 2021–2023 — with a complete laboratory feature set — reaches INCONCLUSIVE rather than outright failure. The same Reliability-pass / Sensitivity-fail / Inclusivity-fail pattern recurs on the three non-clinical cohorts, confirming the protocol generalises beyond healthcare. The MIMIC-IV-ED integration (`examples/external_validation_mimic_ed.py`) is implemented and validated end-to-end on the public MIMIC-IV-ED demo; the full credentialed cohort is the priority next step.
 
 ## Roadmap
 
 - [x] External validation on UCI Heart Disease (Cleveland)
 - [x] External validation on UCI Diabetes 130-US Hospitals
-- [x] External validation on NCHS NHIS 2024 (released 2025) and CDC BRFSS 2024 (released Aug 2025)
-- [ ] Validation on MIMIC-IV / eICU (PhysioNet credential required)
+- [x] External validation on NCHS NHIS 2024, NHIS 2023, NHANES 2021–2023, and CDC BRFSS 2024
+- [x] Cross-domain validation on German Credit, UCI Adult Income, and Folktables ACS-Income
+- [x] MIMIC-IV-ED integration implemented and validated on the public demo
+- [ ] Full MIMIC-IV-ED / eICU evaluation (PhysioNet credential required)
 - [ ] Re-run on NHIS 2025 / NHANES 2025–2026 once microdata is released
 - [ ] Empirical recalibration of pass/fail thresholds against deployment outcomes
 - [ ] Extension to multi-label and time-series risk models
@@ -292,7 +304,7 @@ Contributions welcome — please open an issue or pull request on GitHub.
 ## Contact
 
 **Rohith Reddy Bellibatlu**
-[rohithreddybc@gmail.com](mailto:rohithreddybc@gmail.com) |
+[rbell084@fiu.edu](mailto:rbell084@fiu.edu) |
 ORCID [0009-0003-6083-0364](https://orcid.org/0009-0003-6083-0364)
 
 ## License

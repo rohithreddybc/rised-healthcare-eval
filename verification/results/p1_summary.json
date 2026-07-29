@@ -1,0 +1,20 @@
+{
+  "seed": 42,
+  "real_cohorts_max_abs_deviation": 5.5029900081216e-08,
+  "real_cohorts_n": 3,
+  "simulation_max_abs_deviation": 4.440892098500626e-16,
+  "simulation_mean_abs_deviation": 7.006397971735253e-17,
+  "simulation_cells": 304,
+  "tie_study_max_naive_deviation": 0.0629503349668184,
+  "tie_study_max_tiecorrected_deviation": 2.220446049250313e-16,
+  "ceiling_max_dev_vs_exact": 3.3306690738754696e-16,
+  "ceiling_max_dev_vs_asymptotic_all_n": 1.0825520526225318e-05,
+  "ceiling_max_dev_vs_asymptotic_large_n": 4.330127256757521e-09,
+  "threshold_0.70_attainable_p_lo": 0.20560797112240511,
+  "threshold_0.70_attainable_p_hi": 0.7943920288775949,
+  "threshold_0.70_numeric_p_lo": 0.21,
+  "threshold_0.70_numeric_p_hi": 0.79,
+  "rho_max_at_p_0.5": 0.8660254037844386,
+  "overall_max_abs_deviation_tiefree_and_real": 5.5029900081216e-08,
+  "verdict": "VERIFIED (exactly, up to floating point, when the score vector has no ties; score ties break the naive identity but the tie-corrected form remains exact)"
+}

@@ -9,7 +9,7 @@ description = "RISED Framework: Reliability, Inclusivity, Sensitivity, Equity, a
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
-    { name = "Rohith Reddy Bellibatlu", email = "rohithreddybc@gmail.com" }
+    { name = "Rohith Reddy Bellibatlu", email = "rbell084@fiu.edu" }
 ]
 keywords = [
     "healthcare AI",

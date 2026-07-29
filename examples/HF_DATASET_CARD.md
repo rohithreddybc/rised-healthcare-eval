@@ -141,11 +141,13 @@ If you use this dataset, please cite the accompanying paper:
 
 ```bibtex
 @article{bellibatlu2026rised,
-  author  = {Bellibatlu, Rohith Reddy},
-  title   = {{RISED}: A Pre-Deployment Safety Evaluation Framework for Clinical {AI}
-             Decision-Support Systems},
+  title   = {{RISED}: A Pre-Deployment Evaluation Framework for High-Stakes {AI}
+             Decision-Support Systems, with Application to Healthcare},
+  author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
+             Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
+  journal = {Expert Systems with Applications},
   year    = {2026},
-  journal = {Artificial Intelligence in Medicine (under review)},
+  note    = {Under review},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
 }
 ```
@@ -169,5 +171,5 @@ terms.
 
 ## Contact
 
-Rohith Reddy Bellibatlu — `rohithreddybc@gmail.com` — ORCID:
+Rohith Reddy Bellibatlu — `rbell084@fiu.edu` — ORCID:
 [0009-0003-6083-0364](https://orcid.org/0009-0003-6083-0364)

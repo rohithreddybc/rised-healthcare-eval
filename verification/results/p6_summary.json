@@ -1,0 +1,66 @@
+{
+  "seed": 42,
+  "cohort_rows_encounters": 99492,
+  "unique_patients": 69667,
+  "mean_rows_per_patient": 1.428107999483256,
+  "max_rows_per_patient": 40,
+  "patients_with_multiple_encounters": 16483,
+  "pct_patients_with_multiple_encounters": 23.65969540815594,
+  "pct_rows_from_repeat_patients": 46.5444457845857,
+  "row_level_split_leakage": {
+    "unique_patients_train": 58628,
+    "unique_patients_test": 17872,
+    "patients_in_both_splits": 6833,
+    "pct_test_patients_also_in_train": 38.23299015219337,
+    "test_rows": 19899,
+    "test_rows_with_patient_in_train": 8381,
+    "pct_test_rows_leaked": 42.11769435650033
+  },
+  "row_level_metrics": {
+    "auroc": 0.6362441499903329,
+    "brier": 0.09646314030759266,
+    "average_precision": 0.19954659649254003,
+    "equity_rho_need_y_true": 0.14899635379536724,
+    "test_n": 19899,
+    "test_prevalence": 0.11226694808784361
+  },
+  "group_level_split_leakage": {
+    "unique_patients_train": 55733,
+    "unique_patients_test": 13934,
+    "patients_in_both_splits": 0,
+    "pct_test_patients_also_in_train": 0.0,
+    "test_rows": 19890,
+    "test_rows_with_patient_in_train": 0,
+    "pct_test_rows_leaked": 0.0
+  },
+  "group_level_metrics": {
+    "auroc": 0.6391657548413878,
+    "brier": 0.09938419898659913,
+    "average_precision": 0.2001983488411252,
+    "equity_rho_need_y_true": 0.1543393649883723,
+    "test_n": 19890,
+    "test_prevalence": 0.1159376571141277
+  },
+  "delta_auroc": 0.002921604851054971,
+  "delta_brier": 0.0029210586790064663,
+  "delta_average_precision": 0.0006517523485851662,
+  "delta_equity_rho_need_y_true": 0.005343011193005065,
+  "multiseed_n_seeds": 20,
+  "multiseed_mean_auroc_delta": -0.0022266248678875,
+  "multiseed_sd_auroc_delta": 0.008222664607635996,
+  "multiseed_se_auroc_delta": 0.0018386437018855723,
+  "multiseed_auroc_delta_ci95": [
+    -0.005830366523583222,
+    0.0013771167878082213
+  ],
+  "multiseed_mean_pct_test_rows_leaked": 41.99909543193125,
+  "did_mean_raw_gap_leaked_minus_clean": -0.1498357825406706,
+  "did_mean_confounding_gap": -0.1742920838960719,
+  "did_mean": 0.024456301355401305,
+  "did_se": 0.006562175069091268,
+  "did_ci95": [
+    0.01159443821998242,
+    0.03731816449082019
+  ],
+  "verdict": "PARTIAL. The structural leakage claim is VERIFIED and large: the row-level split places 6,833 patients in both train and test, and ~42% of test rows belong to a patient seen in training. A sensitive within-split difference-in-differences does detect a genuine leakage advantage on the leaked stratum (+0.025 AUROC, 95% CI excludes 0). However the implied consequence for the PUBLISHED headline number is NOT supported: switching to GroupShuffleSplit changes pooled test AUROC by -0.0022 (95% CI [-0.0058, +0.0014]) over 20 seeds, i.e. indistinguishable from zero and smaller than split-to-split noise. The reported AUROC ~0.64 is not materially inflated by the leakage."
+}

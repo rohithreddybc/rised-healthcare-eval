@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use RISED in your research, please cite both the software and the paper."
-title: "RISED: Reliability, Inclusivity, Sensitivity, Equity, and Deployability Framework for Healthcare AI Evaluation"
+title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems"
 version: 0.1.0
-date-released: "2025-01-01"
+date-released: "2026-01-01"
 license: MIT
 repository-code: "https://github.com/rohithreddybc/rised-healthcare-eval"
 doi: "ZENODO_DOI_PLACEHOLDER"
@@ -10,18 +10,39 @@ authors:
   - family-names: "Bellibatlu"
     given-names: "Rohith Reddy"
     orcid: "https://orcid.org/0009-0003-6083-0364"
+  - family-names: "Singh"
+    given-names: "Manpreet"
+    orcid: "https://orcid.org/0000-0003-2368-2377"
+  - family-names: "Jajoo"
+    given-names: "Yash"
+    orcid: "https://orcid.org/0009-0005-8103-7415"
+  - family-names: "Lakhanpal"
+    given-names: "Shyamal"
+    orcid: "https://orcid.org/0009-0008-3948-511X"
+  - family-names: "Israni"
+    given-names: "Abhishek"
+    orcid: "https://orcid.org/0009-0000-1956-4656"
 keywords:
-  - healthcare AI evaluation
-  - algorithmic fairness
+  - expert systems
+  - pre-deployment evaluation
+  - trustworthy AI
   - clinical decision support
-  - health equity
-  - AI reliability
-references:
-  - type: article
-    title: "Evaluating AI-Assisted Decision Support in High-Stakes Healthcare: A Framework for Reliability, Inclusivity, Sensitivity, Equity, and Deployability"
-    authors:
-      - family-names: "Bellibatlu"
-        given-names: "Rohith Reddy"
-    journal: "arXiv"
-    year: 2025
-    url: "https://arxiv.org/abs/ARXIV_ID_PLACEHOLDER"
+  - algorithmic fairness
+  - model robustness
+preferred-citation:
+  type: article
+  title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems, with Application to Healthcare"
+  authors:
+    - family-names: "Bellibatlu"
+      given-names: "Rohith Reddy"
+    - family-names: "Singh"
+      given-names: "Manpreet"
+    - family-names: "Jajoo"
+      given-names: "Yash"
+    - family-names: "Lakhanpal"
+      given-names: "Shyamal"
+    - family-names: "Israni"
+      given-names: "Abhishek"
+  journal: "Expert Systems with Applications"
+  year: 2026
+  notes: "Under review"

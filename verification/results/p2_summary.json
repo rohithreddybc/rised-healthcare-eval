@@ -1,0 +1,81 @@
+{
+  "seed": 42,
+  "n_reps_per_cell": 2000,
+  "true_auc_all_groups": 0.7,
+  "prevalence": 0.2,
+  "null": "every subgroup has identical true AUC; true parity gap = 0",
+  "fast_auc_max_dev_vs_sklearn": 1.1102230246251565e-16,
+  "monotone_increasing_in_n_groups": true,
+  "monotone_decreasing_in_group_size": true,
+  "all_cells_positive_mean_range": true,
+  "min_mean_range_disjoint": 0.016106513014841648,
+  "max_mean_range_disjoint": 0.5288559737676567,
+  "loglog_slope_vs_group_size_mean": -0.5173585725936134,
+  "headline_cells": [
+    {
+      "n_groups": 2,
+      "group_size": 500,
+      "mean_range": 0.03244489869793866,
+      "p95_range": 0.08010883969258116,
+      "P_gt_0.05": 0.216,
+      "P_gt_0.10": 0.0175
+    },
+    {
+      "n_groups": 5,
+      "group_size": 500,
+      "mean_range": 0.06721462391380982,
+      "p95_range": 0.11265996062225454,
+      "P_gt_0.05": 0.743,
+      "P_gt_0.10": 0.0995
+    },
+    {
+      "n_groups": 10,
+      "group_size": 500,
+      "mean_range": 0.08887413961480663,
+      "p95_range": 0.1304391085449873,
+      "P_gt_0.05": 0.9665,
+      "P_gt_0.10": 0.2845
+    },
+    {
+      "n_groups": 20,
+      "group_size": 500,
+      "mean_range": 0.1080958741961353,
+      "p95_range": 0.1455016134688872,
+      "P_gt_0.05": 1.0,
+      "P_gt_0.10": 0.633
+    },
+    {
+      "n_groups": 10,
+      "group_size": 50,
+      "mean_range": 0.29378245399944003,
+      "p95_range": 0.4337274564149209,
+      "P_gt_0.05": 1.0,
+      "P_gt_0.10": 0.9995
+    },
+    {
+      "n_groups": 10,
+      "group_size": 100,
+      "mean_range": 0.20126473151100965,
+      "p95_range": 0.2990163507486877,
+      "P_gt_0.05": 1.0,
+      "P_gt_0.10": 0.991
+    },
+    {
+      "n_groups": 10,
+      "group_size": 1000,
+      "mean_range": 0.06303630414000341,
+      "p95_range": 0.0923266317165672,
+      "P_gt_0.05": 0.771,
+      "P_gt_0.10": 0.0205
+    },
+    {
+      "n_groups": 10,
+      "group_size": 2000,
+      "mean_range": 0.044807762102274065,
+      "p95_range": 0.0657497527590486,
+      "P_gt_0.05": 0.308,
+      "P_gt_0.10": 0.0
+    }
+  ],
+  "verdict": "VERIFIED: under an exact equality null the expected max-min AUC range is strictly positive in every cell tested, increases monotonically with the number of pooled subgroups, and decays as m^-0.5 in group size."
+}

@@ -1,0 +1,20 @@
+{
+  "seed": 42,
+  "tau_ref": 0.5,
+  "boundary_delta": 0.05,
+  "y_true_occurrences_in_body": 0,
+  "docstring_admits_y_true_unused": true,
+  "permutation_max_abs_change_in_sensitivity_outputs": 0.0,
+  "permutation_auroc_min": 0.4683992114722594,
+  "permutation_auroc_max": 0.5159101002929718,
+  "tfr_vs_cdf_functional_max_dev": 1.1102230246251565e-16,
+  "constant_0.05_max_TFR": 0.0,
+  "constant_0.05_rank_stability_score": 1.0,
+  "constant_0.05_auroc": 0.5,
+  "concentrated_max_TFR": 1.0,
+  "concentrated_auroc": 0.8005472186832389,
+  "s2_continuous_max_abs_residual": 1.1102230246251565e-16,
+  "s2_atom_max_residual_minus_predicted": 2.7755575615628914e-17,
+  "s2_atom_max_residual_observed": 0.10000000000000003,
+  "verdict": "VERIFIED: TFR is exactly |F_n(tau)-F_n(tau0)|, invariant to y_true permutation; a constant 0.05 model scores a perfect TFR=0 at AUROC=0.5, while a concentrated model with AUROC~0.80 scores the worst possible TFR=1.0. S2 holds exactly, with residual equal to the atom mass at tau0+delta."
+}

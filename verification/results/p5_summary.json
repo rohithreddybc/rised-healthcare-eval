@@ -1,0 +1,89 @@
+{
+  "seed": 42,
+  "n_shap_samples": 50,
+  "global_and_local_share_same_rows": true,
+  "identity_F_top3_equals_1_for_d_le_3": true,
+  "identity_stability_equals_1_for_d_le_3": true,
+  "n_runs_d_le_3": 40,
+  "chance_level_max_abs_diff_analytic_vs_empirical": 0.09429000000000004,
+  "chance_level_table": [
+    {
+      "d": 2,
+      "analytic_chance_3_over_d": 1.0,
+      "empirical_exchangeable_null": 1.0,
+      "empirical_sd": 0.0,
+      "abs_diff": 0.0
+    },
+    {
+      "d": 3,
+      "analytic_chance_3_over_d": 1.0,
+      "empirical_exchangeable_null": 1.0,
+      "empirical_sd": 0.0,
+      "abs_diff": 0.0
+    },
+    {
+      "d": 4,
+      "analytic_chance_3_over_d": 0.75,
+      "empirical_exchangeable_null": 0.80188,
+      "empirical_sd": 0.04606154144185798,
+      "abs_diff": 0.05188000000000004
+    },
+    {
+      "d": 5,
+      "analytic_chance_3_over_d": 0.6,
+      "empirical_exchangeable_null": 0.6742999999999999,
+      "empirical_sd": 0.05479698896837307,
+      "abs_diff": 0.07429999999999992
+    },
+    {
+      "d": 6,
+      "analytic_chance_3_over_d": 0.5,
+      "empirical_exchangeable_null": 0.58348,
+      "empirical_sd": 0.05778485614761016,
+      "abs_diff": 0.08348
+    },
+    {
+      "d": 8,
+      "analytic_chance_3_over_d": 0.375,
+      "empirical_exchangeable_null": 0.46847000000000005,
+      "empirical_sd": 0.0586110834228476,
+      "abs_diff": 0.09347000000000005
+    },
+    {
+      "d": 10,
+      "analytic_chance_3_over_d": 0.3,
+      "empirical_exchangeable_null": 0.39429000000000003,
+      "empirical_sd": 0.058443099678234044,
+      "abs_diff": 0.09429000000000004
+    },
+    {
+      "d": 15,
+      "analytic_chance_3_over_d": 0.2,
+      "empirical_exchangeable_null": 0.28963,
+      "empirical_sd": 0.05418360545404856,
+      "abs_diff": 0.08962999999999999
+    },
+    {
+      "d": 20,
+      "analytic_chance_3_over_d": 0.15,
+      "empirical_exchangeable_null": 0.23289000000000004,
+      "empirical_sd": 0.05258182100308052,
+      "abs_diff": 0.08289000000000005
+    },
+    {
+      "d": 30,
+      "analytic_chance_3_over_d": 0.1,
+      "empirical_exchangeable_null": 0.17111,
+      "empirical_sd": 0.048406279551314414,
+      "abs_diff": 0.07111
+    },
+    {
+      "d": 50,
+      "analytic_chance_3_over_d": 0.06,
+      "empirical_exchangeable_null": 0.11760000000000002,
+      "empirical_sd": 0.041907517225433434,
+      "abs_diff": 0.057600000000000026
+    }
+  ],
+  "verdict": "VERIFIED: F_top3 and top_feature_stability are identically 1.0 for every d <= 3 run, under both an informative and a pure-noise DGP; global and local feature sets are computed from the same X[:50]; and the chance level for d > 3 is 3/d (empirically slightly higher due to the shared-rows circularity)."
+}
