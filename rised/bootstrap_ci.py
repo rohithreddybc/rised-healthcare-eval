@@ -9,14 +9,148 @@ BCa references:
 For metrics bounded on [0,1] near boundaries (JSS, AUC parity gap, max TFR), the
 percentile bootstrap is known to undercover; BCa applies bias correction (z0)
 and acceleration (a) to produce intervals with correct coverage in finite samples.
+
+Clustered (grouped) resampling
+------------------------------
+Row-level resampling assumes rows are independent. That assumption fails when a
+cohort contains repeated measurements on the same unit (e.g. multiple hospital
+encounters per patient), and row-level intervals are then anti-conservative.
+:class:`ResamplingPlan` implements the cluster bootstrap of Field & Welsh (2007):
+unique group identifiers are resampled with replacement and *all* rows belonging
+to a sampled group are taken. The matching jackknife leaves out one whole group
+at a time, which is the delete-one-cluster jackknife required for a coherent BCa
+acceleration constant under clustering.
+
+  Field, C. A. & Welsh, A. H. (2007). Bootstrapping clustered data.
+  JRSS-B 69(3):369-390.
 """
 
 from __future__ import annotations
 
-from typing import Callable, Optional, Tuple
+import warnings
+from typing import Callable, Iterator, List, Optional, Sequence, Tuple
 
 import numpy as np
 from scipy.stats import norm
+
+#: Below this many usable replicates the BCa tail quantiles are not estimable.
+MIN_RELIABLE_BOOTSTRAP = 200
+
+
+class ResamplingPlan:
+    """Row-level or cluster-level resampling plan for the bootstrap/jackknife.
+
+    Parameters
+    ----------
+    n : int
+        Number of rows in the sample.
+    groups : array-like of shape (n,), optional
+        Cluster identifier per row. When ``None`` (the default) resampling is
+        row-level and behaviour is identical to the pre-existing bootstrap.
+        When supplied, the resampling unit becomes the unique group id.
+
+    Notes
+    -----
+    Bootstrap replicates produced under clustering do **not** in general have
+    length ``n``; they have the total length of the sampled clusters. Estimators
+    must therefore accept an index array of arbitrary length.
+    """
+
+    def __init__(self, n: int, groups=None) -> None:
+        self.n = int(n)
+        if groups is None:
+            self.groups = None
+            self._members: Optional[List[np.ndarray]] = None
+            return
+
+        g = np.asarray(groups)
+        if g.ndim != 1 or len(g) != self.n:
+            raise ValueError(
+                f"groups must be 1-D of length n={self.n}; got shape {g.shape}."
+            )
+        self.groups = g
+        _, inverse = np.unique(g, return_inverse=True)
+        n_groups = int(inverse.max()) + 1 if len(inverse) else 0
+        order = np.argsort(inverse, kind="stable")
+        counts = np.bincount(inverse, minlength=n_groups)
+        bounds = np.concatenate([[0], np.cumsum(counts)])
+        self._members = [
+            order[bounds[i]:bounds[i + 1]] for i in range(n_groups)
+        ]
+
+    # ── introspection ────────────────────────────────────────────────────────
+    @property
+    def clustered(self) -> bool:
+        """True when resampling is at the group level."""
+        return self.groups is not None
+
+    @property
+    def n_units(self) -> int:
+        """Number of independent resampling units (rows, or groups)."""
+        return self.n if self._members is None else len(self._members)
+
+    def describe(self) -> dict:
+        """Machine-readable description for inclusion in result ``details``."""
+        out = {"clustered": self.clustered, "n_rows": self.n, "n_units": self.n_units}
+        if self._members is not None:
+            sizes = np.array([len(m) for m in self._members], dtype=float)
+            out["mean_rows_per_group"] = float(sizes.mean()) if len(sizes) else 0.0
+            out["max_rows_per_group"] = int(sizes.max()) if len(sizes) else 0
+        return out
+
+    # ── resampling ───────────────────────────────────────────────────────────
+    def bootstrap_index(self, rng: np.random.Generator) -> np.ndarray:
+        """Draw one bootstrap index array (row-level or cluster-level)."""
+        if self._members is None:
+            return rng.integers(0, self.n, size=self.n)
+        n_g = len(self._members)
+        if n_g == 0:
+            return np.empty(0, dtype=int)
+        picks = rng.integers(0, n_g, size=n_g)
+        return np.concatenate([self._members[i] for i in picks])
+
+    def jackknife_index_iter(self) -> Iterator[np.ndarray]:
+        """Yield leave-one-unit-out index arrays.
+
+        Leaves out one *row* when unclustered, one whole *group* when clustered.
+        """
+        if self._members is None:
+            full = np.arange(self.n)
+            for i in range(self.n):
+                yield np.delete(full, i)
+        else:
+            n_g = len(self._members)
+            for i in range(n_g):
+                keep = [self._members[j] for j in range(n_g) if j != i]
+                yield (
+                    np.sort(np.concatenate(keep)) if keep else np.empty(0, dtype=int)
+                )
+
+    def full_index(self) -> np.ndarray:
+        return np.arange(self.n)
+
+
+def bootstrap_replicates(
+    statistic_fn: Callable[[np.ndarray], float],
+    plan: ResamplingPlan,
+    n_bootstrap: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Compute ``n_bootstrap`` replicates of ``statistic_fn`` under ``plan``."""
+    out = np.empty(int(n_bootstrap), dtype=float)
+    for b in range(int(n_bootstrap)):
+        out[b] = statistic_fn(plan.bootstrap_index(rng))
+    return out
+
+
+def jackknife_from_plan(
+    statistic_fn: Callable[[np.ndarray], float],
+    plan: ResamplingPlan,
+) -> np.ndarray:
+    """Delete-one-unit jackknife replicates of ``statistic_fn`` under ``plan``."""
+    return np.array(
+        [statistic_fn(idx) for idx in plan.jackknife_index_iter()], dtype=float
+    )
 
 
 def bca_interval(
@@ -46,9 +180,22 @@ def bca_interval(
     """
     theta_boot = np.asarray(theta_boot, dtype=float)
     theta_jack = np.asarray(theta_jack, dtype=float)
+    theta_boot = theta_boot[~np.isnan(theta_boot)]
+    theta_jack = theta_jack[~np.isnan(theta_jack)]
     B = len(theta_boot)
-    if B == 0:
+    if B == 0 or np.isnan(theta_hat):
         return (float("nan"), float("nan"))
+    if len(theta_jack) == 0:
+        theta_jack = np.array([theta_hat], dtype=float)
+    if B < MIN_RELIABLE_BOOTSTRAP:
+        warnings.warn(
+            f"BCa interval computed from only {B} usable bootstrap replicates. "
+            f"The bias-correction z0 saturates at 1/(2B) and the tail quantiles "
+            f"are not estimable at this B; use at least "
+            f"{MIN_RELIABLE_BOOTSTRAP} (1000 for published figures).",
+            UserWarning,
+            stacklevel=2,
+        )
 
     # Bias correction z0
     prop_below = float(np.mean(theta_boot < theta_hat))
@@ -87,9 +234,13 @@ def jackknife_replicates(
     statistic_fn: Callable[[np.ndarray], float],
     n: int,
     indices: Optional[np.ndarray] = None,
+    groups=None,
 ) -> np.ndarray:
     """
-    Compute jackknife (leave-one-out) replicates of a statistic.
+    Compute jackknife replicates of a statistic.
+
+    Leaves out one row at a time by default; when ``groups`` is supplied, leaves
+    out one whole group at a time (delete-one-cluster jackknife).
 
     Parameters
     ----------
@@ -98,13 +249,19 @@ def jackknife_replicates(
     n : int
         Sample size.
     indices : np.ndarray, optional
-        Pre-computed full index array (default: np.arange(n)).
+        Pre-computed full index array (default: np.arange(n)). Ignored when
+        ``groups`` is supplied.
+    groups : array-like of shape (n,), optional
+        Cluster identifier per row. Default ``None`` reproduces the original
+        leave-one-row-out behaviour exactly.
 
     Returns
     -------
-    theta_jack : np.ndarray, shape (n,)
-        Jackknife replicates.
+    theta_jack : np.ndarray
+        Jackknife replicates, one per resampling unit.
     """
+    if groups is not None:
+        return jackknife_from_plan(statistic_fn, ResamplingPlan(n, groups))
     if indices is None:
         indices = np.arange(n)
     out = np.empty(n, dtype=float)
