@@ -12,7 +12,7 @@ systems.**
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-81%20passing-brightgreen)](#tests)
-[![Coverage](https://img.shields.io/badge/coverage-82%25-brightgreen)](#tests)
+[![Coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)](#tests)
 
 > An XGBoost classifier with **AUROC 0.961** can still fail three of five
 > RISED metrics. Aggregate accuracy alone does not surface reliability under
@@ -319,8 +319,9 @@ compliance with any of these frameworks.
 pytest --tb=short -q
 ```
 
-81 tests passing, 82% overall line coverage (>90% on the core evaluation
-modules: reliability, sensitivity, equity, inclusivity, metrics).
+168 tests passing, 91% overall line coverage. Per-module coverage is 81–100%
+across the evaluation modules; `reproduce_all` is the one uncovered module, as
+it orchestrates network-dependent example scripts.
 
 ---
 
