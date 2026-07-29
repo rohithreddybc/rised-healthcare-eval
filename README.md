@@ -1,34 +1,43 @@
 # RISED Framework
 
-**A pre-deployment evaluation framework for high-stakes AI decision-support
-systems — Reliability, Inclusivity, Sensitivity, Equity, Deployability —
-with deep application to healthcare and cross-domain demonstrations on
-credit and hiring expert systems.**
+**A measurement toolkit for evaluating high-stakes AI decision-support
+systems across five dimensions — Reliability, Inclusivity, Sensitivity,
+Equity, Deployability — computing each metric with bootstrap confidence
+intervals, plus a configurable advisory policy layer on top. Applied to
+healthcare, with cross-domain demonstrations on credit and hiring expert
+systems.**
 
 [![Dataset on HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-rised--healthcare--eval--dataset-yellow)](https://huggingface.co/datasets/Rohithreddybc/rised-healthcare-eval-dataset)
 [![DOI](https://img.shields.io/badge/DOI-10.57967%2Fhf%2F8734-blue)](https://doi.org/10.57967/hf/8734)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-81%20passing-brightgreen)](#tests)
-[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](#tests)
+[![Coverage](https://img.shields.io/badge/coverage-82%25-brightgreen)](#tests)
 
 > An XGBoost classifier with **AUROC 0.961** can still fail three of five
-> RISED dimensions. Aggregate accuracy is necessary but not sufficient for safe
-> deployment of a high-stakes expert system.
+> RISED metrics. Aggregate accuracy alone does not surface reliability under
+> input perturbation, subgroup performance gaps, threshold instability, or
+> proxy-dependent equity findings.
 
 RISED — **R**eliability, **I**nclusivity, **S**ensitivity, **E**quity,
-**D**eployability — is a structured framework for testing high-stakes AI
-decision-support systems *before* they are deployed. Each of the five
-dimensions is operationalized through formal sub-criteria with
-literature-grounded pass/fail thresholds and bootstrap 95% confidence
-intervals, packaged as an open-source Python library. The framework was
+**D**eployability — is a measurement toolkit for high-stakes AI
+decision-support systems. Each of the five dimensions is operationalized
+as a metric, computed with bootstrap 95% confidence intervals and compared
+against a literature-derived reference threshold, packaged as an
+open-source Python library. A configurable advisory policy layer turns
+each metric/threshold comparison into a pass/fail flag for convenience —
+this is a configurable convention supplied by the library, not an
+empirically validated deployment-readiness determination, and RISED does
+not certify that a model is safe or cleared to deploy. The framework was
 developed for clinical AI (where the empirical evidence is densest and the
-regulatory pressure is highest) and is demonstrated on credit-scoring and
-hiring expert systems via the cross-domain demos in `examples/`.
+regulatory discussion is most active) and is demonstrated on
+credit-scoring and hiring expert systems via the cross-domain demos in
+`examples/`.
 
 📄 **Paper:** *RISED: A Pre-Deployment Evaluation Framework for High-Stakes
-AI Decision-Support Systems, with Application to Healthcare*, submitted to
-*Expert Systems with Applications* (Elsevier, IF 8.5, CiteScore 13.8, Q1).
+AI Decision-Support Systems, with Application to Healthcare* — manuscript
+in preparation for submission to the *Journal of Biomedical Informatics*
+(Elsevier).
 Dataset DOI: [10.57967/hf/8734](https://doi.org/10.57967/hf/8734)
 
 ---
@@ -38,15 +47,15 @@ Dataset DOI: [10.57967/hf/8734](https://doi.org/10.57967/hf/8734)
 If you use RISED in your own evaluation, please cite the paper:
 
 ```bibtex
-@article{bellibatlu2026rised,
+@unpublished{bellibatlu2026rised,
   title   = {RISED: A Pre-Deployment Evaluation Framework for
              High-Stakes AI Decision-Support Systems, with
              Application to Healthcare},
   author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
              Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
-  journal = {Expert Systems with Applications},
+  note    = {Manuscript in preparation for submission to the
+             Journal of Biomedical Informatics},
   year    = {2026},
-  note    = {Under review},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
 }
 ```
@@ -60,11 +69,14 @@ conda env create -f environment.yml && conda activate rised
 python -m rised.reproduce_all
 ```
 
-This runs the synthetic-cohort evaluation, all three real-data external
-validations, the multi-model robustness check, the Fairlearn comparison,
-and the two cross-domain demos (`adult_income_demo.py`,
-`german_credit_demo.py`) in sequence, reproducing every number in the
-paper.
+This runs, in sequence: four real-data within-cohort evaluations (UCI Heart
+Disease, UCI Diabetes 130, NHIS 2024, NHIS 2023), the multi-model
+robustness check, the Fairlearn comparison, and three cross-domain demos
+(`adult_income_demo.py`, `folktables_acs_income_demo.py`,
+`german_credit_demo.py`). It does **not** currently run the synthetic-cohort
+baseline or the NHANES 2021–2023, BRFSS 2024, or MIMIC-IV-ED evaluations —
+run those individually with the corresponding script listed in the cohort
+table below.
 
 ---
 
@@ -87,8 +99,8 @@ accuracy) on a held-out test set. That number cannot detect:
 
 These failure modes are well-documented at scale in production clinical AI
 (Obermeyer et al., *Science* 2019; Wong et al., *JAMA Intern Med* 2021;
-Finlayson et al., *NEJM* 2021), but no existing toolkit captures them as a
-gateable pre-deployment test.
+Finlayson et al., *NEJM* 2021), but no existing toolkit reports all five as
+part of a single, reproducible measurement pass.
 
 ---
 
@@ -101,6 +113,11 @@ gateable pre-deployment test.
 | **S**ensitivity   | Max threshold flip rate (TFR) | ≤ 10%  | Wynants 2019 |
 | **E**quity        | Need-prediction ρ (Spearman)  | ≥ 0.70 | Cohen 1988; Obermeyer 2019 |
 | **D**eployability | Mean inference latency Λ      | ≤ 500 ms | Sutton 2020 |
+
+> The thresholds above are literature-derived conventions used as defaults
+> by the advisory policy layer. They are configurable, and RISED does not
+> assert that they have been empirically validated against observed
+> deployment outcomes.
 
 ---
 
@@ -163,9 +180,16 @@ fig.savefig("scorecard.png", dpi=150)
 
 ## Reproducing the Paper's Results
 
-The paper applies RISED to an XGBoost classifier (AUROC 0.961, Brier 0.073) on
-the 2,000-patient held-out test split, using BCa bootstrap CIs and Holm-Bonferroni
-family-wise error correction.
+The paper applies RISED's metric and bootstrap-CI functions to an XGBoost
+classifier (AUROC 0.961, Brier 0.073) on the 2,000-patient held-out test
+split. The table below reports BCa bootstrap confidence intervals computed
+from the library's estimator functions; the Status column follows the
+manuscript's own decision rule for that analysis (a metric whose CI
+excludes the reference threshold is marked PASS/FAIL, one whose CI spans
+it is marked INCONCLUSIVE). That decision rule is applied in the paper's
+analysis scripts — it is **not** the same computation as `report.summary()`
+above, which compares point estimates against the reference thresholds
+directly and does not apply a multiple-comparisons correction.
 
 | Dimension | Value | 95% BCa CI | Status |
 |-----------|------:|:----------:|:------:|
@@ -176,9 +200,12 @@ family-wise error correction.
 | ρ_need (CCI proxy)        | 0.599  | —                | DIAGNOSTIC² |
 | Λ (per cohort)            | ~1 ms  | —                | PASS |
 
-¹ BCa CI [0.042, 0.066] spans the 0.05 threshold → INCONCLUSIVE under the CI rule.
-² Equity is reported as a proxy-dependence diagnostic, not a stand-alone gate; verdicts
-   an externally validated need measure.
+¹ BCa CI [0.042, 0.066] spans the 0.05 threshold → INCONCLUSIVE under the
+  manuscript's CI decision rule.
+² Equity is reported as a proxy-dependence diagnostic, not a stand-alone
+  gate: the two rows show how the verdict depends on which need proxy is
+  chosen, since no independently validated need measure was available for
+  this cohort.
 
 Bootstrap CIs from 1,000 iterations with `random_state=42`. Hardware-dependent
 latency reported on a single test machine.
@@ -224,16 +251,18 @@ for the full feature schema and demographic breakdown.
 
 RISED is designed to **complement** existing toolkits, not replace them:
 
-| Toolkit | Purpose | Pre-deployment gate? |
-|---------|---------|----------------------|
-| AI Fairness 360 | Menu of fairness metrics for model selection | No (development-time) |
-| Fairlearn       | Fairness-aware training algorithms           | No (development-time) |
-| TRIPOD+AI       | Reporting standard for prediction studies   | No (reporting only) |
-| TEHAI           | Translational evaluation taxonomy            | No (qualitative) |
-| **RISED**       | **5-dim pre-deployment test with pass/fail thresholds** | **Yes** |
+| Toolkit | Purpose | Output |
+|---------|---------|--------|
+| AI Fairness 360 | Menu of fairness metrics for model selection | Metrics (development-time) |
+| Fairlearn       | Fairness-aware training algorithms           | Metrics + mitigation (development-time) |
+| TRIPOD+AI       | Reporting standard for prediction studies   | Reporting checklist only |
+| TEHAI           | Translational evaluation taxonomy            | Qualitative taxonomy |
+| **RISED**       | **5-dimension metric suite with bootstrap CIs and a configurable advisory policy layer** | **Metrics + advisory pass/fail flags** |
 
-RISED operationalizes the testing requirements implied — but not specified —
-by the FDA AI/ML Action Plan, the ONC HTI-1 rule, and the EU AI Act.
+RISED's five dimensions were chosen to reflect testing concerns raised — but
+not specified in operational detail — by the FDA AI/ML Action Plan, the ONC
+HTI-1 rule, and the EU AI Act. RISED does not implement, and does not claim,
+compliance with any of these frameworks.
 
 ---
 
@@ -251,23 +280,23 @@ modules: reliability, sensitivity, equity, inclusivity, metrics).
 ## Citation
 
 ```bibtex
-@article{bellibatlu2026rised,
+@unpublished{bellibatlu2026rised,
   title   = {{RISED}: A Pre-Deployment Evaluation Framework for High-Stakes {AI}
              Decision-Support Systems, with Application to Healthcare},
   author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
              Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
-  journal = {Expert Systems with Applications},
+  note    = {Manuscript in preparation for submission to the
+             Journal of Biomedical Informatics},
   year    = {2026},
-  note    = {Under review},
   url     = {https://github.com/rohithreddybc/rised-healthcare-eval}
 }
 ```
 
 ---
 
-## External validation on real datasets
+## Within-cohort evaluation on real datasets
 
-The framework has been re-run unchanged on six publicly available real-data clinical cohorts spanning 35 years of vintage, plus three non-clinical cohorts that demonstrate the protocol is domain-agnostic:
+The framework has been re-run unchanged on six publicly available real-data clinical cohorts spanning 35 years of vintage, plus three non-clinical cohorts that demonstrate the protocol is domain-agnostic. In every case the model is trained and tested on a random split **within the same cohort** — there is no cross-site, cross-time, or cross-population holdout, so these are within-cohort evaluations of generalization to a held-out random sample, not external validations:
 
 | Cohort | n | Era | Outcome | Reproduce |
 |---|---|---|---|---|
@@ -281,16 +310,17 @@ The framework has been re-run unchanged on six publicly available real-data clin
 | *Cross-domain:* UCI Adult Income | 45,222 | 1994 | Income > $50k | `python examples/adult_income_demo.py` |
 | *Cross-domain:* Folktables ACS-Income | 20,000 | 2018 | Income > $50k | `python examples/folktables_acs_income_demo.py` |
 
-The cohorts produce non-uniform pass/fail patterns that support the framework's construct validity. On Diabetes 130, Reliability passes by three orders of magnitude (PSS = 0.0004) while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively; both NHIS cohorts and BRFSS 2024 reproduce the Inclusivity/Sensitivity failure, while NHANES 2021–2023 — with a complete laboratory feature set — reaches INCONCLUSIVE rather than outright failure. The same Reliability-pass / Sensitivity-fail / Inclusivity-fail pattern recurs on the three non-clinical cohorts, confirming the protocol generalises beyond healthcare. The MIMIC-IV-ED integration (`examples/external_validation_mimic_ed.py`) is implemented and validated end-to-end on the public MIMIC-IV-ED demo; the full credentialed cohort is the priority next step.
+The cohorts produce non-uniform pass/fail patterns across these within-cohort evaluations. On Diabetes 130, Reliability passes by three orders of magnitude (PSS = 0.0004) while Inclusivity (ΔAUC = 0.262) and Sensitivity (max TFR = 49.1%) fail decisively; both NHIS cohorts and BRFSS 2024 reproduce the Inclusivity/Sensitivity failure, while NHANES 2021–2023 — with a complete laboratory feature set — reaches INCONCLUSIVE rather than outright failure. The same Reliability-pass / Sensitivity-fail / Inclusivity-fail pattern recurs on the three non-clinical cohorts, showing the protocol runs beyond healthcare data as well. The MIMIC-IV-ED integration (`examples/external_validation_mimic_ed.py`) runs end-to-end on the public MIMIC-IV-ED demo (again a within-cohort split); the full credentialed cohort is the priority next step.
 
 ## Roadmap
 
-- [x] External validation on UCI Heart Disease (Cleveland)
-- [x] External validation on UCI Diabetes 130-US Hospitals
-- [x] External validation on NCHS NHIS 2024, NHIS 2023, NHANES 2021–2023, and CDC BRFSS 2024
-- [x] Cross-domain validation on German Credit, UCI Adult Income, and Folktables ACS-Income
-- [x] MIMIC-IV-ED integration implemented and validated on the public demo
+- [x] Within-cohort evaluation on UCI Heart Disease (Cleveland)
+- [x] Within-cohort evaluation on UCI Diabetes 130-US Hospitals
+- [x] Within-cohort evaluation on NCHS NHIS 2024, NHIS 2023, NHANES 2021–2023, and CDC BRFSS 2024
+- [x] Within-cohort evaluation on non-clinical domains: German Credit, UCI Adult Income, and Folktables ACS-Income
+- [x] MIMIC-IV-ED integration implemented and runs end-to-end on the public demo
 - [ ] Full MIMIC-IV-ED / eICU evaluation (PhysioNet credential required)
+- [ ] True external validation across sites, time periods, or populations
 - [ ] Re-run on NHIS 2025 / NHANES 2025–2026 once microdata is released
 - [ ] Empirical recalibration of pass/fail thresholds against deployment outcomes
 - [ ] Extension to multi-label and time-series risk models
