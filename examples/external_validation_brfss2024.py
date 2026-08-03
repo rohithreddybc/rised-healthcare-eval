@@ -196,21 +196,17 @@ def main():
     eq_independent = evaluate_equity(
         model, X_te, y_te, demo_with_need, need_column="physhlth_proxy")
 
-    # Bootstrap CI for rho_need under both proxies
+    # Bootstrap CI for rho_need under the independent proxy
     B = 1000
     rs = np.random.RandomState(42)
     n = len(scores_te)
     phys = physhlth_te.values
-    boot_y, boot_phys = [], []
+    boot_phys = []
     for _ in range(B):
         idx = rs.choice(n, size=n, replace=True)
-        r1, _ = spearmanr(scores_te[idx], y_te[idx])
-        r2, _ = spearmanr(scores_te[idx], phys[idx])
-        boot_y.append(r1)
-        boot_phys.append(r2)
-    boot_y = np.array(boot_y)
+        r, _ = spearmanr(scores_te[idx], phys[idx])
+        boot_phys.append(r)
     boot_phys = np.array(boot_phys)
-    rho_y_ci = (np.percentile(boot_y, 2.5), np.percentile(boot_y, 97.5))
     rho_phys_ci = (np.percentile(boot_phys, 2.5),
                    np.percentile(boot_phys, 97.5))
 

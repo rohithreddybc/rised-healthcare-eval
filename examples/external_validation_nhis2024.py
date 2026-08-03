@@ -233,21 +233,17 @@ def main():
     eq_independent = evaluate_equity(
         model, X_te, y_te, demo_with_need, need_column="genhlth_proxy")
 
-    # Bootstrap CI for rho_need under both proxies
+    # Bootstrap CI for rho_need under the independent proxy
     B = 1000
     rs = np.random.RandomState(42)
     n = len(scores_te)
     gh = genhlth_te.values
-    boot_y, boot_gh = [], []
+    boot_gh = []
     for _ in range(B):
         idx = rs.choice(n, size=n, replace=True)
-        r1, _ = spearmanr(scores_te[idx], y_te[idx])
-        r2, _ = spearmanr(scores_te[idx], gh[idx])
-        boot_y.append(r1)
-        boot_gh.append(r2)
-    boot_y = np.array(boot_y)
+        r, _ = spearmanr(scores_te[idx], gh[idx])
+        boot_gh.append(r)
     boot_gh = np.array(boot_gh)
-    rho_y_ci = (np.percentile(boot_y, 2.5), np.percentile(boot_y, 97.5))
     rho_gh_ci = (np.percentile(boot_gh, 2.5),
                  np.percentile(boot_gh, 97.5))
 

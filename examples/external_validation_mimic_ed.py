@@ -227,14 +227,11 @@ def main():
     rs = np.random.RandomState(42)
     n = len(scores_te)
     need_vec = (6.0 - acuity_te.values)
-    boot_y, boot_need = [], []
+    boot_need = []
     for _ in range(B):
         idx = rs.choice(n, size=n, replace=True)
-        r1, _ = spearmanr(scores_te[idx], y_te[idx])
-        r2, _ = spearmanr(scores_te[idx], need_vec[idx])
-        boot_y.append(r1)
-        boot_need.append(r2)
-    rho_y_ci = (np.percentile(boot_y, 2.5), np.percentile(boot_y, 97.5))
+        r, _ = spearmanr(scores_te[idx], need_vec[idx])
+        boot_need.append(r)
     rho_need_ci = (np.percentile(boot_need, 2.5), np.percentile(boot_need, 97.5))
 
     print("\n=== RISED scorecard on MIMIC-IV-ED (real data) ===")

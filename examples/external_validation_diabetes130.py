@@ -147,21 +147,17 @@ def main():
     eq_independent = evaluate_equity(
         model, X_te, y_te, demo_with_need, need_column="n_inpatient_proxy")
 
-    # Bootstrap CI for rho_need under both proxies
+    # Bootstrap CI for rho_need under the independent proxy
     B = 1000
     rs = np.random.RandomState(42)
     n = len(scores_te)
-    boot_y, boot_inp = [], []
+    boot_inp = []
     n_inp = n_inpatient_te.values
     for _ in range(B):
         idx = rs.choice(n, size=n, replace=True)
-        r1, _ = spearmanr(scores_te[idx], y_te[idx])
-        r2, _ = spearmanr(scores_te[idx], n_inp[idx])
-        boot_y.append(r1)
-        boot_inp.append(r2)
-    boot_y = np.array(boot_y)
+        r, _ = spearmanr(scores_te[idx], n_inp[idx])
+        boot_inp.append(r)
     boot_inp = np.array(boot_inp)
-    rho_y_ci = (np.percentile(boot_y, 2.5), np.percentile(boot_y, 97.5))
     rho_inp_ci = (np.percentile(boot_inp, 2.5), np.percentile(boot_inp, 97.5))
 
     # 8. Print scorecard

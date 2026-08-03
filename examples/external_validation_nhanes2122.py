@@ -270,16 +270,12 @@ def main():
     rs = np.random.RandomState(42)
     n = len(scores_te)
     hba1c_arr = hba1c_te.values
-    boot_y, boot_hba = [], []
+    boot_hba = []
     for _ in range(B):
         idx = rs.choice(n, size=n, replace=True)
-        r1, _ = spearmanr(scores_te[idx], y_te[idx])
-        r2, _ = spearmanr(scores_te[idx], hba1c_arr[idx])
-        boot_y.append(r1)
-        boot_hba.append(r2)
-    boot_y   = np.array(boot_y)
+        r, _ = spearmanr(scores_te[idx], hba1c_arr[idx])
+        boot_hba.append(r)
     boot_hba = np.array(boot_hba)
-    rho_y_ci   = (np.percentile(boot_y,   2.5), np.percentile(boot_y,   97.5))
     rho_hba_ci = (np.percentile(boot_hba, 2.5), np.percentile(boot_hba, 97.5))
 
     # 11. Print scorecard
