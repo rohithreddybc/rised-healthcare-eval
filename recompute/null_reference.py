@@ -31,14 +31,45 @@ class* -- which is precisely the statement "every subgroup has the same true
 AUC". The true parity gap is therefore 0 by construction and everything
 observed is selection bias plus sampling noise, at the cohort's real geometry.
 
-Each demographic column is permuted independently, matching the fact that
-``evaluate_inclusivity`` computes an independent gap within each column and then
-maximises over columns.
+Two permutation schemes
+-----------------------
+``scheme="independent"`` (the original, and still the default so that every
+previously published number reproduces bit-for-bit) draws a *fresh* permutation
+for each demographic column. That makes the per-column gaps independent of one
+another.
+
+``scheme="joint"`` draws ONE permutation of the row indices per replicate --
+within the positives and within the negatives separately -- and carries *all*
+demographic columns together on those permuted rows.
+
+The joint scheme is the correct one. Age, sex, race, insurance and income are
+strongly associated in these cohorts; the independent scheme destroys that
+association and so makes the per-column gaps independent when in reality they
+are positively dependent. The maximum of independent components is
+stochastically LARGER than the maximum of positively dependent components with
+the same margins, so the independent null is too wide, its p-values are too
+large, and a negative conclusion drawn from it is partly an artefact of the
+resampling scheme. Note that each column's *marginal* null is identical under
+the two schemes -- only the cross-column dependence, and hence the maximum,
+changes.
+
+Both schemes preserve the same things (subgroup sizes, subgroup prevalences,
+the marginal score distribution, the cohort AUROC) and both break the
+subgroup-to-score link conditional on outcome, which is the null of interest.
+The joint scheme additionally preserves the full demographic contingency table.
 
 The statistic replicated is the 0.2.0 headline: the maximum over demographic
 columns of the within-column (max - min) subgroup AUC, applying the same
 n >= min_subgroup_n and non-degenerate-labels exclusion rule used in the point
 estimate.
+
+Subgroup inclusion rules
+------------------------
+``m_min = 30`` was never varied anywhere in the package, and the null's width is
+dominated by its noisiest estimable levels, so the inclusion rule is now a swept
+parameter (:data:`INCLUSION_RULES`) rather than a hard-coded constant. All rules
+are evaluated on the *same* permutation draws, so the sweep costs almost nothing
+and the settings are perfectly paired.
 """
 
 from __future__ import annotations
@@ -93,6 +124,136 @@ def _max_partition_gap(
     return float(best)
 
 
+# ── Subgroup inclusion rules (swept; m30 is the published default) ───────────
+#: Every rule additionally requires >= 2 positives and >= 2 negatives, which is
+#: the minimum for an estimable within-level AUROC and is what the 0.2.0 point
+#: estimate already enforced.
+#:
+#: ``ev10`` is the events-based rule the prognostic-model literature argues for:
+#: a level needs at least 10 observations in EACH outcome class before its
+#: AUROC is treated as estimable. At NHIS 2024's prevalence of 0.075 a level of
+#: n=30 carries about 2 events, so ``m30`` admits levels whose AUROC is nearly
+#: pure noise -- and noise inflates a max-min range.
+INCLUSION_RULES: Dict[str, Dict[str, object]] = {
+    "m20": {"kind": "size", "min_n": 20,
+            "label": "n >= 20"},
+    "m30": {"kind": "size", "min_n": 30,
+            "label": "n >= 30 (published default)"},
+    "m50": {"kind": "size", "min_n": 50,
+            "label": "n >= 50"},
+    "m100": {"kind": "size", "min_n": 100,
+             "label": "n >= 100"},
+    "ev10": {"kind": "events", "min_events": 10,
+             "label": "n_pos >= 10 and n_neg >= 10"},
+}
+
+DEFAULT_RULE = "m30"
+SCHEMES = ("independent", "joint")
+
+
+def _rule_admits(rule: Dict[str, object], n: int, n_pos: int, n_neg: int) -> bool:
+    if n_pos < 2 or n_neg < 2:
+        return False
+    if rule["kind"] == "size":
+        return n >= int(rule["min_n"])          # type: ignore[arg-type]
+    return min(n_pos, n_neg) >= int(rule["min_events"])   # type: ignore[arg-type]
+
+
+def _column_level_stats(y: np.ndarray, s: np.ndarray, codes: np.ndarray):
+    """(n, n_pos, n_neg, auc) for every level of one column with estimable AUC.
+
+    Computed once per column per replicate and then filtered by each inclusion
+    rule, so the whole m_min sweep costs one pass rather than five.
+    """
+    stats = []
+    for lvl in np.unique(codes):
+        mask = codes == lvl
+        n = int(mask.sum())
+        y_g = y[mask]
+        n_pos = int(y_g.sum())
+        n_neg = n - n_pos
+        if n_pos < 2 or n_neg < 2:
+            continue
+        a = fast_auc(y_g, s[mask])
+        if np.isnan(a):
+            continue
+        stats.append((n, n_pos, n_neg, float(a)))
+    return stats
+
+
+def partition_gaps_by_rule(
+    y: np.ndarray,
+    s: np.ndarray,
+    codes_by_col: Dict[str, np.ndarray],
+    rules: Optional[List[str]] = None,
+) -> Dict[str, float]:
+    """Max over columns of the within-column (max-min) AUC, for EVERY rule.
+
+    One pass over the columns and levels; the rules only differ in which levels
+    they keep, so they share the AUROC computations.
+    """
+    names = list(rules) if rules is not None else list(INCLUSION_RULES)
+    best = {k: np.nan for k in names}
+    for codes in codes_by_col.values():
+        stats = _column_level_stats(y, s, codes)
+        for k in names:
+            rule = INCLUSION_RULES[k]
+            aucs = [a for (n, npos, nneg, a) in stats
+                    if _rule_admits(rule, n, npos, nneg)]
+            if len(aucs) >= 2:
+                gap = max(aucs) - min(aucs)
+                best[k] = gap if np.isnan(best[k]) else max(best[k], gap)
+    return {k: float(v) for k, v in best.items()}
+
+
+def code_columns(
+    demographic_df: pd.DataFrame,
+    cols: Optional[List[str]] = None,
+) -> Dict[str, np.ndarray]:
+    """Integer-code each demographic column once, in the given column order."""
+    demo = demographic_df.reset_index(drop=True)
+    use = cols if cols is not None else list(demo.columns)
+    out: Dict[str, np.ndarray] = {}
+    for c in use:
+        _, inv = np.unique(np.asarray(demo[c].astype(str)), return_inverse=True)
+        out[c] = inv.astype(np.int32)
+    return out
+
+
+def draw_permuted_codes(
+    codes_by_col: Dict[str, np.ndarray],
+    pos_idx: np.ndarray,
+    neg_idx: np.ndarray,
+    rng: np.random.Generator,
+    scheme: str = "independent",
+) -> Dict[str, np.ndarray]:
+    """One replicate's permuted demographic assignment.
+
+    ``independent`` -- a fresh within-class permutation per column, which
+    destroys the association between age, sex, race and insurance.
+    ``joint`` -- ONE within-class permutation of the row indices, applied to
+    every column, which carries whole demographic rows and therefore preserves
+    the joint contingency structure exactly.
+    """
+    if scheme == "joint":
+        n = len(next(iter(codes_by_col.values())))
+        perm = np.empty(n, dtype=np.int64)
+        perm[pos_idx] = rng.permutation(pos_idx)
+        perm[neg_idx] = rng.permutation(neg_idx)
+        return {c: codes[perm] for c, codes in codes_by_col.items()}
+    if scheme != "independent":
+        raise ValueError(f"unknown permutation scheme {scheme!r}")
+    permuted: Dict[str, np.ndarray] = {}
+    for c, codes in codes_by_col.items():
+        new = np.empty_like(codes)
+        # Permute labels within the positives and within the negatives:
+        # preserves each level's size and positive count exactly.
+        new[pos_idx] = codes[rng.permutation(pos_idx)]
+        new[neg_idx] = codes[rng.permutation(neg_idx)]
+        permuted[c] = new
+    return permuted
+
+
 def cohort_null_reference(
     y_true,
     scores,
@@ -102,6 +263,7 @@ def cohort_null_reference(
     n_reps: int = 2000,
     random_state: int = 42,
     observed_gap: Optional[float] = None,
+    scheme: str = "independent",
 ) -> Dict[str, object]:
     """Null distribution of the max per-partition AUC gap for THIS cohort.
 
@@ -122,6 +284,9 @@ def cohort_null_reference(
     observed_gap : float, optional
         The measured max per-partition gap. When supplied, a one-sided
         Monte-Carlo p-value and an excess-over-null are reported.
+    scheme : {'independent', 'joint'}
+        Permutation scheme; see the module docstring. ``independent`` is the
+        default only for backward compatibility -- ``joint`` is the correct one.
 
     Returns
     -------
@@ -135,13 +300,8 @@ def cohort_null_reference(
         if subgroup_columns is not None
         else list(demographic_df.columns)
     )
-    demo = demographic_df.reset_index(drop=True)
-
     # Integer-code each column once; permutation then works on small int arrays.
-    codes_by_col: Dict[str, np.ndarray] = {}
-    for c in cols:
-        _, inv = np.unique(np.asarray(demo[c].astype(str)), return_inverse=True)
-        codes_by_col[c] = inv.astype(np.int32)
+    codes_by_col = code_columns(demographic_df, cols)
 
     pos_idx = np.flatnonzero(y == 1)
     neg_idx = np.flatnonzero(y == 0)
@@ -149,22 +309,23 @@ def cohort_null_reference(
     rng = np.random.default_rng(random_state)
     vals = np.full(n_reps, np.nan, dtype=float)
     for r in range(n_reps):
-        permuted: Dict[str, np.ndarray] = {}
-        for c, codes in codes_by_col.items():
-            new = np.empty_like(codes)
-            # Permute labels within the positives and within the negatives:
-            # preserves each level's size and positive count exactly.
-            new[pos_idx] = codes[rng.permutation(pos_idx)]
-            new[neg_idx] = codes[rng.permutation(neg_idx)]
-            permuted[c] = new
+        permuted = draw_permuted_codes(
+            codes_by_col, pos_idx, neg_idx, rng, scheme=scheme)
         vals[r] = _max_partition_gap(y, s, permuted, min_subgroup_n)
 
     v = vals[~np.isnan(vals)]
     out: Dict[str, object] = {
         "null_design": (
-            "stratified permutation of subgroup labels within outcome classes; "
-            "preserves subgroup sizes and prevalences, forces equal true AUC"
+            f"{scheme} stratified permutation of subgroup labels within "
+            "outcome classes; preserves subgroup sizes and prevalences, "
+            "forces equal true AUC"
+            + ("; one row permutation carried across all demographic columns, "
+               "preserving their joint contingency structure"
+               if scheme == "joint" else
+               "; a fresh permutation per demographic column, which destroys "
+               "the association between the columns")
         ),
+        "permutation_scheme": scheme,
         "n_reps": int(n_reps),
         "n_valid_reps": int(len(v)),
         "min_subgroup_n": int(min_subgroup_n),
@@ -182,13 +343,43 @@ def cohort_null_reference(
         "null_p99_gap": float(np.percentile(v, 99)),
     })
     if observed_gap is not None and np.isfinite(observed_gap):
-        # One-sided Monte-Carlo p-value with the standard +1 correction.
-        n_ge = int(np.sum(v >= float(observed_gap)))
-        out["observed_gap"] = float(observed_gap)
-        out["p_value_vs_null"] = float((n_ge + 1) / (len(v) + 1))
-        out["excess_over_null_mean"] = float(observed_gap - np.mean(v))
-        out["exceeds_null_p95"] = bool(observed_gap > np.percentile(v, 95))
+        out.update(mc_pvalue(v, float(observed_gap)))
     return out
+
+
+def mc_pvalue(null_vals: np.ndarray, observed: float) -> Dict[str, object]:
+    """One-sided Monte-Carlo p-value with its Monte-Carlo standard error.
+
+    The +1 correction makes the test exact-valid; its consequence is a hard
+    floor at 1/(B+1), which must be REPORTED as an inequality rather than
+    printed as if it were an attained value. ``p_is_floor`` flags that case and
+    ``p_report`` renders it as ``<= 1/(B+1)``.
+    """
+    v = np.asarray(null_vals, dtype=float)
+    b = len(v)
+    n_ge = int(np.sum(v >= observed))
+    p = (n_ge + 1) / (b + 1)
+    floor = 1.0 / (b + 1)
+    # SE of the plug-in binomial proportion; the +1 correction shifts the point
+    # estimate but not the sampling variability, and at the floor the estimate
+    # is censored so the usual SE understates -- flagged via p_is_floor.
+    p_hat = n_ge / b
+    se = float(np.sqrt(max(p_hat * (1.0 - p_hat), 0.0) / b))
+    return {
+        "observed_gap": float(observed),
+        "n_null_ge_observed": n_ge,
+        "p_value_vs_null": float(p),
+        "p_value_mc_se": se,
+        "p_value_floor": float(floor),
+        "p_is_floor": bool(n_ge == 0),
+        "p_report": (f"<= {floor:.2e}" if n_ge == 0 else f"{p:.4f}"),
+        "excess_over_null_mean": float(observed - np.mean(v)),
+        "exceeds_null_p95": bool(observed > np.percentile(v, 95)),
+        "exceeds_null_median": bool(observed > np.median(v)),
+        # The smallest observed gap that would have reached p < 0.05, i.e. the
+        # null's 95th percentile: the minimum detectable effect of this design.
+        "minimum_detectable_gap_p05": float(np.percentile(v, 95)),
+    }
 
 
 def self_check(n_reps: int = 2000, random_state: int = 42) -> Dict[str, float]:
