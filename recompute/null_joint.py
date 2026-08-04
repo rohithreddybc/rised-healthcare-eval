@@ -116,6 +116,60 @@ def _level_audit(y, s, codes_by_col) -> Dict[str, Any]:
     return audit
 
 
+def _observed_gap_by_column(y, s, codes_by_col, rule_name: str
+                            ) -> Dict[str, float]:
+    """Per-partition observed gap, before the max over partitions.
+
+    The statistic is a maximum. How much the cross-column dependence can
+    possibly matter is bounded by how close the runner-up partition is to the
+    leader: if one partition dominates, the maximum is effectively that one
+    partition and the joint-vs-independent distinction is nearly moot.
+    """
+    rule = INCLUSION_RULES[rule_name]
+    out: Dict[str, float] = {}
+    for col, codes in codes_by_col.items():
+        stats = _column_level_stats(y, s, codes)
+        aucs = [a for (n, npos, nneg, a) in stats
+                if _rule_admits(rule, n, npos, nneg)]
+        out[col] = (float(max(aucs) - min(aucs)) if len(aucs) >= 2
+                    else float("nan"))
+    return out
+
+
+def _cramers_v(a: np.ndarray, b: np.ndarray) -> float:
+    """Bias-corrected Cramer's V between two coded demographic columns.
+
+    Quantifies the association the independent permutation destroys and the
+    joint permutation preserves.
+    """
+    from scipy.stats import chi2_contingency
+
+    ct = np.zeros((a.max() + 1, b.max() + 1), dtype=float)
+    np.add.at(ct, (a, b), 1.0)
+    ct = ct[ct.sum(1) > 0][:, ct.sum(0) > 0]
+    if min(ct.shape) < 2:
+        return float("nan")
+    chi2s = chi2_contingency(ct, correction=False)[0]
+    n = ct.sum()
+    phi2 = chi2s / n
+    r, k = ct.shape
+    phi2c = max(0.0, phi2 - (r - 1) * (k - 1) / (n - 1))
+    rc = r - (r - 1) ** 2 / (n - 1)
+    kc = k - (k - 1) ** 2 / (n - 1)
+    denom = min(rc - 1, kc - 1)
+    return float(np.sqrt(phi2c / denom)) if denom > 0 else float("nan")
+
+
+def _association(codes_by_col: Dict[str, np.ndarray]) -> Dict[str, float]:
+    cols = list(codes_by_col)
+    out: Dict[str, float] = {}
+    for i, a in enumerate(cols):
+        for bcol in cols[i + 1:]:
+            out[f"{a}|{bcol}"] = _cramers_v(
+                codes_by_col[a], codes_by_col[bcol])
+    return out
+
+
 def _levels_used(codes_by_col, y, rule_name: str) -> Dict[str, int]:
     rule = INCLUSION_RULES[rule_name]
     out = {}
@@ -161,6 +215,10 @@ def run_cohort(cohort: str, n_reps: int = DEFAULT_REPS,
         "subgroup_columns": cols,
         "inclusion_rules": {k: dict(v) for k, v in INCLUSION_RULES.items()},
         "observed_gap_by_rule": observed,
+        "observed_gap_by_column_by_rule": {
+            k: _observed_gap_by_column(y, s, codes_by_col, k)
+            for k in rule_names},
+        "demographic_association_cramers_v": _association(codes_by_col),
         "n_levels_used_by_rule": {
             k: _levels_used(codes_by_col, y, k) for k in rule_names},
         "level_audit": _level_audit(y, s, codes_by_col),
