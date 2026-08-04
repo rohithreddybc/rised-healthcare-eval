@@ -1,0 +1,267 @@
+{
+  "cohort": "uci_heart",
+  "is_clinical": true,
+  "seed": 42,
+  "n_reps": 10000,
+  "n_test": 61,
+  "prevalence": 0.5409836065573771,
+  "subgroup_columns": [
+    "sex",
+    "age_group"
+  ],
+  "inclusion_rules": {
+    "m20": {
+      "kind": "size",
+      "min_n": 20,
+      "label": "n >= 20"
+    },
+    "m30": {
+      "kind": "size",
+      "min_n": 30,
+      "label": "n >= 30 (published default)"
+    },
+    "m50": {
+      "kind": "size",
+      "min_n": 50,
+      "label": "n >= 50"
+    },
+    "m100": {
+      "kind": "size",
+      "min_n": 100,
+      "label": "n >= 100"
+    },
+    "ev10": {
+      "kind": "events",
+      "min_events": 10,
+      "label": "n_pos >= 10 and n_neg >= 10"
+    }
+  },
+  "observed_gap_by_rule": {
+    "m20": NaN,
+    "m30": NaN,
+    "m50": NaN,
+    "m100": NaN,
+    "ev10": NaN
+  },
+  "observed_gap_by_column_by_rule": {
+    "m20": {
+      "sex": NaN,
+      "age_group": NaN
+    },
+    "m30": {
+      "sex": NaN,
+      "age_group": NaN
+    },
+    "m50": {
+      "sex": NaN,
+      "age_group": NaN
+    },
+    "m100": {
+      "sex": NaN,
+      "age_group": NaN
+    },
+    "ev10": {
+      "sex": NaN,
+      "age_group": NaN
+    }
+  },
+  "demographic_association_cramers_v": {
+    "sex|age_group": 0.0
+  },
+  "n_levels_used_by_rule": {
+    "m20": {
+      "sex": 1,
+      "age_group": 1
+    },
+    "m30": {
+      "sex": 1,
+      "age_group": 0
+    },
+    "m50": {
+      "sex": 0,
+      "age_group": 0
+    },
+    "m100": {
+      "sex": 0,
+      "age_group": 0
+    },
+    "ev10": {
+      "sex": 1,
+      "age_group": 1
+    }
+  },
+  "level_audit": {
+    "sex": [
+      {
+        "level_code": 0,
+        "n": 19,
+        "n_pos": 16,
+        "n_neg": 3,
+        "auc_estimable": true,
+        "admitted_by": []
+      },
+      {
+        "level_code": 1,
+        "n": 42,
+        "n_pos": 17,
+        "n_neg": 25,
+        "auc_estimable": true,
+        "admitted_by": [
+          "m20",
+          "m30",
+          "ev10"
+        ]
+      }
+    ],
+    "age_group": [
+      {
+        "level_code": 0,
+        "n": 28,
+        "n_pos": 15,
+        "n_neg": 13,
+        "auc_estimable": true,
+        "admitted_by": [
+          "m20",
+          "ev10"
+        ]
+      },
+      {
+        "level_code": 1,
+        "n": 18,
+        "n_pos": 12,
+        "n_neg": 6,
+        "auc_estimable": true,
+        "admitted_by": []
+      },
+      {
+        "level_code": 2,
+        "n": 15,
+        "n_pos": 6,
+        "n_neg": 9,
+        "auc_estimable": true,
+        "admitted_by": []
+      }
+    ]
+  },
+  "load_runtime_s": 0.2356576999882236,
+  "results": {
+    "independent": {
+      "runtime_s": 3.358319599996321,
+      "m20": {
+        "rule": "m20",
+        "rule_label": "n >= 20",
+        "permutation_scheme": "independent",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m30": {
+        "rule": "m30",
+        "rule_label": "n >= 30 (published default)",
+        "permutation_scheme": "independent",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m50": {
+        "rule": "m50",
+        "rule_label": "n >= 50",
+        "permutation_scheme": "independent",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m100": {
+        "rule": "m100",
+        "rule_label": "n >= 100",
+        "permutation_scheme": "independent",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "ev10": {
+        "rule": "ev10",
+        "rule_label": "n_pos >= 10 and n_neg >= 10",
+        "permutation_scheme": "independent",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      }
+    },
+    "joint": {
+      "runtime_s": 3.3867891000118107,
+      "m20": {
+        "rule": "m20",
+        "rule_label": "n >= 20",
+        "permutation_scheme": "joint",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m30": {
+        "rule": "m30",
+        "rule_label": "n >= 30 (published default)",
+        "permutation_scheme": "joint",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m50": {
+        "rule": "m50",
+        "rule_label": "n >= 50",
+        "permutation_scheme": "joint",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "m100": {
+        "rule": "m100",
+        "rule_label": "n >= 100",
+        "permutation_scheme": "joint",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      },
+      "ev10": {
+        "rule": "ev10",
+        "rule_label": "n_pos >= 10 and n_neg >= 10",
+        "permutation_scheme": "joint",
+        "n_reps": 10000,
+        "null_estimable": false,
+        "n_valid_reps": 0,
+        "observed_gap": null,
+        "p_value_vs_null": null,
+        "note": "not estimable: fewer than two admissible subgroups in every partition"
+      }
+    }
+  },
+  "total_runtime_s": 6.98538000008557,
+  "status": "ok"
+}
