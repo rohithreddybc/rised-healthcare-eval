@@ -24,11 +24,21 @@ replicates inside each permutation-based method. Defaults are 1000 and 999. The
 Monte-Carlo standard error of a 0.05 rate at 1000 simulations is 0.0069, which
 resolves the difference between 0.05 and, say, 0.08. Both numbers are recorded in
 every output row; nothing is reduced silently.
+
+Checkpointing
+-------------
+This study is several core-hours of work, so each ``(geometry, rule)`` cell is
+written to ``recompute/results/type1_cells/<geometry>__<rule>__<sims>_<perm>.json``
+the moment it finishes and is skipped on a later run. A killed or interrupted run
+therefore loses at most one cell, and re-invoking the same command resumes.
+``--force`` recomputes regardless. Cells are dispatched longest-first, so the
+slow ``multi_partition`` geometry starts immediately rather than becoming a tail.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -43,6 +53,16 @@ from recompute.comparators.simulate import GEOMETRIES, GEOMETRY_BY_NAME, Geometr
 
 RESULTS = REPO / "recompute" / "results"
 OUT_CSV = RESULTS / "comparator_type1.csv"
+CELL_DIR = RESULTS / "type1_cells"
+
+#: Rough per-simulation cost, used only to dispatch the slow cells first so they
+#: do not become the tail of the run. Measured once; correctness never depends
+#: on these numbers being right.
+_COST = {
+    "multi_partition": 3.05, "many_10": 1.05, "rare_outcome": 0.92,
+    "composite_shift_skewed": 0.89, "composite_shift_4": 0.87,
+    "skewed_5": 0.50, "balanced_3x1000": 0.48, "balanced_5x200": 0.40,
+}
 
 DEFAULT_SIMS = 1000
 DEFAULT_PERM = 999
@@ -100,8 +120,21 @@ def _one_sim(geom: Geometry, rep: int, rule: str, n_perm: int,
     return out
 
 
+def cell_path(geom_name: str, rule: str, n_sims: int, n_perm: int) -> Path:
+    return CELL_DIR / f"{geom_name}__{rule}__{n_sims}_{n_perm}.json"
+
+
 def _run_geometry(args) -> List[Dict[str, object]]:
-    geom_name, rule, n_sims, n_perm, seed, alpha = args
+    geom_name, rule, n_sims, n_perm, seed, alpha, force = args
+    path = cell_path(geom_name, rule, n_sims, n_perm)
+    if path.exists() and not force:
+        try:
+            rows = json.loads(path.read_text(encoding="utf-8"))
+            print(f"  [cached] {geom_name} / {rule}", flush=True)
+            return rows
+        except (ValueError, OSError):
+            pass                      # corrupt checkpoint: recompute it
+
     geom = GEOMETRY_BY_NAME[geom_name]
     t0 = time.perf_counter()
     sims = [_one_sim(geom, r, rule, n_perm, seed, alpha) for r in range(n_sims)]
@@ -165,6 +198,14 @@ def _run_geometry(args) -> List[Dict[str, object]]:
             "mean_runtime_per_dataset_s": float(
                 np.mean([sd["lum2022__t"] for sd in sims])),
         })
+
+    # Checkpoint immediately: this cell is minutes to an hour of work and must
+    # not be lost if the run is interrupted.
+    CELL_DIR.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+    tmp.replace(path)
+    print(f"  [done] {geom_name} / {rule}  ({wall/60:.1f} min)", flush=True)
     return rows
 
 
@@ -177,31 +218,34 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--alpha", type=float, default=ALPHA)
     ap.add_argument("--only", type=str, default="")
+    ap.add_argument("--force", action="store_true",
+                    help="recompute cells even if a checkpoint exists")
     ap.add_argument("--out", type=str, default=str(OUT_CSV))
     args = ap.parse_args(argv)
 
     rules = [r.strip() for r in args.rules.split(",") if r.strip()]
     names = ([g.strip() for g in args.only.split(",") if g.strip()]
              or [g.name for g in GEOMETRIES])
-    jobs = [(nm, rule, args.sims, args.perm, args.seed, args.alpha)
+    jobs = [(nm, rule, args.sims, args.perm, args.seed, args.alpha, args.force)
             for nm in names for rule in rules]
+    # Longest-first, so the slow geometries start immediately instead of
+    # becoming a tail that idles every other worker.
+    jobs.sort(key=lambda j: -_COST.get(j[0], 1.0))
 
+    n_cached = sum(1 for j in jobs
+                   if cell_path(j[0], j[1], j[2], j[3]).exists() and not args.force)
     print(f"Type I study: {len(names)} geometries x {len(rules)} rules, "
-          f"{args.sims} sims, B={args.perm}, {args.jobs} worker(s)", flush=True)
+          f"{args.sims} sims, B={args.perm}, {args.jobs} worker(s); "
+          f"{n_cached}/{len(jobs)} cells already checkpointed", flush=True)
     t0 = time.perf_counter()
     rows: List[Dict[str, object]] = []
     if args.jobs > 1:
         with ProcessPoolExecutor(max_workers=args.jobs) as ex:
             for res in ex.map(_run_geometry, jobs):
                 rows.extend(res)
-                print(f"  done {res[0]['geometry']} / {res[0]['rule']} "
-                      f"({res[0]['geometry_wall_s']/60:.1f} min)", flush=True)
     else:
         for j in jobs:
-            res = _run_geometry(j)
-            rows.extend(res)
-            print(f"  done {res[0]['geometry']} / {res[0]['rule']} "
-                  f"({res[0]['geometry_wall_s']/60:.1f} min)", flush=True)
+            rows.extend(_run_geometry(j))
 
     df = pd.DataFrame(rows)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
