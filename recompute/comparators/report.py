@@ -126,6 +126,55 @@ def rule_sensitivity(df: pd.DataFrame) -> str:
     return _md(pd.DataFrame(rows))
 
 
+def agreement_matrix(df: pd.DataFrame, rule: str) -> str:
+    """Pairwise agreement between methods on the evaluable cohorts."""
+    d = df[(df["rule"] == rule) & (df["conclusion"] != "not_evaluable")]
+    piv = d.pivot_table(index="cohort", columns="method", values="conclusion",
+                        aggfunc="first")
+    rows = []
+    for a in METHOD_ORDER:
+        row = {"method": METHOD_LABEL[a]}
+        for b in METHOD_ORDER:
+            if a not in piv or b not in piv:
+                row[b] = "--"
+                continue
+            sa, sb = piv[a], piv[b]
+            keep = sa.notna() & sb.notna()
+            n = int(keep.sum())
+            row[b] = f"{int((sa[keep] == sb[keep]).sum())}/{n}"
+        rows.append(row)
+    out = pd.DataFrame(rows)
+    out.columns = ["method"] + [METHOD_LABEL[m] for m in METHOD_ORDER]
+    return _md(out)
+
+
+def incumbent_vs_rest(df: pd.DataFrame, rule: str) -> str:
+    """What each method finds that the incumbent misses, and the reverse."""
+    d = df[(df["rule"] == rule) & (df["conclusion"] != "not_evaluable")]
+    piv = d.pivot_table(index="cohort", columns="method", values="conclusion",
+                        aggfunc="first")
+    if "permutation_null" not in piv:
+        return "_incumbent column missing_"
+    inc = piv["permutation_null"]
+    rows = []
+    for m in METHOD_ORDER:
+        if m == "permutation_null" or m not in piv:
+            continue
+        other = piv[m]
+        only_other = [c for c in piv.index
+                      if other[c] == "flag" and inc[c] == "no_flag"]
+        only_inc = [c for c in piv.index
+                    if inc[c] == "flag" and other[c] == "no_flag"]
+        rows.append({
+            "method": METHOD_LABEL[m],
+            "flags that the incumbent misses": (", ".join(only_other)
+                                                if only_other else "--"),
+            "incumbent flags that it misses": (", ".join(only_inc)
+                                               if only_inc else "--"),
+        })
+    return _md(pd.DataFrame(rows))
+
+
 def runtime_table(df: pd.DataFrame) -> str:
     rows = []
     for m in METHOD_ORDER:
@@ -189,19 +238,26 @@ def main() -> int:
     parts.append(verdict_grid(df, "m30") + "\n")
     parts.append("## T2. Verdict grid, events rule ev10\n")
     parts.append(verdict_grid(df, "ev10") + "\n")
-    parts.append("## T3. Inclusion-rule sensitivity\n")
+    parts.append("## T3. Pairwise agreement on evaluable cohorts, m30\n")
+    parts.append(agreement_matrix(df, "m30") + "\n")
+    parts.append("## T4. What each method finds that the incumbent does not, m30\n")
+    parts.append(incumbent_vs_rest(df, "m30") + "\n")
+    parts.append("## T5. Same, ev10\n")
+    parts.append(incumbent_vs_rest(df, "ev10") + "\n")
+    parts.append("## T6. Inclusion-rule sensitivity\n")
     parts.append(rule_sensitivity(df) + "\n")
-    parts.append("## T4. Runtime at m30\n")
+    parts.append("## T7. Runtime at m30\n")
     parts.append(runtime_table(df) + "\n")
-    parts.append("## T5. Full detail, m30\n")
+    parts.append("## T8. Full detail, m30\n")
     parts.append(detail_table(df, "m30") + "\n")
-    parts.append("## T6. Full detail, ev10\n")
+    parts.append("## T9. Full detail, ev10\n")
     parts.append(detail_table(df, "ev10") + "\n")
     if t1 is not None:
-        parts.append("## T7. Simulated-null geometries\n")
+        parts.append("## T10. Simulated-null geometries\n")
         parts.append(type1_geometry_key(t1) + "\n")
-        for rule in sorted(set(t1["rule"])):
-            parts.append(f"## T8. Type I error at nominal 0.05, rule {rule}\n")
+        for i, rule in enumerate(sorted(set(t1["rule"]))):
+            parts.append(f"## T{11 + i}. Type I error at nominal 0.05, "
+                         f"rule {rule}\n")
             parts.append(type1_table(t1, rule) + "\n")
     OUT.write_text("\n".join(parts), encoding="utf-8")
     print(f"wrote {OUT}")
