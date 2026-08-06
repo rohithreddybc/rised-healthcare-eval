@@ -200,6 +200,36 @@ def test_observed_gap_matches_published_null_run_all(cohort):
 
 
 @pytest.mark.slow
+@pytest.mark.parametrize("cohort", ["german_credit", "nhanes2123", "synthetic"])
+def test_recomputed_null_reproduces_the_published_pvalues(cohort):
+    """The strongest equivalence claim available.
+
+    Reproducing the observed statistic shows the comparators see the same inputs.
+    Reproducing the entire null -- every p-value, at B=10,000 and seed 42 --
+    shows the comparator kernel reproduces the incumbent's whole *procedure*, so
+    a runtime measured on that kernel is a fair basis for comparison and any
+    difference in verdict is the statistic and nothing else.
+    """
+    path = NULL_DIR / f"{cohort}.json"
+    if not path.exists():
+        pytest.skip(f"{path} not present")
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    if stored.get("status") != "ok":
+        pytest.skip("stored run did not succeed")
+    block = stored["results"]["joint"]
+    data = load_cohort(cohort)
+    got = incumbent.recompute_null(data, n_perm=stored["n_reps"],
+                                   seed=stored["seed"])
+    for rule in RULES:
+        want = block[rule].get("p_value_vs_null")
+        mine = got[rule]["p_value"]
+        if want is None:
+            assert math.isnan(mine), f"{cohort}/{rule}"
+        else:
+            assert mine == pytest.approx(want, abs=1e-12), f"{cohort}/{rule}"
+
+
+@pytest.mark.slow
 def test_permutation_draws_match_the_incumbents():
     """A comparator's permutation stream must be the incumbent's stream.
 

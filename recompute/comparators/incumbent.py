@@ -86,6 +86,56 @@ def run_cohort(cohort: str, rules: Optional[List[str]] = None,
     return {"results": results, "runtime_s": total_perm_s, "payload": payload}
 
 
+def recompute_null(data, n_perm: int = 10_000, seed: int = 42,
+                   rules: Optional[List[str]] = None,
+                   scheme: str = "joint") -> Dict[str, object]:
+    """Recompute the incumbent's whole null through the comparator kernel.
+
+    Two jobs.
+
+    First, validation: this must reproduce every stored p-value exactly, because
+    it draws from the same :func:`draw_permuted_codes` stream with the same seed
+    and evaluates the same statistic. Reproducing the point estimate only shows
+    the inputs match; reproducing the null shows the *procedure* matches.
+    ``tests/test_comparators.py::test_recomputed_null_reproduces_the_published_pvalues``
+    asserts it.
+
+    Second, a fair runtime column. The stored runtimes came from the original
+    ``scipy.rankdata`` code path; the comparators run on the vectorised kernel.
+    Comparing those two directly would credit studentization with a speed-up that
+    belongs to the kernel. This function times the incumbent's own statistic on
+    the *same* kernel, which is the honest basis for the runtime comparison.
+    """
+    import time as _time
+
+    from recompute.comparators.core import (
+        PermContext,
+        RULE_NAMES,
+        gap_from_levels,
+        mc_p,
+    )
+
+    rules = list(rules) if rules is not None else list(RULE_NAMES)
+    t0 = _time.perf_counter()
+    ctx = PermContext(data.y, data.s, data.codes_by_col)
+    obs = {r: gap_from_levels(ctx.observed(), r) for r in rules}
+    rng = np.random.default_rng(seed)
+    vals = np.full((len(rules), n_perm), np.nan)
+    for b in range(n_perm):
+        lv = ctx.draw(rng, scheme)
+        for i, r in enumerate(rules):
+            vals[i, b] = gap_from_levels(lv, r)
+    runtime = _time.perf_counter() - t0
+
+    out: Dict[str, object] = {"runtime_s": runtime, "n_perm": n_perm,
+                              "seed": seed, "scheme": scheme}
+    for i, r in enumerate(rules):
+        p, floor = ((mc_p(vals[i], obs[r]))
+                    if np.isfinite(obs[r]) else (float("nan"), False))
+        out[r] = {"observed_gap": obs[r], "p_value": p, "p_is_floor": floor}
+    return out
+
+
 def recompute_gap(data, rule: str) -> float:
     """Recompute the incumbent's observed statistic via the comparator code."""
     from recompute.comparators.naive import cohort_gap
