@@ -237,6 +237,11 @@ your admissibility rule in advance". Pre-registering `m30` would have preserved
 the manuscript's negative finding while leaving it just as wrong: DiCiccio and
 Lum both reject it at `m30` itself.
 
+The rule-robustness result above stands on its own — it is a statement about how
+each verdict moves, not about which verdict is right. Whether the comparators'
+extra flags are *power* rather than false positives is a separate question, and
+it is settled by the Type I study in Section 3, not by this section.
+
 ## 5. Runtime
 
 Measured like for like — every method on the same vectorised kernel, B = 10,000,
