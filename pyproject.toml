@@ -65,6 +65,9 @@ include = ["rised*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov=rised --cov-report=term-missing"
+markers = [
+    "slow: cohort-level checks that load every dataset and fit every model; deselect with -m 'not slow'",
+]
 
 [tool.black]
 line-length = 100
