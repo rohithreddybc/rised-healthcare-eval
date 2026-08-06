@@ -156,15 +156,108 @@ exactly why the Type I column below is the one that matters.
 
 ## 4. Sensitivity to the inclusion rule
 
-<!-- T6 -->
+This is the manuscript's remaining claim: that subgroup admissibility is an
+uncontrolled degree of freedom which flips the verdict. The claim is *general*
+only if it afflicts published methods too. It does not.
 
-<!-- RULESENS -->
+### 4.1 Counting flips makes the methods look alike. That is the wrong count.
+
+| method | cohorts whose verdict flips across the five rules |
+|---|---|
+| Permutation null (incumbent) | 3/10 |
+| DiCiccio 2020 | 3/10 |
+| Lum 2022 (z) | 3/10 |
+| Lum 2022 (Cochran Q) | 2/10 |
+| Four-fifths | 1/10 |
+| Fixed threshold | 1/10 |
+
+On raw flip counts the incumbent and the two published methods are
+indistinguishable, and the median p-value swing across the rules is likewise
+almost identical — 0.55 orders of magnitude for the incumbent against 0.58 for
+DiCiccio. On that evidence the manuscript's claim would look general.
+
+**It is not, because a flip only matters if it moves the conclusion.**
+
+### 4.2 The conclusion-level result
+
+The manuscript's claim is about the clinical cohorts: *no clinical cohort
+produces a gap distinguishable from chance*. So the number that matters is how
+many clinical cohorts each method flags under each rule, and whether it ever
+crosses zero.
+
+| method | clinical flagged m20/m30/m50/m100/ev10 | span | conclusion inverts? |
+|---|---|---|---|
+| **Permutation null (incumbent)** | **0 0 0 1 2** | **2** | **YES** |
+| DiCiccio 2020 | 3 3 3 3 3 | 0 | no |
+| Lum 2022 (z) | 3 3 3 1 3 | 2 | no |
+| Lum 2022 (Cochran Q) | 5 5 5 3 4 | 2 | no |
+| Lum 2022 (bootstrap CI) | 2 2 2 1 2 | 1 | no |
+| Four-fifths | 3 3 3 2 3 | 1 | no |
+| Fixed threshold | 5 5 5 5 4 | 1 | no |
+
+**The incumbent is the only method whose substantive conclusion inverts across
+the sweep, and DiCiccio's does not move at all.** The incumbent says "no clinical
+cohort shows a disparity" under `m20`, `m30` and `m50`, and "two do" under
+`ev10`. There is no admissibility rule under which DiCiccio would license the
+manuscript's claim: it flags three of the five estimable clinical cohorts under
+every one of the five rules. Lum's z-test flags three under every rule except
+`m100` — and `m100` is the outcome-blind rule that `RECOMPUTED_NULL_JOINT.md`
+already argues is incoherent, since it admits NHIS 2024 age levels of n=286 with
+2 events while dropping a BRFSS race level of n=59 with 12 events.
+
+Two further observations sharpen this.
+
+**`m20`, `m30` and `m50` are identical for every method.** Every flip in the
+whole study occurs at `m100` or `ev10`. The uncontrolled degree of freedom is
+therefore narrower and sharper than "the inclusion rule": it is **whether
+admissibility is defined on rows or on events**. Varying the row threshold from
+20 to 50 changes nothing for anybody.
+
+**The reshuffling is real but harmless for the comparators.** DiCiccio's flagged
+*set* does move (Jaccard 0.71 against `m30`): BRFSS drops out at `m100`, NHIS
+2023 comes in. But the count and the substantive reading are unchanged, because
+it flags most cohorts under every rule. The incumbent's Jaccard is 0.33 — it
+retains only a third of its flagged set — and its set is so small that a single
+change rewrites the paper.
+
+### 4.3 What this means for the thesis
+
+**The fragility is not a general property of subgroup-disparity testing. It is a
+defect specific to a raw max-over-partitions range.** The mechanism is the one in
+Section 2: because both the statistic and its null are a maximum over partitions
+of an *unstandardised* range, the noisiest partition sets the threshold for every
+other partition, and which partition is noisiest is exactly what the
+admissibility rule controls. Change the rule, change which partition dominates,
+change the verdict. Studentizing each pairwise comparison (DiCiccio) or
+subtracting each partition's own sampling variance (Lum) removes that coupling,
+and with it the fragility.
+
+The honest conclusion is therefore **"do not use this statistic"**, not "specify
+your admissibility rule in advance". Pre-registering `m30` would have preserved
+the manuscript's negative finding while leaving it just as wrong: DiCiccio and
+Lum both reject it at `m30` itself.
 
 ## 5. Runtime
 
-<!-- T7 -->
+Measured like for like — every method on the same vectorised kernel, B = 10,000,
+ten cohorts. (The runtimes stored in `results/null_joint/` came from the
+incumbent's original `scipy.rankdata` path and total 295 s; quoting those against
+the comparators would credit studentization with a speed-up that belongs to the
+kernel.)
 
-<!-- RUNTIME -->
+| method | total over ten cohorts | relative |
+|---|---|---|
+| Permutation null (incumbent) | 192.9 s | 1.0× |
+| DiCiccio 2020 | 187.8 s | 0.97× |
+| Four-fifths (via fairlearn) | 16.1 s | 0.08× |
+| Lum 2022 | 0.54 s | 0.003× |
+| Fixed threshold | 0.10 s | 0.0005× |
+
+**Studentization is free.** DiCiccio costs the same as the incumbent to within
+3%, because both are dominated by the same 10,000 stratified permutations and the
+DeLong variance is one extra pass over data already sorted. **Lum costs nothing
+at all** — 356× cheaper than the incumbent — because its correction is analytic
+and needs no resampling. Per-cohort figures are in T7.
 
 ## 6. What the existing procedure adds over the published alternatives
 
