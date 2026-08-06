@@ -482,6 +482,28 @@ def test_four_fifths_does_not_fire_on_a_large_absolute_gap():
     assert four_fifths.ratio(lv) > four_fifths.THRESHOLD
 
 
+@pytest.mark.parametrize("cohort", SMOKE_COHORTS)
+def test_four_fifths_matches_fairlearn_on_every_cohort(cohort):
+    """The published implementation and our loop-friendly one must agree.
+
+    ``run_cohort`` reports fairlearn's number; ``ratio`` is used inside the Type
+    I simulation for speed. If they ever diverge the reported and simulated
+    behaviour of the rule would be different things.
+    """
+    data = load_cohort(cohort)
+    for rule in RULES:
+        for col, codes in data.codes_by_col.items():
+            keep = admissible(level_stats(data.y, data.s, codes), rule)
+            fl = four_fifths.ratio_fairlearn(data.y, data.s, codes, rule)
+            if len(keep) < 2:
+                assert math.isnan(fl["ratio"])
+                continue
+            assert fl["ratio"] == pytest.approx(four_fifths.ratio(keep),
+                                                abs=1e-12)
+            assert fl["difference"] == pytest.approx(max_min_gap(keep),
+                                                     abs=1e-12)
+
+
 def test_four_fifths_min_detectable_gap():
     lv = [core.Level(100, 30, 70, 0.80, 0.01),
           core.Level(100, 30, 70, 0.75, 0.01)]
