@@ -204,6 +204,107 @@ def same_kernel_runtime(rt: pd.DataFrame) -> str:
     return _md(out)
 
 
+def rule_substantive_stability(df: pd.DataFrame) -> str:
+    """The table the manuscript's remaining claim stands or falls on.
+
+    Counting verdict flips per cohort understates the difference between
+    methods, because a flip only matters if it moves the *substantive*
+    conclusion. The manuscript's claim is about the clinical cohorts: "no
+    clinical cohort produces a gap distinguishable from chance". So the
+    quantity that matters is how many clinical cohorts each method flags under
+    each admissibility rule, and whether that number ever crosses zero.
+
+    ``Jaccard vs m30`` is the overlap of the flagged cohort *set* with the set at
+    the published rule; 1.00 means the same cohorts, lower means reshuffling.
+    """
+    rows = []
+    for m in METHOD_ORDER:
+        counts, jac = [], []
+        base = set(df[(df["method"] == m) & (df["rule"] == "m30")
+                      & (df["conclusion"] == "flag")]["cohort"])
+        for ru in RULE_NAMES:
+            sel = df[(df["method"] == m) & (df["rule"] == ru)
+                     & (df["conclusion"] == "flag")]
+            counts.append(int(sel[sel["is_clinical"].astype(bool)].shape[0]))
+            s = set(sel["cohort"])
+            union = base | s
+            jac.append(len(base & s) / len(union) if union else 1.0)
+        rows.append({
+            "method": METHOD_LABEL[m],
+            "clinical flagged m20/m30/m50/m100/ev10": " ".join(str(c)
+                                                               for c in counts),
+            "span": max(counts) - min(counts),
+            "crosses zero?": ("**YES -- conclusion inverts**"
+                              if (min(counts) == 0 and max(counts) > 0)
+                              else "no"),
+            "min Jaccard vs m30": f"{min(jac):.2f}",
+        })
+    return _md(pd.DataFrame(rows))
+
+
+def rule_pvalue_spread(df: pd.DataFrame) -> str:
+    """How far each method's p-value travels across the five inclusion rules.
+
+    The manuscript's remaining claim is that the subgroup-admissibility rule is
+    an uncontrolled degree of freedom that flips the verdict. That claim is
+    general only if it afflicts published methods too, so this is the table the
+    claim stands or falls on. ``log10 span`` is
+    ``log10(max p / min p)`` over the rules -- orders of magnitude of p-value
+    swing attributable to nothing but the admissibility rule.
+    """
+    rows = []
+    for m in METHOD_ORDER:
+        d = df[(df["method"] == m) & (df["conclusion"] != "not_evaluable")]
+        if d.empty or d["p_value"].isna().all():
+            rows.append({"method": METHOD_LABEL[m], "cohorts with a p-value": 0,
+                         "median log10 span": "n/a (no p-value)",
+                         "worst log10 span": "n/a", "worst cohort": "--",
+                         "worst p range": "--"})
+            continue
+        recs = []
+        for c, g in d.groupby("cohort"):
+            p = g["p_value"].dropna()
+            if len(p) < 2 or p.min() <= 0:
+                continue
+            recs.append((c, float(np.log10(p.max() / p.min())), p.min(), p.max()))
+        if not recs:
+            continue
+        spans = np.array([r[1] for r in recs])
+        worst = recs[int(np.argmax(spans))]
+        rows.append({
+            "method": METHOD_LABEL[m],
+            "cohorts with a p-value": len(recs),
+            "median log10 span": f"{np.median(spans):.2f}",
+            "worst log10 span": f"{spans.max():.2f}",
+            "worst cohort": worst[0],
+            "worst p range": f"{worst[2]:.4g} to {worst[3]:.4g}",
+        })
+    return _md(pd.DataFrame(rows))
+
+
+def rule_flip_detail(df: pd.DataFrame) -> str:
+    """Per-cohort verdict string across the five rules, for every method."""
+    rows = []
+    for m in METHOD_ORDER:
+        piv = df[df["method"] == m].pivot_table(
+            index="cohort", columns="rule", values="conclusion", aggfunc="first")
+        piv = piv.reindex(columns=RULE_NAMES)
+        for c in COHORT_ORDER:
+            if c not in piv.index:
+                continue
+            seq = [{"flag": "F", "no_flag": ".", "not_evaluable": "-"}.get(
+                piv.loc[c, ru], "?") for ru in RULE_NAMES]
+            decided = {s for s in seq if s in ("F", ".")}
+            rows.append({
+                "method": METHOD_LABEL[m],
+                "cohort": c,
+                "m20/m30/m50/m100/ev10": " ".join(seq),
+                "flips?": "**yes**" if len(decided) > 1 else "no",
+            })
+    out = pd.DataFrame(rows)
+    return _md(out[out["flips?"] == "**yes**"])
+
+
 def runtime_table(df: pd.DataFrame) -> str:
     rows = []
     for m in METHOD_ORDER:
@@ -315,8 +416,15 @@ def main() -> int:
     parts.append(incumbent_vs_rest(df, "m30") + "\n")
     parts.append("## T5. Same, ev10\n")
     parts.append(incumbent_vs_rest(df, "ev10") + "\n")
-    parts.append("## T6. Inclusion-rule sensitivity\n")
+    parts.append("## T6. Inclusion-rule sensitivity: does the SUBSTANTIVE "
+                 "conclusion move?\n")
+    parts.append(rule_substantive_stability(df) + "\n")
+    parts.append("## T6a. Inclusion-rule sensitivity: flags and verdict flips\n")
     parts.append(rule_sensitivity(df) + "\n")
+    parts.append("## T6b. Inclusion-rule sensitivity: p-value spread\n")
+    parts.append(rule_pvalue_spread(df) + "\n")
+    parts.append("## T6c. Every cohort whose verdict flips, by method\n")
+    parts.append(rule_flip_detail(df) + "\n")
     parts.append("## T7. Runtime, all methods on the same kernel, B=10,000\n")
     rtp = RESULTS / "comparator_runtime.csv"
     if rtp.exists():

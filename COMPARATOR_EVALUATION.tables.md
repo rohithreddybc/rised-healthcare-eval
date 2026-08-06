@@ -64,7 +64,19 @@
 | Four-fifths (0.80 ratio) | brfss2024, diabetes130 | acs_income, nhis2023 |
 | Fixed threshold (Delta >= 0.05) | adult_income, brfss2024, diabetes130 | -- |
 
-## T6. Inclusion-rule sensitivity
+## T6. Inclusion-rule sensitivity: does the SUBSTANTIVE conclusion move?
+
+| method | clinical flagged m20/m30/m50/m100/ev10 | span | crosses zero? | min Jaccard vs m30 |
+|---|---|---|---|---|
+| Permutation null (incumbent) | 0 0 0 1 2 | 2 | **YES -- conclusion inverts** | 0.33 |
+| DiCiccio 2020 (studentized max-T) | 3 3 3 3 3 | 0 | no | 0.71 |
+| Lum 2022 (V_dc, closed-form z) | 3 3 3 1 3 | 2 | no | 0.67 |
+| Lum 2022 inputs, Cochran Q (our addition) | 5 5 5 3 4 | 2 | no | 0.75 |
+| Lum 2022 (V_dc, bootstrap CI) | 2 2 2 1 2 | 1 | no | 0.50 |
+| Four-fifths (0.80 ratio) | 3 3 3 2 3 | 1 | no | 0.67 |
+| Fixed threshold (Delta >= 0.05) | 5 5 5 5 4 | 1 | no | 0.86 |
+
+## T6a. Inclusion-rule sensitivity: flags and verdict flips
 
 | method | flags @m20 | flags @m30 | flags @m50 | flags @m100 | flags @ev10 | cohorts whose verdict flips | which |
 |---|---|---|---|---|---|---|---|
@@ -76,7 +88,54 @@
 | Four-fifths (0.80 ratio) | 3 | 3 | 3 | 2 | 3 | 1/10 | brfss2024 |
 | Fixed threshold (Delta >= 0.05) | 7 | 7 | 7 | 7 | 6 | 1/10 | nhanes2123 |
 
-## T7. Runtime at m30
+## T6b. Inclusion-rule sensitivity: p-value spread
+
+| method | cohorts with a p-value | median log10 span | worst log10 span | worst cohort | worst p range |
+|---|---|---|---|---|---|
+| Permutation null (incumbent) | 9 | 0.55 | 1.62 | nhis2023 | 0.0179 to 0.7422 |
+| DiCiccio 2020 (studentized max-T) | 9 | 0.58 | 2.05 | brfss2024 | 0.0017 to 0.1921 |
+| Lum 2022 (V_dc, closed-form z) | 8 | 0.00 | 7.67 | brfss2024 | 2.127e-08 to 1 |
+| Lum 2022 inputs, Cochran Q (our addition) | 9 | 0.00 | 10.22 | nhis2024 | 3.793e-13 to 0.00625 |
+| Lum 2022 (V_dc, bootstrap CI) | 0 | n/a (no p-value) | n/a | -- | -- |
+| Four-fifths (0.80 ratio) | 0 | n/a (no p-value) | n/a | -- | -- |
+| Fixed threshold (Delta >= 0.05) | 0 | n/a (no p-value) | n/a | -- | -- |
+
+## T6c. Every cohort whose verdict flips, by method
+
+| method | cohort | m20/m30/m50/m100/ev10 | flips? |
+|---|---|---|---|
+| Permutation null (incumbent) | adult_income | . . . F . | **yes** |
+| Permutation null (incumbent) | nhis2023 | . . . F F | **yes** |
+| Permutation null (incumbent) | nhis2024 | . . . . F | **yes** |
+| DiCiccio 2020 (studentized max-T) | brfss2024 | F F F . F | **yes** |
+| DiCiccio 2020 (studentized max-T) | nhis2023 | . . . F F | **yes** |
+| DiCiccio 2020 (studentized max-T) | nhis2024 | F F F F . | **yes** |
+| Lum 2022 (V_dc, closed-form z) | brfss2024 | F F F . F | **yes** |
+| Lum 2022 (V_dc, closed-form z) | nhis2024 | . . . . F | **yes** |
+| Lum 2022 (V_dc, closed-form z) | nhanes2123 | F F F . . | **yes** |
+| Lum 2022 inputs, Cochran Q (our addition) | brfss2024 | F F F . F | **yes** |
+| Lum 2022 inputs, Cochran Q (our addition) | nhanes2123 | F F F . . | **yes** |
+| Lum 2022 (V_dc, bootstrap CI) | brfss2024 | F F F . F | **yes** |
+| Four-fifths (0.80 ratio) | brfss2024 | F F F . F | **yes** |
+| Fixed threshold (Delta >= 0.05) | nhanes2123 | F F F F . | **yes** |
+
+## T7. Runtime, all methods on the same kernel, B=10,000
+
+| cohort | n_test | partitions | incumbent, original kernel s | incumbent, same kernel s | DiCiccio s | Lum s | four-fifths s | fixed threshold s |
+|---|---|---|---|---|---|---|---|---|
+| Diabetes 130 | 19,890 | 3 | 74.9 | 49.9 | 49.0 | 0.152 | 4.781 | 0.019 |
+| BRFSS 2024 | 8,978 | 5 | 59.9 | 42.0 | 39.5 | 0.184 | 3.533 | 0.025 |
+| Adult Income | 9,045 | 3 | 39.4 | 21.3 | 21.1 | 0.059 | 1.886 | 0.006 |
+| NHIS 2023 | 5,423 | 4 | 37.8 | 22.1 | 21.9 | 0.044 | 1.918 | 0.013 |
+| NHIS 2024 | 1,950 | 5 | 26.2 | 17.4 | 17.4 | 0.022 | 1.150 | 0.005 |
+| ACS-Income | 4,000 | 3 | 18.6 | 10.9 | 10.6 | 0.013 | 1.094 | 0.004 |
+| Synthetic baseline | 2,000 | 4 | 18.9 | 12.7 | 14.1 | 0.025 | 1.054 | 0.010 |
+| NHANES 21-23 | 820 | 4 | 13.1 | 10.5 | 8.5 | 0.035 | 0.549 | 0.009 |
+| German Credit | 200 | 2 | 3.2 | 3.3 | 2.9 | 0.006 | 0.153 | 0.001 |
+| UCI Heart | 61 | 2 | 3.4 | 2.7 | 2.8 | 0.001 | 0.003 | 0.003 |
+| **total** |  |  | **295.3** | **192.9** | **187.8** | **0.541** | **16.122** | **0.095** |
+
+### T7b. Runtime as recorded in the comparison sweep, m30
 
 | method | min s | median s | max s | total over 10 cohorts s |
 |---|---|---|---|---|
