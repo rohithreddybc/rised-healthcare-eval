@@ -175,6 +175,35 @@ def incumbent_vs_rest(df: pd.DataFrame, rule: str) -> str:
     return _md(pd.DataFrame(rows))
 
 
+def same_kernel_runtime(rt: pd.DataFrame) -> str:
+    """Like-for-like runtime: every method on the same vectorised kernel."""
+    rows = []
+    for _, r in rt.iterrows():
+        rows.append({
+            "cohort": r["cohort_label"],
+            "n_test": f"{int(r['n_test']):,}",
+            "partitions": int(r["n_partitions"]),
+            "incumbent, original kernel s": f"{r['permutation_null_original_kernel_s']:.1f}",
+            "incumbent, same kernel s": f"{r['permutation_null_same_kernel_s']:.1f}",
+            "DiCiccio s": f"{r['diciccio2020_s']:.1f}",
+            "Lum s": f"{r['lum2022_s']:.3f}",
+            "four-fifths s": f"{r['four_fifths_s']:.3f}",
+            "fixed threshold s": f"{r['fixed_threshold_005_s']:.3f}",
+        })
+    out = pd.DataFrame(rows)
+    tot = {
+        "cohort": "**total**", "n_test": "", "partitions": "",
+        "incumbent, original kernel s": f"**{rt['permutation_null_original_kernel_s'].sum():.1f}**",
+        "incumbent, same kernel s": f"**{rt['permutation_null_same_kernel_s'].sum():.1f}**",
+        "DiCiccio s": f"**{rt['diciccio2020_s'].sum():.1f}**",
+        "Lum s": f"**{rt['lum2022_s'].sum():.3f}**",
+        "four-fifths s": f"**{rt['four_fifths_s'].sum():.3f}**",
+        "fixed threshold s": f"**{rt['fixed_threshold_005_s'].sum():.3f}**",
+    }
+    out = pd.concat([out, pd.DataFrame([tot])], ignore_index=True)
+    return _md(out)
+
+
 def runtime_table(df: pd.DataFrame) -> str:
     rows = []
     for m in METHOD_ORDER:
@@ -246,7 +275,13 @@ def main() -> int:
     parts.append(incumbent_vs_rest(df, "ev10") + "\n")
     parts.append("## T6. Inclusion-rule sensitivity\n")
     parts.append(rule_sensitivity(df) + "\n")
-    parts.append("## T7. Runtime at m30\n")
+    parts.append("## T7. Runtime, all methods on the same kernel, B=10,000\n")
+    rtp = RESULTS / "comparator_runtime.csv"
+    if rtp.exists():
+        parts.append(same_kernel_runtime(pd.read_csv(rtp)) + "\n")
+    else:
+        parts.append("_run `python -m recompute.comparators.bench` first_\n")
+    parts.append("### T7b. Runtime as recorded in the comparison sweep, m30\n")
     parts.append(runtime_table(df) + "\n")
     parts.append("## T8. Full detail, m30\n")
     parts.append(detail_table(df, "m30") + "\n")
