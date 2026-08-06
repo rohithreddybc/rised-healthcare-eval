@@ -242,6 +242,48 @@ def type1_table(t1: pd.DataFrame, rule: str) -> str:
     return _md(out)
 
 
+def type1_summary(t1: pd.DataFrame, alpha: float = 0.05) -> str:
+    """Calibration headline: worst-case Type I rate per method.
+
+    Split by simple versus composite null, because that split is the whole point
+    of the DiCiccio paper and a method can be perfectly calibrated on one and
+    badly wrong on the other.
+    """
+    rows = []
+    for m in METHOD_ORDER:
+        d = t1[t1["method"] == m]
+        if d.empty:
+            continue
+        simple = d[~d["composite_null"].astype(bool)]["type1_rate"]
+        comp = d[d["composite_null"].astype(bool)]["type1_rate"]
+        nominal = bool(d["has_nominal_level"].iloc[0])
+        rows.append({
+            "method": METHOD_LABEL[m],
+            "nominal level?": "yes" if nominal else "no (screen)",
+            "simple null: median": f"{simple.median():.3f}",
+            "simple null: worst": f"{simple.max():.3f}",
+            "composite null: median": f"{comp.median():.3f}",
+            "composite null: worst": f"{comp.max():.3f}",
+            "overall worst": f"{d['type1_rate'].max():.3f}",
+            "verdict": _calibration_verdict(d["type1_rate"].max(), nominal,
+                                            alpha),
+        })
+    return _md(pd.DataFrame(rows))
+
+
+def _calibration_verdict(worst: float, nominal: bool, alpha: float) -> str:
+    if not nominal:
+        return "n/a -- no error control claimed"
+    if not np.isfinite(worst):
+        return "--"
+    # MC SE of a rate at 1000 simulations is at most 0.016; allow two of them.
+    if worst <= alpha + 0.032:
+        return "calibrated"
+    if worst <= 2 * alpha:
+        return "mildly anti-conservative"
+    return "**anti-conservative**"
+
+
 def type1_geometry_key(t1: pd.DataFrame) -> str:
     d = t1.drop_duplicates("geometry")
     rows = [{
@@ -290,8 +332,10 @@ def main() -> int:
     if t1 is not None:
         parts.append("## T10. Simulated-null geometries\n")
         parts.append(type1_geometry_key(t1) + "\n")
+        parts.append("## T11. Type I error, calibration summary\n")
+        parts.append(type1_summary(t1) + "\n")
         for i, rule in enumerate(sorted(set(t1["rule"]))):
-            parts.append(f"## T{11 + i}. Type I error at nominal 0.05, "
+            parts.append(f"## T{12 + i}. Type I error at nominal 0.05, "
                          f"rule {rule}\n")
             parts.append(type1_table(t1, rule) + "\n")
     OUT.write_text("\n".join(parts), encoding="utf-8")
