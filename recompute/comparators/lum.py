@@ -210,10 +210,24 @@ def dc_ztest(thetas: Sequence[float], variances: Sequence[float]
              ) -> Dict[str, float]:
     """One-sided closed-form test of ``H0: tau^2 = 0`` on the Lum estimator.
 
-    This is the primary Lum verdict: the paper's estimator plus the paper's
-    stated (here re-derived) uncertainty quantification, asked the only question
-    the paper's real-data conclusion turns on -- is the corrected disparity
+    This is the direct reading of the paper's estimator plus the paper's stated
+    (here re-derived) uncertainty quantification, asked the only question the
+    paper's real-data conclusion turns on: is the corrected disparity
     distinguishable from zero?
+
+    **Read the p-value with care at small L.** Under H0 the numerator is a
+    weighted sum of L-1 chi-square variates, which is markedly right-skewed when
+    L is small, and a normal approximation to its upper tail is poor. At L = 2 it
+    is a single chi-square with one degree of freedom and the approximation is
+    badly anti-conservative far out in the tail: ACS-Income's age partition has
+    two levels and returns p = 2e-37 where the exact two-sample comparison of the
+    same two AUROCs gives 1e-05. The *decision* at a conventional alpha is much
+    better behaved than the tail probability -- and it is the decision, not the
+    p-value, that :mod:`recompute.comparators.type1` validates. Where an exactly
+    calibrated reference is wanted, :func:`cochran_q` supplies one: with known
+    variances and approximately normal estimates, Q is chi-square on L-1 degrees
+    of freedom exactly, not asymptotically. ``n_levels`` is returned so the
+    caveat can be applied.
     """
     base = double_corrected_variance(thetas, variances)
     if base["n_levels"] < 2:
@@ -223,7 +237,8 @@ def dc_ztest(thetas: Sequence[float], variances: Sequence[float]
     if not np.isfinite(se0) or se0 <= 0:
         return {"z": float("nan"), "p_value": float("nan"), "se_null": se0}
     z = base["V_dc"] / se0
-    return {"z": float(z), "p_value": float(norm.sf(z)), "se_null": float(se0)}
+    return {"z": float(z), "p_value": float(norm.sf(z)), "se_null": float(se0),
+            "n_levels": int(base["n_levels"])}
 
 
 def bootstrap_ci(thetas: Sequence[float], variances: Sequence[float],

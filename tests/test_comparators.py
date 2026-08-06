@@ -445,6 +445,24 @@ def test_dc_ztest_rejects_a_real_disparity_and_not_a_null_one():
     assert lum.dc_ztest([0.750, 0.751, 0.749, 0.750, 0.752], v)["p_value"] > 0.5
 
 
+def test_dc_ztest_tail_pvalue_is_unreliable_at_two_levels():
+    """Pins the caveat carried in the report.
+
+    With two subgroups the numerator of V_dc is a single chi-square variate and
+    the normal approximation to its far upper tail is badly anti-conservative.
+    The exact comparison of two AUROCs is the two-sample z on the difference.
+    """
+    th = [0.8856, 0.8328]
+    v = [7.2712e-05, 7.2712e-05]
+    p_dc = lum.dc_ztest(th, v)["p_value"]
+    from scipy.stats import norm as _norm
+
+    p_exact = 2 * _norm.sf(abs(th[0] - th[1]) / math.sqrt(sum(v)))
+    assert p_dc < p_exact / 1e10          # 1e-37 against 1e-05
+    # Cochran's Q on the same inputs is the exactly calibrated reference.
+    assert lum.cochran_q(th, v)["p_value"] == pytest.approx(p_exact, rel=0.05)
+
+
 def test_dc_ztest_z_is_the_estimate_over_the_null_se():
     th = [0.6, 0.7, 0.8, 0.75, 0.65]
     v = [0.002, 0.003, 0.001, 0.004, 0.002]

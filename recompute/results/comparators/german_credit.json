@@ -1,0 +1,334 @@
+{
+  "cohort": "german_credit",
+  "n_test": 200,
+  "prevalence": 0.7,
+  "load_runtime_s": 0.05230909993406385,
+  "n_perm": 60,
+  "seed": 42,
+  "diciccio": {
+    "m20": {
+      "n_pairs": 2,
+      "max_pair": [
+        "age_group",
+        0,
+        1
+      ],
+      "p_maxT": 0.9344262295081968,
+      "p_holm_permutation": 1.0,
+      "p_holm_asymptotic": 1.0,
+      "null_max_p95": 1.889199747734189
+    },
+    "m30": {
+      "n_pairs": 2,
+      "max_pair": [
+        "age_group",
+        0,
+        1
+      ],
+      "p_maxT": 0.9344262295081968,
+      "p_holm_permutation": 1.0,
+      "p_holm_asymptotic": 1.0,
+      "null_max_p95": 1.889199747734189
+    },
+    "m50": {
+      "n_pairs": 2,
+      "max_pair": [
+        "age_group",
+        0,
+        1
+      ],
+      "p_maxT": 0.9344262295081968,
+      "p_holm_permutation": 1.0,
+      "p_holm_asymptotic": 1.0,
+      "null_max_p95": 1.889199747734189
+    },
+    "ev10": {
+      "n_pairs": 2,
+      "max_pair": [
+        "age_group",
+        0,
+        1
+      ],
+      "p_maxT": 0.9344262295081968,
+      "p_holm_permutation": 1.0,
+      "p_holm_asymptotic": 1.0,
+      "null_max_p95": 1.889199747734189
+    }
+  },
+  "lum": {
+    "m20": {
+      "sex": {
+        "n_levels": 2,
+        "naive_variance": 0.0003920000000000038,
+        "mean_sampling_variance": 0.004466827567169672,
+        "V_dc": -0.0040748275671696685,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 11.394968283595992,
+        "ci_lo": -0.004461416982509897,
+        "ci_hi": 0.017011254525004137,
+        "z_z": -0.6450524811140773,
+        "z_p_value": 0.7405534117710426,
+        "z_se_null": 0.006317048126273367,
+        "z_n_levels": 2,
+        "q_Q": 0.08775803276605723,
+        "q_df": 1,
+        "q_p_value": 0.7670469385293078,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.028000000000000136,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      },
+      "age_group": {
+        "n_levels": 2,
+        "naive_variance": 0.00042455339200025706,
+        "mean_sampling_variance": 0.0038142221364367017,
+        "V_dc": -0.0033896687444364445,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 8.984081174022023,
+        "ci_lo": -0.0038116242985174334,
+        "ci_hi": 0.01463030955257736,
+        "z_z": -0.6284001480328771,
+        "z_p_value": 0.7351290799311057,
+        "z_se_null": 0.005394124675252465,
+        "z_n_levels": 2,
+        "q_Q": 0.11130798805464451,
+        "q_df": 1,
+        "q_p_value": 0.7386598958068962,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.02913943691975729,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      }
+    },
+    "m30": {
+      "sex": {
+        "n_levels": 2,
+        "naive_variance": 0.0003920000000000038,
+        "mean_sampling_variance": 0.004466827567169672,
+        "V_dc": -0.0040748275671696685,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 11.394968283595992,
+        "ci_lo": -0.004461416982509897,
+        "ci_hi": 0.017011254525004137,
+        "z_z": -0.6450524811140773,
+        "z_p_value": 0.7405534117710426,
+        "z_se_null": 0.006317048126273367,
+        "z_n_levels": 2,
+        "q_Q": 0.08775803276605723,
+        "q_df": 1,
+        "q_p_value": 0.7670469385293078,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.028000000000000136,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      },
+      "age_group": {
+        "n_levels": 2,
+        "naive_variance": 0.00042455339200025706,
+        "mean_sampling_variance": 0.0038142221364367017,
+        "V_dc": -0.0033896687444364445,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 8.984081174022023,
+        "ci_lo": -0.0038116242985174334,
+        "ci_hi": 0.01463030955257736,
+        "z_z": -0.6284001480328771,
+        "z_p_value": 0.7351290799311057,
+        "z_se_null": 0.005394124675252465,
+        "z_n_levels": 2,
+        "q_Q": 0.11130798805464451,
+        "q_df": 1,
+        "q_p_value": 0.7386598958068962,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.02913943691975729,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      }
+    },
+    "m50": {
+      "sex": {
+        "n_levels": 2,
+        "naive_variance": 0.0003920000000000038,
+        "mean_sampling_variance": 0.004466827567169672,
+        "V_dc": -0.0040748275671696685,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 11.394968283595992,
+        "ci_lo": -0.004461416982509897,
+        "ci_hi": 0.017011254525004137,
+        "z_z": -0.6450524811140773,
+        "z_p_value": 0.7405534117710426,
+        "z_se_null": 0.006317048126273367,
+        "z_n_levels": 2,
+        "q_Q": 0.08775803276605723,
+        "q_df": 1,
+        "q_p_value": 0.7670469385293078,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.028000000000000136,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      },
+      "age_group": {
+        "n_levels": 2,
+        "naive_variance": 0.00042455339200025706,
+        "mean_sampling_variance": 0.0038142221364367017,
+        "V_dc": -0.0033896687444364445,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 8.984081174022023,
+        "ci_lo": -0.0038116242985174334,
+        "ci_hi": 0.01463030955257736,
+        "z_z": -0.6284001480328771,
+        "z_p_value": 0.7351290799311057,
+        "z_se_null": 0.005394124675252465,
+        "z_n_levels": 2,
+        "q_Q": 0.11130798805464451,
+        "q_df": 1,
+        "q_p_value": 0.7386598958068962,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.02913943691975729,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      }
+    },
+    "ev10": {
+      "sex": {
+        "n_levels": 2,
+        "naive_variance": 0.0003920000000000038,
+        "mean_sampling_variance": 0.004466827567169672,
+        "V_dc": -0.0040748275671696685,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 11.394968283595992,
+        "ci_lo": -0.004461416982509897,
+        "ci_hi": 0.017011254525004137,
+        "z_z": -0.6450524811140773,
+        "z_p_value": 0.7405534117710426,
+        "z_se_null": 0.006317048126273367,
+        "z_n_levels": 2,
+        "q_Q": 0.08775803276605723,
+        "q_df": 1,
+        "q_p_value": 0.7670469385293078,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.028000000000000136,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      },
+      "age_group": {
+        "n_levels": 2,
+        "naive_variance": 0.00042455339200025706,
+        "mean_sampling_variance": 0.0038142221364367017,
+        "V_dc": -0.0033896687444364445,
+        "V_dc_truncated": 0.0,
+        "noise_share_of_naive": 8.984081174022023,
+        "ci_lo": -0.0038116242985174334,
+        "ci_hi": 0.01463030955257736,
+        "z_z": -0.6284001480328771,
+        "z_p_value": 0.7351290799311057,
+        "z_se_null": 0.005394124675252465,
+        "z_n_levels": 2,
+        "q_Q": 0.11130798805464451,
+        "q_df": 1,
+        "q_p_value": 0.7386598958068962,
+        "q_tau2_DL": 0.0,
+        "observed_range": 0.02913943691975729,
+        "range_moment": 0.0,
+        "range_shrunk": 0.0,
+        "expected_normal_range_dL": 1.1288850625620217
+      }
+    }
+  },
+  "four_fifths": {
+    "m20": {
+      "sex": {
+        "ratio": 0.9577677224736048,
+        "min_auc": 0.635,
+        "max_auc": 0.663,
+        "gap_needed_to_fire": 0.1326,
+        "observed_gap": 0.028000000000000025,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9577677224736046
+      },
+      "age_group": {
+        "ratio": 0.9579953799276479,
+        "min_auc": 0.6645803698435278,
+        "max_auc": 0.693719806763285,
+        "gap_needed_to_fire": 0.13874396135265699,
+        "observed_gap": 0.02913943691975729,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9579953799276479
+      }
+    },
+    "m30": {
+      "sex": {
+        "ratio": 0.9577677224736048,
+        "min_auc": 0.635,
+        "max_auc": 0.663,
+        "gap_needed_to_fire": 0.1326,
+        "observed_gap": 0.028000000000000025,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9577677224736046
+      },
+      "age_group": {
+        "ratio": 0.9579953799276479,
+        "min_auc": 0.6645803698435278,
+        "max_auc": 0.693719806763285,
+        "gap_needed_to_fire": 0.13874396135265699,
+        "observed_gap": 0.02913943691975729,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9579953799276479
+      }
+    },
+    "m50": {
+      "sex": {
+        "ratio": 0.9577677224736048,
+        "min_auc": 0.635,
+        "max_auc": 0.663,
+        "gap_needed_to_fire": 0.1326,
+        "observed_gap": 0.028000000000000025,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9577677224736046
+      },
+      "age_group": {
+        "ratio": 0.9579953799276479,
+        "min_auc": 0.6645803698435278,
+        "max_auc": 0.693719806763285,
+        "gap_needed_to_fire": 0.13874396135265699,
+        "observed_gap": 0.02913943691975729,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9579953799276479
+      }
+    },
+    "ev10": {
+      "sex": {
+        "ratio": 0.9577677224736048,
+        "min_auc": 0.635,
+        "max_auc": 0.663,
+        "gap_needed_to_fire": 0.1326,
+        "observed_gap": 0.028000000000000025,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9577677224736046
+      },
+      "age_group": {
+        "ratio": 0.9579953799276479,
+        "min_auc": 0.6645803698435278,
+        "max_auc": 0.693719806763285,
+        "gap_needed_to_fire": 0.13874396135265699,
+        "observed_gap": 0.02913943691975729,
+        "n_levels": 2,
+        "implementation": "fairlearn.metrics.MetricFrame.ratio",
+        "ratio_internal": 0.9579953799276479
+      }
+    }
+  }
+}
