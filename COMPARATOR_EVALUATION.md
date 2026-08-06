@@ -98,13 +98,13 @@ n = 90 with 13 events; the age partition is two levels of n = 3,989 and n = 5,05
 carrying 1,430 and 812 events. The incumbent's statistic is the **maximum over
 partitions of a raw range**, so it reports 0.081 from race — and its null is the
 maximum over partitions too, so the same tiny race levels inflate the reference
-distribution to a 95th percentile of 0.139. The 0.067 age gap, which is over
-twelve standard errors and beyond serious doubt, is never tested on its own
-terms: it is smaller than the race gap, so it never becomes the statistic, and
-the null it would have been compared against was widened by a different
-partition's noise. Lum's decomposition says the same thing arithmetically — for
-Adult Income's age partition only 1.3% of the observed dispersion is sampling
-noise.
+distribution to a 95th percentile of 0.139. The 0.067 age gap is never tested on
+its own terms: it is smaller than the race gap, so it never becomes the
+statistic, and the null it would have been compared against was widened by a
+different partition's noise. Yet that age gap is **8.7 standard errors** — it is
+exactly the pair that produces DiCiccio's cohort statistic of `max |T| = 8.71`.
+Lum's decomposition says the same thing arithmetically: for Adult Income's age
+partition only 1.3% of the observed dispersion is sampling noise.
 
 Both comparators avoid this because both work on a noise-adjusted scale *within*
 each comparison before any maximum is taken. Studentization divides each pair's
@@ -120,16 +120,33 @@ every subgroup equally, so a noisy level drags the estimate; Q weights by
 precision and down-weights it. That is a real methodological difference, not a
 bug, and it is why both are reported.
 
-**The four-fifths rule barely engages.** It flags three cohorts at `m30`, and
-inspection of the reason matters more than the count: the gap a cohort needs
-before the rule can fire is `0.2 × max_k AUROC_k`, which is 0.157 to 0.191 across
-these ten cohorts. NHIS 2023's 0.128 gap, ACS-Income's 0.053 gap, and Adult
-Income's 0.081 gap are all structurally invisible to it. The rule was written for
-selection rates, which have a meaningful zero; AUROC has an uninformative point
-at 0.5, so a ratio of 0.80 corresponds to a subgroup performing at chance while
-another performs at 0.63. `min_detectable_gap` is reported per partition so this
-is visible rather than implied. The three cohorts it does flag are the three with
-a subgroup AUROC near or below 0.6.
+**The four-fifths rule barely engages, and its threshold is essentially
+arbitrary on this scale.** It flags three cohorts at `m30` — Diabetes 130
+(subgroup AUROC 0.571 against 0.787), BRFSS 2024 (0.727 against 0.950, the high
+end being a race level of n = 59) and NHIS 2024 (0.650 against 0.978). The
+reason matters more than the count. Before the rule can fire at all, a cohort's
+max−min gap must reach `0.2 × max_k AUROC_k`, which across these ten cohorts is
+**0.133 to 0.200**:
+
+| cohort | ratio | gap needed to fire | gap observed |
+|---|---|---|---|
+| Diabetes 130 | 0.726 | 0.157 | 0.216 |
+| BRFSS 2024 | 0.765 | 0.190 | 0.224 |
+| NHIS 2024 | 0.665 | 0.196 | 0.328 |
+| NHIS 2023 | 0.852 | 0.173 | 0.128 |
+| Adult Income | 0.915 | 0.191 | 0.081 |
+| ACS-Income | 0.940 | 0.177 | 0.053 |
+| NHANES 21-23 | 0.925 | 0.200 | 0.075 |
+| Synthetic baseline | 0.953 | 0.196 | 0.046 |
+| German Credit | 0.958 | 0.133 | 0.028 |
+
+NHIS 2023's 0.128 gap, Adult Income's 0.081 and ACS-Income's 0.053 are
+structurally invisible to it, and ACS-Income is the one cohort the incumbent is
+confident about. The rule was written for selection rates, which have a
+meaningful zero; AUROC has an uninformative point at 0.5, so a ratio of 0.80
+corresponds to one subgroup at chance while another sits at 0.625. Nothing about
+the number 0.80 transfers. `min_detectable_gap` is reported per partition so this
+is visible rather than implied.
 
 **The naive 0.05 threshold flags most things.** Seven of nine at `m30`. It is the
 most sensitive rule in the table and it has no error control at all, which is
