@@ -47,8 +47,18 @@ DIAGNOSTICS_DIR = RESULTS / "comparators"
 from recompute.null_reference import INCLUSION_RULES  # noqa: E402
 
 
+#: Methods whose result cannot depend on the permutation scheme, because they
+#: never permute. When the sweep is run under more than one scheme these are
+#: computed for the first scheme only; emitting them once per scheme would put
+#: literal duplicate rows in the table and silently double every count taken
+#: from it.
+SCHEME_FREE = ("lum2022", "lum2022_cochranQ", "lum2022_bootstrapCI",
+               "four_fifths", "fixed_threshold_005")
+
+
 def _rows_for_cohort(cohort: str, n_perm: int, seed: int, alpha: float,
-                     scheme: str = "joint") -> List[Dict[str, object]]:
+                     scheme: str = "joint", with_scheme_free: bool = True
+                     ) -> List[Dict[str, object]]:
     """Run every method on one cohort and return flat rows."""
     from recompute.comparators import diciccio, four_fifths, incumbent, lum, naive
 
@@ -58,16 +68,20 @@ def _rows_for_cohort(cohort: str, n_perm: int, seed: int, alpha: float,
                                                scheme=scheme),
         diciccio.METHOD: diciccio.run_cohort(data, n_perm=n_perm, seed=seed,
                                              alpha=alpha, scheme=scheme),
-        lum.METHOD: lum.run_cohort(data, alpha=alpha, seed=seed),
-        four_fifths.METHOD: four_fifths.run_cohort(data),
-        naive.METHOD: naive.run_cohort(data),
     }
+    if with_scheme_free:
+        blocks.update({
+            lum.METHOD: lum.run_cohort(data, alpha=alpha, seed=seed),
+            four_fifths.METHOD: four_fifths.run_cohort(data),
+            naive.METHOD: naive.run_cohort(data),
+        })
 
     # Lum emits three readings of the same estimator (closed-form z-test,
     # Cochran's Q, parametric-bootstrap CI). All three go in the CSV so the
     # choice of primary is auditable.
     flat = {m: b["results"] for m, b in blocks.items()}
-    flat.update(blocks[lum.METHOD].get("variants", {}))
+    if with_scheme_free:
+        flat.update(blocks[lum.METHOD].get("variants", {}))
 
     rows: List[Dict[str, object]] = []
     for method, block_results in flat.items():
@@ -97,6 +111,8 @@ def _rows_for_cohort(cohort: str, n_perm: int, seed: int, alpha: float,
 
     # Full per-partition diagnostics, kept out of the CSV so it stays readable.
     DIAGNOSTICS_DIR.mkdir(parents=True, exist_ok=True)
+    if not with_scheme_free:
+        return rows
     diag = {
         "cohort": cohort,
         "n_test": data.n_test,
@@ -130,10 +146,11 @@ def _jsonable(o):
 
 
 def _worker(args):
-    cohort, n_perm, seed, alpha, scheme = args
+    cohort, n_perm, seed, alpha, scheme, with_scheme_free = args
     t0 = time.perf_counter()
     try:
-        rows = _rows_for_cohort(cohort, n_perm, seed, alpha, scheme)
+        rows = _rows_for_cohort(cohort, n_perm, seed, alpha, scheme,
+                                with_scheme_free)
         print(f"[ok ] {cohort:<15} {scheme:<11} "
               f"{(time.perf_counter()-t0)/60:6.2f} min", flush=True)
         return rows
@@ -194,7 +211,11 @@ def run_cohorts(cohorts: List[str], n_perm: int, seed: int, alpha: float,
           f"x 5 methods x {len(schemes)} scheme(s) {tuple(schemes)}, "
           f"B={n_perm}, seed={seed}, {jobs} worker(s)", flush=True)
     t0 = time.perf_counter()
-    payload = [(c, n_perm, seed, alpha, s) for s in schemes for c in cohorts]
+    # The closed-form and deterministic methods are computed under the first
+    # scheme only -- they do not permute, so a second copy would be a duplicate
+    # row rather than a second measurement.
+    payload = [(c, n_perm, seed, alpha, s, i == 0)
+               for i, s in enumerate(schemes) for c in cohorts]
     rows: List[Dict[str, object]] = []
     if jobs > 1:
         with ProcessPoolExecutor(max_workers=jobs) as ex:

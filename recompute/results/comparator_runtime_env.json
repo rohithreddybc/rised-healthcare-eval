@@ -1,0 +1,108 @@
+{
+  "platform": "Windows-10-10.0.26200-SP0",
+  "machine": "AMD64",
+  "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+  "logical_cores": 12,
+  "python": "3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]",
+  "numpy": "1.26.4",
+  "scipy": "1.15.3",
+  "pandas": "3.0.2",
+  "blas_thread_env": {
+    "OMP_NUM_THREADS": "<unset>",
+    "OPENBLAS_NUM_THREADS": "<unset>",
+    "MKL_NUM_THREADS": "<unset>",
+    "NUMEXPR_NUM_THREADS": "<unset>",
+    "VECLIB_MAXIMUM_THREADS": "<unset>"
+  },
+  "timestamp_utc": "2026-08-09T06:16:46Z",
+  "ram_total_gb": 13.7,
+  "physical_cores": 8,
+  "numpy_blas": {
+    "Compilers": {
+      "c": {
+        "name": "msvc",
+        "linker": "link",
+        "version": "19.29.30153",
+        "commands": "cl"
+      },
+      "cython": {
+        "name": "cython",
+        "linker": "cython",
+        "version": "3.0.8",
+        "commands": "cython"
+      },
+      "c++": {
+        "name": "msvc",
+        "linker": "link",
+        "version": "19.29.30153",
+        "commands": "cl"
+      }
+    },
+    "Machine Information": {
+      "host": {
+        "cpu": "x86_64",
+        "family": "x86_64",
+        "endian": "little",
+        "system": "windows"
+      },
+      "build": {
+        "cpu": "x86_64",
+        "family": "x86_64",
+        "endian": "little",
+        "system": "windows"
+      }
+    },
+    "Build Dependencies": {
+      "blas": {
+        "name": "openblas64",
+        "found": true,
+        "version": "0.3.23.dev",
+        "detection method": "pkgconfig",
+        "include directory": "/c/opt/64/include",
+        "lib directory": "/c/opt/64/lib",
+        "openblas configuration": "USE_64BITINT=1 DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS= NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= SKYLAKEX MAX_THREADS=2",
+        "pc file directory": "C:/opt/64/lib/pkgconfig"
+      },
+      "lapack": {
+        "name": "dep2270588361616",
+        "found": true,
+        "version": "1.26.4",
+        "detection method": "internal",
+        "include directory": "unknown",
+        "lib directory": "unknown",
+        "openblas configuration": "unknown",
+        "pc file directory": "unknown"
+      }
+    },
+    "Python Information": {
+      "path": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cibw-run-j442zwj6\\cp311-win_amd64\\build\\venv\\Scripts\\python.exe",
+      "version": "3.11"
+    },
+    "SIMD Extensions": {
+      "baseline": [
+        "SSE",
+        "SSE2",
+        "SSE3"
+      ],
+      "found": [
+        "SSSE3",
+        "SSE41",
+        "POPCNT",
+        "SSE42",
+        "AVX",
+        "F16C",
+        "FMA3",
+        "AVX2"
+      ],
+      "not found": [
+        "AVX512F",
+        "AVX512CD",
+        "AVX512_SKX",
+        "AVX512_CLX",
+        "AVX512_CNL",
+        "AVX512_ICL"
+      ]
+    }
+  },
+  "cpu_brand": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel"
+}

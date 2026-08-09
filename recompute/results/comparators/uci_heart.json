@@ -2,7 +2,7 @@
   "cohort": "uci_heart",
   "n_test": 61,
   "prevalence": 0.5409836065573771,
-  "load_runtime_s": 0.13797240005806088,
+  "load_runtime_s": 0.11307849999866448,
   "n_perm": 10000,
   "seed": 42,
   "diciccio": {},
