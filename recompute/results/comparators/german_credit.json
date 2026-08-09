@@ -2,8 +2,8 @@
   "cohort": "german_credit",
   "n_test": 200,
   "prevalence": 0.7,
-  "load_runtime_s": 0.16220390000671614,
-  "n_perm": 10000,
+  "load_runtime_s": 0.041061000010813586,
+  "n_perm": 60,
   "seed": 42,
   "diciccio": {
     "m20": {
@@ -12,19 +12,19 @@
       "n_pairs_dropped_var_floor": 0,
       "frac_pairs_dropped_var_floor": 0.0,
       "n_null_pair_evaluations_dropped_var_floor": 0,
-      "n_null_pair_evaluations": 20000,
+      "n_null_pair_evaluations": 120,
       "max_pair": [
         "age_group",
         0,
         1
       ],
-      "p_maxT": 0.9288071192880712,
-      "p_maxT_report": "0.9288",
+      "p_maxT": 0.9344262295081968,
+      "p_maxT_report": "0.9344",
       "p_is_floor": false,
-      "p_floor_value": 9.999000099990002e-05,
+      "p_floor_value": 0.01639344262295082,
       "p_holm_permutation": 1.0,
       "p_holm_asymptotic": 1.0,
-      "null_max_p95": 2.3471128027200403
+      "null_max_p95": 1.889199747734189
     },
     "m30": {
       "n_pairs": 2,
@@ -32,19 +32,19 @@
       "n_pairs_dropped_var_floor": 0,
       "frac_pairs_dropped_var_floor": 0.0,
       "n_null_pair_evaluations_dropped_var_floor": 0,
-      "n_null_pair_evaluations": 20000,
+      "n_null_pair_evaluations": 120,
       "max_pair": [
         "age_group",
         0,
         1
       ],
-      "p_maxT": 0.9288071192880712,
-      "p_maxT_report": "0.9288",
+      "p_maxT": 0.9344262295081968,
+      "p_maxT_report": "0.9344",
       "p_is_floor": false,
-      "p_floor_value": 9.999000099990002e-05,
+      "p_floor_value": 0.01639344262295082,
       "p_holm_permutation": 1.0,
       "p_holm_asymptotic": 1.0,
-      "null_max_p95": 2.3471128027200403
+      "null_max_p95": 1.889199747734189
     },
     "m50": {
       "n_pairs": 2,
@@ -52,19 +52,19 @@
       "n_pairs_dropped_var_floor": 0,
       "frac_pairs_dropped_var_floor": 0.0,
       "n_null_pair_evaluations_dropped_var_floor": 0,
-      "n_null_pair_evaluations": 20000,
+      "n_null_pair_evaluations": 120,
       "max_pair": [
         "age_group",
         0,
         1
       ],
-      "p_maxT": 0.9288071192880712,
-      "p_maxT_report": "0.9288",
+      "p_maxT": 0.9344262295081968,
+      "p_maxT_report": "0.9344",
       "p_is_floor": false,
-      "p_floor_value": 9.999000099990002e-05,
+      "p_floor_value": 0.01639344262295082,
       "p_holm_permutation": 1.0,
       "p_holm_asymptotic": 1.0,
-      "null_max_p95": 2.3471128027200403
+      "null_max_p95": 1.889199747734189
     },
     "ev10": {
       "n_pairs": 2,
@@ -72,19 +72,19 @@
       "n_pairs_dropped_var_floor": 0,
       "frac_pairs_dropped_var_floor": 0.0,
       "n_null_pair_evaluations_dropped_var_floor": 0,
-      "n_null_pair_evaluations": 20000,
+      "n_null_pair_evaluations": 120,
       "max_pair": [
         "age_group",
         0,
         1
       ],
-      "p_maxT": 0.9288071192880712,
-      "p_maxT_report": "0.9288",
+      "p_maxT": 0.9344262295081968,
+      "p_maxT_report": "0.9344",
       "p_is_floor": false,
-      "p_floor_value": 9.999000099990002e-05,
+      "p_floor_value": 0.01639344262295082,
       "p_holm_permutation": 1.0,
       "p_holm_asymptotic": 1.0,
-      "null_max_p95": 2.3471128027200403
+      "null_max_p95": 1.889199747734189
     }
   },
   "lum": {

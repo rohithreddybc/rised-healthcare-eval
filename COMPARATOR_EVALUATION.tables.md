@@ -217,7 +217,20 @@ _Read the ranking with the `flags @m30` column in view. A rule that flags almost
 
 ## T7. Runtime, all methods on the same kernel, repeated
 
-_comparator_runtime.csv predates the repeated benchmark; re-run `python -m recompute.comparators.bench --repeats 3`. The superseded file held a single un-repeated timing per method, which cannot support a runtime claim._
+_Machine: Intel64 Family 6 Model 186 Stepping 2, GenuineIntel, 8 physical / 12 logical cores, 13.7 GB RAM, Windows-10-10.0.26200-SP0; numpy 1.26.4, scipy 1.15.3. B = 10,000, 3 repeats, sequential (no two timings share the machine)._
+| cohort | n_test | part. | incumbent, shipped kernel s | incumbent, same kernel s (median) | +- sd | DiCiccio s (median) | +- sd  | overhead % | > noise? | Lum s | four-fifths s | fixed threshold s |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Diabetes 130 | 19,890 | 3 | 74.9 | 27.6 | 0.3 | 27.6 | 0.3 | -0.2 | no | 0.021 | 2.423 | 0.012 |
+| BRFSS 2024 | 8,978 | 5 | 59.9 | 23.2 | 0.2 | 23.2 | 0.4 | -0.1 | no | 0.027 | 1.995 | 0.010 |
+| Adult Income | 9,045 | 3 | 39.4 | 12.2 | 0.3 | 11.8 | 0.1 | -3.5 | no | 0.014 | 1.194 | 0.006 |
+| NHIS 2023 | 5,423 | 4 | 37.8 | 11.9 | 0.1 | 11.8 | 0.1 | -1.3 | no | 0.018 | 1.050 | 0.006 |
+| NHIS 2024 | 1,950 | 5 | 26.2 | 9.4 | 0.0 | 9.4 | 0.3 | -0.2 | no | 0.019 | 0.656 | 0.005 |
+| ACS-Income | 4,000 | 3 | 18.6 | 6.0 | 0.0 | 5.7 | 0.0 | -5.2 | **yes** | 0.010 | 0.597 | 0.003 |
+| Synthetic baseline | 2,000 | 4 | 18.9 | 7.2 | 0.1 | 6.9 | 0.1 | -4.5 | **yes** | 0.015 | 0.535 | 0.003 |
+| NHANES 21-23 | 820 | 4 | 13.1 | 5.3 | 0.1 | 4.8 | 0.1 | -9.2 | **yes** | 0.012 | 0.317 | 0.002 |
+| German Credit | 200 | 2 | 3.2 | 1.5 | 0.0 | 1.3 | 0.0 | -14.3 | **yes** | 0.005 | 0.099 | 0.001 |
+| UCI Heart | 61 | 2 | 3.4 | 1.5 | 0.0 | 1.4 | 0.0 | -6.3 | **yes** | 0.001 | 0.001 | 0.001 |
+**Runtime verdict.** The studentization overhead exceeds the run-to-run noise in 5 of 10 cohorts. Where it does not, the honest statement is that studentization costs no material runtime, with **no number attached** -- the difference is inside the measurement noise and quoting it would overstate what 3 repeats can resolve. Note that the shipped-kernel column is the incumbent as it actually ships, through `scipy.rankdata`; it must not be differenced against the studentized column, because the gap between them is the vectorised kernel, not the statistic.
 
 ### T7b. Runtime as recorded in the comparison sweep, m30
 

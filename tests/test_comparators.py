@@ -707,14 +707,40 @@ def test_comparison_csv_is_internally_consistent():
     import pandas as pd
 
     df = pd.read_csv(path)
-    assert len(df) == 10 * len(RULES) * 7
+    # Two permutation-based methods, which appear once per permutation scheme
+    # the sweep was run under, plus five scheme-free methods, which appear
+    # exactly once however many schemes were run (recompute.comparators.run
+    # computes them for the first scheme only -- a second copy would be a
+    # duplicate row, not a second measurement).
+    sch = df["permutation_scheme"].fillna("")
+    n_schemes = sch[sch != ""].nunique()
+    assert n_schemes >= 1
+    assert len(df) == 10 * len(RULES) * (2 * n_schemes + 5)
+    for m in ("lum2022", "lum2022_cochranQ", "lum2022_bootstrapCI",
+              "four_fifths", "fixed_threshold_005"):
+        assert (df["method"] == m).sum() == 10 * len(RULES), m
+        assert (sch[df["method"] == m] == "").all(), m
+
     # A p-value, where present, must agree with the conclusion.
     has_p = df["p_value"].notna() & (df["conclusion"] != "not_evaluable")
     sub = df[has_p]
     assert ((sub["p_value"] < 0.05) == (sub["conclusion"] == "flag")).all()
+
+    # A p-value at the Monte-Carlo floor must be rendered as an inequality and
+    # never as a value a table could round to zero.
+    floored = df[df["p_is_floor"].astype("boolean").fillna(False)]
+    assert len(floored) > 0
+    assert floored["p_value_report"].str.startswith("<= ").all()
+
     # The naive baseline and the incumbent must share the observed statistic.
-    piv = df.pivot_table(index=["cohort", "rule"], columns="method",
-                         values="statistic")
+    one = df[(sch == "") | (sch == "joint")]
+    piv = one.pivot_table(index=["cohort", "rule"], columns="method",
+                          values="statistic")
     both = piv[["permutation_null", "fixed_threshold_005"]].dropna()
     assert np.allclose(both["permutation_null"], both["fixed_threshold_005"],
                        atol=1e-9)
+
+    # Multiplicity adjustment can only ever make a p-value larger.
+    ok = df["p_value"].notna() & df["p_holm_across_cohorts"].notna()
+    assert (df.loc[ok, "p_holm_across_cohorts"] >= df.loc[ok, "p_value"]).all()
+    assert (df.loc[ok, "p_bh_across_cohorts"] >= df.loc[ok, "p_value"]).all()
