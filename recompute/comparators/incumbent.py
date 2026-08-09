@@ -78,8 +78,13 @@ def run_cohort(cohort: str, rules: Optional[List[str]] = None,
             statistic_name="max-min AUROC gap",
             p_value=float(p),
             p_is_floor=bool(entry.get("p_is_floor", False)),
+            n_perm=int(payload["n_reps"]),
             runtime_s=total_perm_s,
             detail=(f"B={payload['n_reps']}; scheme={scheme}; "
+                    # The stored payload already renders the floor as an
+                    # inequality; carry that string through rather than letting
+                    # a downstream table print 0.000.
+                    f"p_report={entry.get('p_report')}; "
                     f"null_p95={entry.get('null_p95_gap'):.4f}; "
                     f"null_mean={entry.get('null_mean_gap'):.4f}"),
         )

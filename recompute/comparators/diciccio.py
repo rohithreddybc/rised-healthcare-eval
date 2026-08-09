@@ -89,6 +89,7 @@ from recompute.comparators.core import (
     admissible,
     holm,
     mc_p,
+    p_report,
 )
 
 METHOD = "diciccio2020"
@@ -186,6 +187,14 @@ def run_cohort(data: CohortData, n_perm: int = 10_000, seed: int = 42,
 
     masks = rule_masks(obs_levels, pairs, rules)
     t_obs = _pair_stats(obs_levels, pairs)
+    # VAR_FLOOR accounting. `studentized` returns nan when Var_a + Var_b <=
+    # VAR_FLOOR, i.e. when the pair carries no estimable sampling variability and
+    # the studentized statistic is undefined. Those pairs are silently dropped
+    # from the max-T family, which changes the family the FWER is controlled over
+    # -- so the count has to be reported, not merely handled. It is per rule
+    # because each rule admits a different set of pairs.
+    var_floor_drops = {
+        rule: int((masks[rule] & ~np.isfinite(t_obs)).sum()) for rule in rules}
 
     # Permutation pass: one row permutation per replicate, carried across every
     # demographic column (the incumbent's joint scheme, same seed).
@@ -197,13 +206,20 @@ def run_cohort(data: CohortData, n_perm: int = 10_000, seed: int = 42,
 
     results: Dict[str, MethodResult] = {}
     diagnostics: Dict[str, Dict[str, object]] = {}
+    # Permuted replicates can also lose pairs to the variance floor even when the
+    # observed pair survives; counted so the null's family size is auditable too.
+    null_floor_drops = {
+        rule: int((~np.isfinite(t_null[masks[rule], :])).sum()) for rule in rules}
     for rule in rules:
         m = masks[rule] & np.isfinite(t_obs)
+        n_admissible = int(masks[rule].sum())
         if m.sum() == 0:
             results[rule] = MethodResult(
                 METHOD, rule, NOT_EVALUABLE, runtime_s=perm_runtime,
                 statistic_name="max |T|",
-                detail="no admissible pair with a defined studentized statistic")
+                detail=(f"no admissible pair with a defined studentized "
+                        f"statistic; n_pairs_admissible={n_admissible}, "
+                        f"n_pairs_dropped_var_floor={var_floor_drops[rule]}"))
             continue
 
         obs_max = float(np.nanmax(t_obs[m]))
@@ -226,16 +242,32 @@ def run_cohort(data: CohortData, n_perm: int = 10_000, seed: int = 42,
             statistic_name="max |T| (studentized)",
             p_value=p_maxt,
             p_is_floor=is_floor,
+            n_perm=n_perm,
             runtime_s=perm_runtime,
             detail=(f"n_pairs={int(m.sum())}; "
+                    f"n_pairs_dropped_var_floor={var_floor_drops[rule]}; "
+                    f"p_report={p_report(p_maxt, n_perm, is_floor)}; "
                     f"p_holm_perm={p_holm_perm:.4g}; "
                     f"p_holm_asymptotic={p_holm_asym:.4g}"),
         )
         k_arg = int(np.flatnonzero(m)[int(np.nanargmax(t_obs[m]))])
         diagnostics[rule] = {
             "n_pairs": int(m.sum()),
+            "n_pairs_admissible": n_admissible,
+            # Pairs the variance floor removed from the max-T family, observed
+            # and (summed over replicates) in the null. VAR_FLOOR = 1e-12; a pair
+            # is dropped when Var_a + Var_b <= that, which happens when both
+            # subgroups have perfectly degenerate placement values.
+            "n_pairs_dropped_var_floor": var_floor_drops[rule],
+            "frac_pairs_dropped_var_floor": (
+                var_floor_drops[rule] / n_admissible if n_admissible else 0.0),
+            "n_null_pair_evaluations_dropped_var_floor": null_floor_drops[rule],
+            "n_null_pair_evaluations": int(n_admissible * n_perm),
             "max_pair": pairs[k_arg],
             "p_maxT": p_maxt,
+            "p_maxT_report": p_report(p_maxt, n_perm, is_floor),
+            "p_is_floor": bool(is_floor),
+            "p_floor_value": 1.0 / (n_perm + 1),
             "p_holm_permutation": p_holm_perm,
             "p_holm_asymptotic": p_holm_asym,
             "null_max_p95": float(np.nanpercentile(null_max, 95)),

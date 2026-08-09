@@ -428,6 +428,29 @@ def mc_p(null_vals: np.ndarray, observed: float) -> Tuple[float, bool]:
     return float((n_ge + 1) / (b + 1)), bool(n_ge == 0)
 
 
+def p_report(p: Optional[float], n_perm: int, is_floor: bool,
+             digits: int = 4) -> str:
+    """Render a Monte-Carlo p-value, never as an attained value at the floor.
+
+    The +1 correction that makes the permutation test exact-valid also puts a
+    hard floor at ``1 / (B + 1)``: with B = 10,000 no p-value below 9.999e-05 can
+    be produced, whatever the data. Printing that as "0.000" -- or worse, letting
+    a downstream table round it to zero -- states an attained precision the
+    design cannot deliver and invites a reader to treat it as overwhelming
+    evidence. At the floor the correct statement is an inequality.
+
+    Matches ``recompute.null_reference.mc_pvalue``'s ``p_report`` field so the
+    comparator tables and the incumbent's tables render the same value the same
+    way.
+    """
+    if p is None or not np.isfinite(p):
+        return "n/a"
+    floor = 1.0 / (n_perm + 1)
+    if is_floor or p <= floor:
+        return f"<= {floor:.2e}"
+    return f"{p:.{digits}f}"
+
+
 # ── Result record shared by every comparator ─────────────────────────────────
 @dataclass
 class MethodResult:
@@ -442,6 +465,18 @@ class MethodResult:
     p_is_floor: bool = False
     runtime_s: float = 0.0
     detail: str = ""
+    #: Number of permutation replicates behind ``p_value``; sets the 1/(B+1)
+    #: floor. ``None`` for closed-form and deterministic methods, which have no
+    #: floor.
+    n_perm: Optional[int] = None
+
+    @property
+    def p_value_report(self) -> str:
+        """The p-value as it must be printed: an inequality when at the floor."""
+        if self.p_value is None or self.n_perm is None:
+            return ("n/a" if self.p_value is None
+                    else f"{float(self.p_value):.4g}")
+        return p_report(self.p_value, int(self.n_perm), self.p_is_floor)
 
     def as_row(self) -> Dict[str, object]:
         return {
@@ -452,6 +487,10 @@ class MethodResult:
             "statistic": self.statistic,
             "p_value": self.p_value,
             "p_is_floor": self.p_is_floor,
+            # Never let a downstream table round a floored p-value to 0.000.
+            "p_value_report": self.p_value_report,
+            "p_floor": (1.0 / (self.n_perm + 1)
+                        if self.n_perm is not None else None),
             "runtime_s": self.runtime_s,
             "detail": self.detail,
         }

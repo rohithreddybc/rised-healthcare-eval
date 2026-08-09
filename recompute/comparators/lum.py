@@ -105,11 +105,28 @@ freedom. Q is the classical inferential companion of exactly this
 method-of-moments correction (it is the ``Q`` of DerSimonian-Laird), but it is
 *our* addition and is labelled as such everywhere it appears.
 
-**Combining over partitions.** A cohort has several partitions and the incumbent
-maxes over them. The Lum verdict flags when any partition flags, with the
-confidence level Bonferroni-adjusted to ``1 - alpha/P`` across the ``P``
-partitions so the family-wise error rate is still controlled; the reported
-p-value is the Holm-adjusted minimum of the per-partition Q p-values.
+**Combining over partitions, and the nominal level.** A cohort has several
+partitions and the incumbent maxes over them. All three Lum readings flag when
+any partition flags, and all three are placed at the same family-wise level
+``alpha``:
+
+  * the z-test and Cochran's Q take the Holm-adjusted minimum of their
+    per-partition p-values and compare it to ``alpha``;
+  * the bootstrap-CI rule flags iff the lower bound on ``V_dc`` clears zero,
+    which is a one-sided test, so its lower bound is placed at the one-sided
+    level ``alpha / P`` -- Bonferroni across the ``P`` partitions.
+
+This was not true before round 2. The cohort path used a fixed two-sided
+``conf = 0.95`` with no multiplicity adjustment (one-sided level 0.025), and the
+Type I path used ``conf = 1 - alpha/P``, which places the lower bound at
+``alpha / 2P`` rather than ``alpha / P`` -- half the intended level, and a
+different level from the one the cohort path used. The bootstrap rule was
+therefore being compared against Holm-at-``alpha`` competitors while running at
+roughly a quarter of their level, which flatters its Type I error and
+understates its (already negligible) power. ``bootstrap_ci`` now takes an
+explicit ``one_sided_alpha`` and returns ``level_lo``, the one-sided level it
+actually used, so the comparison is auditable from the output rather than from
+the source.
 """
 
 from __future__ import annotations
@@ -243,21 +260,36 @@ def dc_ztest(thetas: Sequence[float], variances: Sequence[float]
 
 def bootstrap_ci(thetas: Sequence[float], variances: Sequence[float],
                  conf: float = 0.95, n_boot: int = N_BOOT_DEFAULT,
-                 seed: int = 42) -> Dict[str, float]:
+                 seed: int = 42, one_sided_alpha: Optional[float] = None
+                 ) -> Dict[str, float]:
     """Parametric-bootstrap percentile interval for ``V_dc``.
 
     Our implementation of the paper's uncertainty quantification (see the module
     docstring). Resamples the L group estimates from
     ``N(theta_bar, v_k + max(V_dc, 0))`` -- i.e. the fitted random-effects model
     -- and recomputes the estimator on each draw.
+
+    Level convention
+    ----------------
+    The decision rule built on this interval is ``flag iff lo > 0``, which uses
+    the lower bound and nothing else and is therefore a **one-sided** test. Pass
+    ``one_sided_alpha`` to place the lower bound at exactly that one-sided level;
+    the returned ``lo`` is then the ``one_sided_alpha`` quantile. ``conf`` is
+    retained for the two-sided reading and is used only when
+    ``one_sided_alpha`` is ``None``, in which case ``lo`` sits at
+    ``(1 - conf) / 2`` -- i.e. a one-sided level of ``(1 - conf) / 2``, half of
+    what the nominal ``conf`` suggests. ``level_lo`` reports the one-sided level
+    actually used, so a reader never has to infer it.
     """
     th = np.asarray(thetas, dtype=float)
     v = np.asarray(variances, dtype=float)
     ok = np.isfinite(th) & np.isfinite(v)
     th, v = th[ok], v[ok]
     L = len(th)
+    a = (float(one_sided_alpha) if one_sided_alpha is not None
+         else (1.0 - conf) / 2.0)
     if L < 2:
-        return {"lo": float("nan"), "hi": float("nan")}
+        return {"lo": float("nan"), "hi": float("nan"), "level_lo": a}
     base = double_corrected_variance(th, v)
     tau2 = base["V_dc_truncated"]
     rng = np.random.default_rng(seed)
@@ -265,9 +297,9 @@ def bootstrap_ci(thetas: Sequence[float], variances: Sequence[float],
     draws = rng.normal(loc=float(th.mean()), scale=sd, size=(n_boot, L))
     s2 = draws.var(axis=1, ddof=1)
     vals = s2 - v.mean()
-    a = (1.0 - conf) / 2.0
     return {"lo": float(np.quantile(vals, a)),
-            "hi": float(np.quantile(vals, 1.0 - a))}
+            "hi": float(np.quantile(vals, 1.0 - a)),
+            "level_lo": a}
 
 
 def cochran_q(thetas: Sequence[float], variances: Sequence[float]
@@ -315,7 +347,8 @@ def shrunken_range(thetas: Sequence[float], variances: Sequence[float],
 
 
 def partition_result(levels: Sequence[Level], conf: float = 0.95,
-                     n_boot: int = N_BOOT_DEFAULT, seed: int = 42
+                     n_boot: int = N_BOOT_DEFAULT, seed: int = 42,
+                     one_sided_alpha: Optional[float] = None
                      ) -> Dict[str, float]:
     """All Lum quantities for one demographic partition."""
     th = [lv.auc for lv in levels]
@@ -324,7 +357,8 @@ def partition_result(levels: Sequence[Level], conf: float = 0.95,
     if out["n_levels"] < 2:
         return out
     out.update({f"ci_{k}": val
-                for k, val in bootstrap_ci(th, v, conf, n_boot, seed).items()})
+                for k, val in bootstrap_ci(th, v, conf, n_boot, seed,
+                                           one_sided_alpha).items()})
     out.update({f"z_{k}": val for k, val in dc_ztest(th, v).items()})
     q = cochran_q(th, v)
     out.update({f"q_{k}": val for k, val in q.items()})
@@ -355,11 +389,22 @@ def run_cohort(data: CohortData, rules: Optional[List[str]] = None,
         f"{METHOD}_cochranQ": {}, f"{METHOD}_bootstrapCI": {}}
     diagnostics: Dict[str, Dict[str, object]] = {}
     for rule in rules:
-        per_part = {}
-        for col, lv in obs_levels.items():
-            keep = admissible(lv, rule)
-            if len(keep) >= 2:
-                per_part[col] = partition_result(keep, n_boot=n_boot, seed=seed)
+        keep_by_col = {col: admissible(lv, rule) for col, lv in obs_levels.items()}
+        keep_by_col = {c: k for c, k in keep_by_col.items() if len(k) >= 2}
+        # EQUAL FOOTING (round-2 fix). The bootstrap-CI rule flags iff lo > 0,
+        # which is one-sided, so its lower bound is placed at the one-sided level
+        # alpha / P -- Bonferroni across the cohort's P partitions. That gives it
+        # the same family-wise level alpha as the Holm-adjusted z-test and Q.
+        # Previously the cohort path used a fixed two-sided conf=0.95 (one-sided
+        # 0.025, no multiplicity adjustment at all) while the Type I path used
+        # conf = 1 - alpha/P (one-sided alpha/2P); neither matched alpha, and the
+        # two paths did not match each other.
+        p_parts = max(len(keep_by_col), 1)
+        one_sided = alpha / p_parts
+        per_part = {
+            col: partition_result(keep, n_boot=n_boot, seed=seed,
+                                  one_sided_alpha=one_sided)
+            for col, keep in keep_by_col.items()}
         if not per_part:
             for target, name in ((results, METHOD),
                                  (variants[f"{METHOD}_cochranQ"],
@@ -432,7 +477,10 @@ def run_cohort(data: CohortData, rules: Optional[List[str]] = None,
             p_value=None,
             runtime_s=time.perf_counter() - t0,
             detail=(f"parametric bootstrap {int(n_boot)} draws; flags when the "
-                    f"lower bound on V_dc clears zero; "
+                    f"lower bound on V_dc clears zero; one-sided level "
+                    f"alpha/P={one_sided:.5g} (P={p_parts} partitions), so the "
+                    f"family-wise level is alpha={alpha:g}, matching the "
+                    f"Holm-adjusted z-test and Q; "
                     f"lo={per_part[worst].get('ci_lo', float('nan')):.5g}"),
         )
         diagnostics[rule] = per_part
@@ -462,8 +510,12 @@ def decide(ctx, rule: str, alpha: float = 0.05, n_boot: int = 1000,
         zps.append(dc_ztest(th, v)["p_value"])
         qps.append(cochran_q(th, v)["p_value"])
         if n_boot:
-            ci = bootstrap_ci(th, v, conf=1.0 - alpha / P, n_boot=n_boot,
-                              seed=seed)
+            # EQUAL FOOTING (round-2 fix): the rule `lo > 0` is one-sided, so the
+            # lower bound goes at one-sided level alpha/P. `conf = 1 - alpha/P`
+            # put it at alpha/2P, i.e. half the intended level. See
+            # bootstrap_ci's docstring.
+            ci = bootstrap_ci(th, v, n_boot=n_boot, seed=seed,
+                              one_sided_alpha=alpha / P)
             if np.isfinite(ci["lo"]) and ci["lo"] > 0.0:
                 boot_flag = True
     p_z = float(np.nanmin(holm(zps))) if np.isfinite(zps).any() else np.nan
