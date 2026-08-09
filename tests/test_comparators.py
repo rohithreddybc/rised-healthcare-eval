@@ -594,9 +594,15 @@ def test_holm_ignores_nan():
     assert adj[0] == pytest.approx(0.02)
 
 
-@pytest.mark.parametrize("geom_name", [g.name for g in
-                                       __import__("recompute.comparators.simulate",
-                                                  fromlist=["GEOMETRIES"]).GEOMETRIES])
+@pytest.mark.parametrize(
+    "geom_name",
+    # Case-mix geometries are deliberately NOT equal-AUROC nulls -- unequal true
+    # subgroup AUROC with no unfairness present is the whole point of them -- so
+    # they are excluded here and checked by their own assertions in
+    # tests/test_type1_reproducibility.py.
+    [g.name for g in __import__("recompute.comparators.simulate",
+                                fromlist=["GEOMETRIES"]).GEOMETRIES
+     if not g.is_case_mix])
 def test_simulated_geometries_really_are_null(geom_name):
     """No DGP may smuggle in a real subgroup effect.
 
