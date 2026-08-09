@@ -439,9 +439,12 @@ def p_report(p: Optional[float], n_perm: int, is_floor: bool,
     design cannot deliver and invites a reader to treat it as overwhelming
     evidence. At the floor the correct statement is an inequality.
 
-    Matches ``recompute.null_reference.mc_pvalue``'s ``p_report`` field so the
-    comparator tables and the incumbent's tables render the same value the same
-    way.
+    Matches ``recompute.null_reference.mc_pvalue``'s ``p_report`` field --
+    including its two-decimal exponent format -- so the comparator tables and the
+    incumbent's tables render the same value the same way and no reader has to
+    reconcile two spellings of the same bound. At B = 10,000 the floor
+    9.999e-05 therefore renders as ``<= 1.00e-04``: rounded *up* to three
+    significant figures, so the inequality stays true.
     """
     if p is None or not np.isfinite(p):
         return "n/a"
