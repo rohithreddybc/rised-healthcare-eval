@@ -23,7 +23,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "permutation_null",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -32,7 +32,7 @@
   "type1_mc_se": 0.00512552436341883,
   "has_nominal_level": true,
   "nominal_level_note": "max-statistic permutation p-value < alpha",
-  "mean_runtime_per_dataset_s": 0.38338027049992524
+  "mean_runtime_per_dataset_s": 0.21480318939976858
  },
  {
   "geometry": "composite_pwl_4",
@@ -58,7 +58,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "diciccio2020",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -67,7 +67,7 @@
   "type1_mc_se": 0.006414904519944158,
   "has_nominal_level": true,
   "nominal_level_note": "max-T permutation p-value < alpha",
-  "mean_runtime_per_dataset_s": 0.40937530120043086
+  "mean_runtime_per_dataset_s": 0.2282655656996503
  },
  {
   "geometry": "composite_pwl_4",
@@ -93,7 +93,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "lum2022",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -102,7 +102,7 @@
   "type1_mc_se": 0.007795832219846705,
   "has_nominal_level": true,
   "nominal_level_note": "Holm over partitions of the one-sided z-test, < alpha",
-  "mean_runtime_per_dataset_s": 0.0014374076000094646
+  "mean_runtime_per_dataset_s": 0.000907097399875056
  },
  {
   "geometry": "composite_pwl_4",
@@ -128,7 +128,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "four_fifths",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -137,7 +137,7 @@
   "type1_mc_se": 0.0,
   "has_nominal_level": false,
   "nominal_level_note": "deterministic rule, no nominal level",
-  "mean_runtime_per_dataset_s": 0.00035283990000607447
+  "mean_runtime_per_dataset_s": 0.00021015629993053153
  },
  {
   "geometry": "composite_pwl_4",
@@ -163,7 +163,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "fixed_threshold_005",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -172,7 +172,7 @@
   "type1_mc_se": 0.015711906313366306,
   "has_nominal_level": false,
   "nominal_level_note": "deterministic rule, no nominal level",
-  "mean_runtime_per_dataset_s": 0.00033250269999552984
+  "mean_runtime_per_dataset_s": 0.00018632549994799773
  },
  {
   "geometry": "composite_pwl_4",
@@ -198,7 +198,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "lum2022_cochranQ",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -207,7 +207,7 @@
   "type1_mc_se": 0.006692607862410586,
   "has_nominal_level": true,
   "nominal_level_note": "Holm over partitions of Cochran's Q, < alpha",
-  "mean_runtime_per_dataset_s": 0.0014374076000094646
+  "mean_runtime_per_dataset_s": 0.000907097399875056
  },
  {
   "geometry": "composite_pwl_4",
@@ -233,7 +233,7 @@
   "seed": 42,
   "geometry_seed_word": 1139998310,
   "pythonhashseed": "0",
-  "geometry_wall_s": 796.0705783000012,
+  "geometry_wall_s": 445.19219760000124,
   "method": "lum2022_bootstrapCI",
   "n_evaluable": 1000,
   "n_not_evaluable": 0,
@@ -242,6 +242,6 @@
   "type1_mc_se": 0.0,
   "has_nominal_level": true,
   "nominal_level_note": "bootstrap lower bound on V_dc > 0 at one-sided level alpha/P (Bonferroni over P partitions); family-wise level alpha",
-  "mean_runtime_per_dataset_s": 0.0014374076000094646
+  "mean_runtime_per_dataset_s": 0.000907097399875056
  }
 ]

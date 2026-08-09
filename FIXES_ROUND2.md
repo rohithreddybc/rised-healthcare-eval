@@ -76,6 +76,14 @@ where no other explanation is available.
   and through the `ProcessPoolExecutor` the study actually uses. These fail
   against the old code.
 
+**End-to-end check.** Two published cells — `casemix_mild_3`/m30 and
+`composite_pwl_4`/m30 — were recomputed from scratch in a fresh process pool with
+a *different worker count* (2 instead of 10). The re-written checkpoint files
+differ from the published ones in exactly two fields — `geometry_wall_s` and
+`mean_runtime_per_dataset_s`, both wall-clock timings. Every statistical field,
+for all seven methods, is **bit-identical**. Under the old seeding this was not
+possible even in principle.
+
 ### Did the published table change? Yes — every cell, but no conclusion
 
 All 46 cells were recomputed from scratch (`--force`, 1000 sims, B = 999,
