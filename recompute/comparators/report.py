@@ -609,6 +609,44 @@ def case_mix_truth(t1: pd.DataFrame) -> str:
     return _md(pd.DataFrame(rows))
 
 
+def max_cell_reference_band(n_cells: int, n_sims: int, alpha: float = 0.05,
+                            n_draw: int = 200_000, seed: int = 42) -> str:
+    """What the WORST cell looks like for a procedure of exactly the right size.
+
+    The calibration summary reports a maximum over many cells, and a maximum is
+    biased upward by construction: with 34 cells at 1000 simulations each, an
+    exactly-sized procedure produces a worst cell around 0.065, not 0.050.
+    Quoting that 0.065 as evidence of anticonservatism is a selection effect, not
+    a finding. This simulates the reference distribution directly -- the maximum
+    of ``n_cells`` independent Binomial(``n_sims``, ``alpha``)/``n_sims``
+    proportions -- so the observed maxima can be read against it.
+
+    Independence across cells is assumed. It is close to true: the geometries
+    are separate simulated datasets. The one dependence is that the m30 and ev10
+    cells of a geometry are computed on the *same* datasets, which makes them
+    positively correlated and makes the true maximum slightly *smaller* than
+    this band. Using the independent band therefore errs toward declaring a
+    method calibrated, which is the cautious direction for the claim being made
+    here (that a maximum near alpha is unremarkable).
+    """
+    rng = np.random.default_rng(seed)
+    draws = rng.binomial(n_sims, alpha, size=(n_draw, n_cells)) / n_sims
+    mx = draws.max(axis=1)
+    q = np.quantile(mx, [0.5, 0.90, 0.95, 0.99])
+    se = float(np.sqrt(alpha * (1 - alpha) / n_sims))
+    return (
+        f"With {n_cells} cells at {n_sims:,} simulations and a true size of "
+        f"exactly {alpha:g}, the Monte-Carlo SE of a single cell is "
+        f"{se:.4f}, and the **maximum** over cells has median "
+        f"**{q[0]:.3f}**, 90th percentile {q[1]:.3f}, 95th percentile "
+        f"**{q[2]:.3f}** and 99th percentile {q[3]:.3f}. A worst cell at or "
+        f"below {q[2]:.3f} is therefore what an exactly-sized procedure "
+        f"produces and is not evidence of anticonservatism. Only a worst cell "
+        f"above that, or a *pattern* of elevated cells rather than one, "
+        f"supports the claim."
+    )
+
+
 def _calibration_verdict(worst: float, nominal: bool, alpha: float) -> str:
     if not nominal:
         return "n/a -- no error control claimed"
@@ -782,6 +820,11 @@ def main() -> int:
             "drawn from an exactly-sized procedure lands around 0.06-0.07; "
             "`(worst - 0.05) / SE` is given so that excess can be judged "
             "instead of eyeballed.\n")
+        n_cells = int(t1[fam != "case_mix"]
+                      .drop_duplicates(["geometry", "rule"]).shape[0])
+        n_sims = int(t1["n_sims"].iloc[0])
+        parts.append("**Reference band for the `overall worst` column.** "
+                     + max_cell_reference_band(n_cells, n_sims) + "\n")
         parts.append(type1_summary(t1) + "\n")
 
         n = 12
