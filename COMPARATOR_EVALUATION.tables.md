@@ -64,7 +64,68 @@
 | Four-fifths (0.80 ratio) | brfss2024, diabetes130 | acs_income, nhis2023 |
 | Fixed threshold (Delta >= 0.05) | adult_income, brfss2024, diabetes130 | -- |
 
-## T6. Inclusion-rule sensitivity: does the SUBSTANTIVE conclusion move?
+## T5b. Cross-cohort multiplicity: raw vs Holm vs BH, m30
+
+_re-run the cohort sweep to populate multiplicity columns_
+
+### T5c. Same, ev10
+
+_re-run the cohort sweep to populate multiplicity columns_
+
+## T5d. Pairs dropped by the studentized variance floor
+
+No pair was dropped by the variance floor in any (cohort x rule) cell: 50 cells checked, 0 pairs dropped in total. The floor is therefore not silently shrinking the max-T family anywhere in this study.
+
+## T6. Rule stability: per-cohort verdict concordance (the corrected metric)
+
+The previous stability claim was read off the **count** of flagged cohorts, which is invariant to any permutation of the flagged set and therefore cannot detect churn. `diciccio2020` flags exactly 3 clinical cohorts under all five rules while the *set* changes three times. The metric below is computed at the level the decision is made -- the cohort.
+
+**all cohorts** (9 with a verdict under at least one rule)
+
+| rank | method | scheme | cohorts changing verdict | which | flag COUNT constant? | flagged SET constant? | mean Jaccard vs m30 | min Jaccard vs m30 | flags @m30 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Fixed threshold (Delta >= 0.05) | n/a | 1 | nhanes2123 | no | no | 0.964 | 0.857 | 7 |
+| 2 | Four-fifths (0.80 ratio) | n/a | 1 | brfss2024 | no | no | 0.917 | 0.667 | 3 |
+| 3 | Lum 2022 (V_dc, bootstrap CI) | n/a | 1 | brfss2024 | no | no | 0.875 | 0.500 | 2 |
+| 4 | Lum 2022 inputs, Cochran Q (our addition) | n/a | 2 | brfss2024;nhanes2123 | no | no | 0.906 | 0.750 | 8 |
+| 5 | DiCiccio 2020 (studentized max-T) | joint | 3 | brfss2024;nhis2023;nhis2024 | **yes** | no | 0.857 | 0.714 | 6 |
+| 6 | Lum 2022 (V_dc, closed-form z) | n/a | 3 | brfss2024;nhanes2123;nhis2024 | no | no | 0.845 | 0.667 | 6 |
+| 7 | Permutation null (incumbent) | joint | 3 | adult_income;nhis2023;nhis2024 | no | no | 0.667 | 0.333 | 1 |
+
+**clinical cohorts** (5 with a verdict under at least one rule)
+
+| rank | method | scheme | cohorts changing verdict | which | flag COUNT constant? | flagged SET constant? | mean Jaccard vs m30 | min Jaccard vs m30 | flags @m30 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Fixed threshold (Delta >= 0.05) | n/a | 1 | nhanes2123 | no | no | 0.950 | 0.800 | 5 |
+| 2 | Four-fifths (0.80 ratio) | n/a | 1 | brfss2024 | no | no | 0.917 | 0.667 | 3 |
+| 3 | Lum 2022 (V_dc, bootstrap CI) | n/a | 1 | brfss2024 | no | no | 0.875 | 0.500 | 2 |
+| 4 | Lum 2022 inputs, Cochran Q (our addition) | n/a | 2 | brfss2024;nhanes2123 | no | no | 0.850 | 0.600 | 5 |
+| 5 | Permutation null (incumbent) | joint | 2 | nhis2023;nhis2024 | no | no | 0.500 | 0.000 | 0 |
+| 6 | DiCiccio 2020 (studentized max-T) | joint | 3 | brfss2024;nhis2023;nhis2024 | **yes** | no | 0.750 | 0.500 | 3 |
+| 7 | Lum 2022 (V_dc, closed-form z) | n/a | 3 | brfss2024;nhanes2123;nhis2024 | no | no | 0.708 | 0.333 | 3 |
+
+_Read the ranking with the `flags @m30` column in view. A rule that flags almost every cohort, or almost none, has little room to churn and scores well for that reason alone; the fixed-0.05 threshold flags 7 of 10 and the four-fifths rule 3 of 10, and neither is being credited here with accuracy, only with insensitivity to the admissibility rule. The finding this table supports is narrower and harder: the two permutation procedures, which are the ones that claim a nominal level, are the least stable of the seven, and the studentized test -- whose stability was the claim under review -- changes the verdict on three clinical cohorts while keeping its flagged count fixed at 3._
+
+### T6-0. Every cohort that changes verdict, with its p-value trajectory
+
+| method | cohort | verdict m20/m30/m50/m100/ev10 | p m20/m30/m50/m100/ev10 | p range | straddles 0.05 |
+|---|---|---|---|---|---|
+| DiCiccio 2020 (studentized max-T) | brfss2024 | F F F . F | 0.005 0.005 0.005 0.192 0.002 | 0.190 | **yes** |
+| Four-fifths (0.80 ratio) | brfss2024 | F F F . F | -- -- -- -- -- | -- | no |
+| Lum 2022 (V_dc, closed-form z) | brfss2024 | F F F . F | 0.000 0.000 0.000 1.000 0.000 | 1.000 | **yes** |
+| Lum 2022 (V_dc, bootstrap CI) | brfss2024 | F F F . F | -- -- -- -- -- | -- | no |
+| Lum 2022 inputs, Cochran Q (our addition) | brfss2024 | F F F . F | 0.000 0.000 0.000 0.076 0.000 | 0.076 | **yes** |
+| Permutation null (incumbent) | adult_income | . . . F . | 0.341 0.341 0.341 0.008 0.121 | 0.332 | **yes** |
+| DiCiccio 2020 (studentized max-T) | nhis2023 | . . . F F | 0.203 0.203 0.057 0.018 0.018 | 0.184 | **yes** |
+| Permutation null (incumbent) | nhis2023 | . . . F F | 0.742 0.742 0.224 0.018 0.018 | 0.724 | **yes** |
+| DiCiccio 2020 (studentized max-T) | nhis2024 | F F F F . | 0.038 0.038 0.038 0.013 0.058 | 0.045 | **yes** |
+| Lum 2022 (V_dc, closed-form z) | nhis2024 | . . . . F | 0.599 0.599 0.599 0.599 0.000 | 0.599 | **yes** |
+| Permutation null (incumbent) | nhis2024 | . . . . F | 0.087 0.087 0.087 0.063 0.024 | 0.063 | **yes** |
+| Fixed threshold (Delta >= 0.05) | nhanes2123 | F F F F . | -- -- -- -- -- | -- | no |
+| Lum 2022 (V_dc, closed-form z) | nhanes2123 | F F F . . | 0.000 0.000 0.000 0.195 0.933 | 0.933 | **yes** |
+| Lum 2022 inputs, Cochran Q (our addition) | nhanes2123 | F F F . . | 0.020 0.020 0.020 0.551 0.154 | 0.531 | **yes** |
+
+## T6d. Inclusion-rule sensitivity: does the SUBSTANTIVE conclusion move?
 
 | method | clinical flagged m20/m30/m50/m100/ev10 | span | crosses zero? | min Jaccard vs m30 |
 |---|---|---|---|---|
@@ -119,21 +180,9 @@
 | Four-fifths (0.80 ratio) | brfss2024 | F F F . F | **yes** |
 | Fixed threshold (Delta >= 0.05) | nhanes2123 | F F F F . | **yes** |
 
-## T7. Runtime, all methods on the same kernel, B=10,000
+## T7. Runtime, all methods on the same kernel, repeated
 
-| cohort | n_test | partitions | incumbent, original kernel s | incumbent, same kernel s | DiCiccio s | Lum s | four-fifths s | fixed threshold s |
-|---|---|---|---|---|---|---|---|---|
-| Diabetes 130 | 19,890 | 3 | 74.9 | 49.9 | 49.0 | 0.152 | 4.781 | 0.019 |
-| BRFSS 2024 | 8,978 | 5 | 59.9 | 42.0 | 39.5 | 0.184 | 3.533 | 0.025 |
-| Adult Income | 9,045 | 3 | 39.4 | 21.3 | 21.1 | 0.059 | 1.886 | 0.006 |
-| NHIS 2023 | 5,423 | 4 | 37.8 | 22.1 | 21.9 | 0.044 | 1.918 | 0.013 |
-| NHIS 2024 | 1,950 | 5 | 26.2 | 17.4 | 17.4 | 0.022 | 1.150 | 0.005 |
-| ACS-Income | 4,000 | 3 | 18.6 | 10.9 | 10.6 | 0.013 | 1.094 | 0.004 |
-| Synthetic baseline | 2,000 | 4 | 18.9 | 12.7 | 14.1 | 0.025 | 1.054 | 0.010 |
-| NHANES 21-23 | 820 | 4 | 13.1 | 10.5 | 8.5 | 0.035 | 0.549 | 0.009 |
-| German Credit | 200 | 2 | 3.2 | 3.3 | 2.9 | 0.006 | 0.153 | 0.001 |
-| UCI Heart | 61 | 2 | 3.4 | 2.7 | 2.8 | 0.001 | 0.003 | 0.003 |
-| **total** |  |  | **295.3** | **192.9** | **187.8** | **0.541** | **16.122** | **0.095** |
+_comparator_runtime.csv predates the repeated benchmark; re-run `python -m recompute.comparators.bench --repeats 3`. The superseded file held a single un-repeated timing per method, which cannot support a runtime claim._
 
 ### T7b. Runtime as recorded in the comparison sweep, m30
 
@@ -149,150 +198,209 @@
 
 ## T8. Full detail, m30
 
-| cohort | method | conclusion | statistic | stat name | p | runtime s |
-|---|---|---|---|---|---|---|
-| Diabetes 130 | Permutation null (incumbent) | no_flag | 0.216 | max-min AUROC gap | 0.1540 | 78.78 |
-| Diabetes 130 | DiCiccio 2020 (studentized max-T) | flag | 5.882 | max |T| (studentized) | 0.0039 | 52.25 |
-| Diabetes 130 | Lum 2022 (V_dc, closed-form z) | flag | 0.004127 | V_dc (double-corrected variance) | 0.0042 | 0.12 |
-| Diabetes 130 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 1.6e-10 | 0.12 |
-| Diabetes 130 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004127 | V_dc (double-corrected variance) | -- | 0.12 |
-| Diabetes 130 | Four-fifths (0.80 ratio) | flag | 0.7256 | min/max AUROC ratio | -- | 2.02 |
-| Diabetes 130 | Fixed threshold (Delta >= 0.05) | flag | 0.216 | max-min AUROC gap | -- | 0.02 |
-| BRFSS 2024 | Permutation null (incumbent) | no_flag | 0.2237 | max-min AUROC gap | 0.0686 | 88.74 |
-| BRFSS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.052 | max |T| (studentized) | 0.0052 | 44.01 |
-| BRFSS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.004239 | V_dc (double-corrected variance) | 2.1e-08 | 0.16 |
-| BRFSS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.004231 | tau2 (DerSimonian-Laird) | 9.1e-11 | 0.16 |
-| BRFSS 2024 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004239 | V_dc (double-corrected variance) | -- | 0.16 |
-| BRFSS 2024 | Four-fifths (0.80 ratio) | flag | 0.7646 | min/max AUROC ratio | -- | 1.62 |
-| BRFSS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.2237 | max-min AUROC gap | -- | 0.02 |
-| Adult Income | Permutation null (incumbent) | no_flag | 0.08081 | max-min AUROC gap | 0.3407 | 39.73 |
-| Adult Income | DiCiccio 2020 (studentized max-T) | flag | 8.707 | max |T| (studentized) | 0.0041 | 21.94 |
-| Adult Income | Lum 2022 (V_dc, closed-form z) | flag | 0.002233 | V_dc (double-corrected variance) | 0.0e+00 | 0.02 |
-| Adult Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002233 | tau2 (DerSimonian-Laird) | 9.4e-18 | 0.02 |
-| Adult Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.002233 | V_dc (double-corrected variance) | -- | 0.02 |
-| Adult Income | Four-fifths (0.80 ratio) | no_flag | 0.9152 | min/max AUROC ratio | -- | 0.93 |
-| Adult Income | Fixed threshold (Delta >= 0.05) | flag | 0.08081 | max-min AUROC gap | -- | 0.01 |
-| NHIS 2023 | Permutation null (incumbent) | no_flag | 0.129 | max-min AUROC gap | 0.7422 | 40.99 |
-| NHIS 2023 | DiCiccio 2020 (studentized max-T) | no_flag | 4.218 | max |T| (studentized) | 0.2028 | 23.21 |
-| NHIS 2023 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.001829 | V_dc (double-corrected variance) | 0.2078 | 0.02 |
-| NHIS 2023 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 0.0004 | 0.02 |
-| NHIS 2023 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001829 | V_dc (double-corrected variance) | -- | 0.02 |
-| NHIS 2023 | Four-fifths (0.80 ratio) | no_flag | 0.8522 | min/max AUROC ratio | -- | 0.91 |
-| NHIS 2023 | Fixed threshold (Delta >= 0.05) | flag | 0.129 | max-min AUROC gap | -- | 0.01 |
-| NHIS 2024 | Permutation null (incumbent) | no_flag | 0.3279 | max-min AUROC gap | 0.0874 | 29.37 |
-| NHIS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.721 | max |T| (studentized) | 0.0382 | 18.41 |
-| NHIS 2024 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.01005 | V_dc (double-corrected variance) | 0.5988 | 0.04 |
-| NHIS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.01366 | tau2 (DerSimonian-Laird) | 3.8e-13 | 0.04 |
-| NHIS 2024 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.01005 | V_dc (double-corrected variance) | -- | 0.04 |
-| NHIS 2024 | Four-fifths (0.80 ratio) | flag | 0.6646 | min/max AUROC ratio | -- | 0.51 |
-| NHIS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.3279 | max-min AUROC gap | -- | 0.01 |
-| ACS-Income | Permutation null (incumbent) | flag | 0.05273 | max-min AUROC gap | <= 1.0e-04 | 29.03 |
-| ACS-Income | DiCiccio 2020 (studentized max-T) | flag | 4.373 | max |T| (studentized) | <= 1.0e-04 | 11.28 |
-| ACS-Income | Lum 2022 (V_dc, closed-form z) | flag | 0.001318 | V_dc (double-corrected variance) | 2.1e-37 | 0.01 |
-| ACS-Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.001318 | tau2 (DerSimonian-Laird) | 3.7e-05 | 0.01 |
-| ACS-Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001318 | V_dc (double-corrected variance) | -- | 0.01 |
-| ACS-Income | Four-fifths (0.80 ratio) | no_flag | 0.9405 | min/max AUROC ratio | -- | 0.50 |
-| ACS-Income | Fixed threshold (Delta >= 0.05) | flag | 0.05273 | max-min AUROC gap | -- | 0.00 |
-| Synthetic baseline | Permutation null (incumbent) | no_flag | 0.04555 | max-min AUROC gap | 0.1651 | 19.16 |
-| Synthetic baseline | DiCiccio 2020 (studentized max-T) | flag | 5.224 | max |T| (studentized) | 0.0142 | 14.40 |
-| Synthetic baseline | Lum 2022 (V_dc, closed-form z) | flag | 0.0004068 | V_dc (double-corrected variance) | 0.0001 | 0.03 |
-| Synthetic baseline | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.0004663 | tau2 (DerSimonian-Laird) | 1.9e-05 | 0.03 |
-| Synthetic baseline | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0004068 | V_dc (double-corrected variance) | -- | 0.03 |
-| Synthetic baseline | Four-fifths (0.80 ratio) | no_flag | 0.9535 | min/max AUROC ratio | -- | 0.43 |
-| Synthetic baseline | Fixed threshold (Delta >= 0.05) | no_flag | 0.04555 | max-min AUROC gap | -- | 0.01 |
-| NHANES 21-23 | Permutation null (incumbent) | no_flag | 0.07484 | max-min AUROC gap | 0.3094 | 13.52 |
-| NHANES 21-23 | DiCiccio 2020 (studentized max-T) | no_flag | 2.805 | max |T| (studentized) | 0.3430 | 10.33 |
-| NHANES 21-23 | Lum 2022 (V_dc, closed-form z) | flag | 0.000521 | V_dc (double-corrected variance) | 2.4e-06 | 0.01 |
-| NHANES 21-23 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0 | tau2 (DerSimonian-Laird) | 0.0202 | 0.01 |
-| NHANES 21-23 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.000521 | V_dc (double-corrected variance) | -- | 0.01 |
-| NHANES 21-23 | Four-fifths (0.80 ratio) | no_flag | 0.9252 | min/max AUROC ratio | -- | 0.30 |
-| NHANES 21-23 | Fixed threshold (Delta >= 0.05) | flag | 0.07484 | max-min AUROC gap | -- | 0.00 |
-| German Credit | Permutation null (incumbent) | no_flag | 0.02914 | max-min AUROC gap | 0.9357 | 3.29 |
-| German Credit | DiCiccio 2020 (studentized max-T) | no_flag | 0.3336 | max |T| (studentized) | 0.9288 | 3.01 |
-| German Credit | Lum 2022 (V_dc, closed-form z) | no_flag | -0.00339 | V_dc (double-corrected variance) | 1.0000 | 0.01 |
-| German Credit | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0 | tau2 (DerSimonian-Laird) | 1.0000 | 0.01 |
-| German Credit | Lum 2022 (V_dc, bootstrap CI) | no_flag | -0.00339 | V_dc (double-corrected variance) | -- | 0.01 |
-| German Credit | Four-fifths (0.80 ratio) | no_flag | 0.9578 | min/max AUROC ratio | -- | 0.10 |
-| German Credit | Fixed threshold (Delta >= 0.05) | no_flag | 0.02914 | max-min AUROC gap | -- | 0.00 |
-| UCI Heart | Permutation null (incumbent) | not_evaluable | -- | max-min AUROC gap | -- | 3.62 |
-| UCI Heart | DiCiccio 2020 (studentized max-T) | not_evaluable | -- | max |T| | -- | 2.97 |
-| UCI Heart | Lum 2022 (V_dc, closed-form z) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Lum 2022 inputs, Cochran Q (our addition) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Lum 2022 (V_dc, bootstrap CI) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Four-fifths (0.80 ratio) | not_evaluable | -- | min/max AUROC ratio | -- | 0.00 |
-| UCI Heart | Fixed threshold (Delta >= 0.05) | not_evaluable | -- | max-min AUROC gap | -- | 0.00 |
+| cohort | method | conclusion | statistic | stat name | p | p Holm (x cohorts) | p BH (x cohorts) | flag after Holm | flag after BH | runtime s |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Diabetes 130 | Permutation null (incumbent) | no_flag | 0.216 | max-min AUROC gap | 0.1540 | -- | -- | -- | -- | 78.78 |
+| Diabetes 130 | DiCiccio 2020 (studentized max-T) | flag | 5.882 | max |T| (studentized) | 0.0039 | -- | -- | -- | -- | 52.25 |
+| Diabetes 130 | Lum 2022 (V_dc, closed-form z) | flag | 0.004127 | V_dc (double-corrected variance) | 0.0042 | -- | -- | -- | -- | 0.12 |
+| Diabetes 130 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 1.6e-10 | -- | -- | -- | -- | 0.12 |
+| Diabetes 130 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004127 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.12 |
+| Diabetes 130 | Four-fifths (0.80 ratio) | flag | 0.7256 | min/max AUROC ratio | -- | -- | -- | -- | -- | 2.02 |
+| Diabetes 130 | Fixed threshold (Delta >= 0.05) | flag | 0.216 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.02 |
+| BRFSS 2024 | Permutation null (incumbent) | no_flag | 0.2237 | max-min AUROC gap | 0.0686 | -- | -- | -- | -- | 88.74 |
+| BRFSS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.052 | max |T| (studentized) | 0.0052 | -- | -- | -- | -- | 44.01 |
+| BRFSS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.004239 | V_dc (double-corrected variance) | 2.1e-08 | -- | -- | -- | -- | 0.16 |
+| BRFSS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.004231 | tau2 (DerSimonian-Laird) | 9.1e-11 | -- | -- | -- | -- | 0.16 |
+| BRFSS 2024 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004239 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.16 |
+| BRFSS 2024 | Four-fifths (0.80 ratio) | flag | 0.7646 | min/max AUROC ratio | -- | -- | -- | -- | -- | 1.62 |
+| BRFSS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.2237 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.02 |
+| Adult Income | Permutation null (incumbent) | no_flag | 0.08081 | max-min AUROC gap | 0.3407 | -- | -- | -- | -- | 39.73 |
+| Adult Income | DiCiccio 2020 (studentized max-T) | flag | 8.707 | max |T| (studentized) | 0.0041 | -- | -- | -- | -- | 21.94 |
+| Adult Income | Lum 2022 (V_dc, closed-form z) | flag | 0.002233 | V_dc (double-corrected variance) | 0.0e+00 | -- | -- | -- | -- | 0.02 |
+| Adult Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002233 | tau2 (DerSimonian-Laird) | 9.4e-18 | -- | -- | -- | -- | 0.02 |
+| Adult Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.002233 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.02 |
+| Adult Income | Four-fifths (0.80 ratio) | no_flag | 0.9152 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.93 |
+| Adult Income | Fixed threshold (Delta >= 0.05) | flag | 0.08081 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHIS 2023 | Permutation null (incumbent) | no_flag | 0.129 | max-min AUROC gap | 0.7422 | -- | -- | -- | -- | 40.99 |
+| NHIS 2023 | DiCiccio 2020 (studentized max-T) | no_flag | 4.218 | max |T| (studentized) | 0.2028 | -- | -- | -- | -- | 23.21 |
+| NHIS 2023 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.001829 | V_dc (double-corrected variance) | 0.2078 | -- | -- | -- | -- | 0.02 |
+| NHIS 2023 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 0.0004 | -- | -- | -- | -- | 0.02 |
+| NHIS 2023 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001829 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.02 |
+| NHIS 2023 | Four-fifths (0.80 ratio) | no_flag | 0.8522 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.91 |
+| NHIS 2023 | Fixed threshold (Delta >= 0.05) | flag | 0.129 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHIS 2024 | Permutation null (incumbent) | no_flag | 0.3279 | max-min AUROC gap | 0.0874 | -- | -- | -- | -- | 29.37 |
+| NHIS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.721 | max |T| (studentized) | 0.0382 | -- | -- | -- | -- | 18.41 |
+| NHIS 2024 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.01005 | V_dc (double-corrected variance) | 0.5988 | -- | -- | -- | -- | 0.04 |
+| NHIS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.01366 | tau2 (DerSimonian-Laird) | 3.8e-13 | -- | -- | -- | -- | 0.04 |
+| NHIS 2024 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.01005 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.04 |
+| NHIS 2024 | Four-fifths (0.80 ratio) | flag | 0.6646 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.51 |
+| NHIS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.3279 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| ACS-Income | Permutation null (incumbent) | flag | 0.05273 | max-min AUROC gap | <= 1.0e-04 | -- | -- | -- | -- | 29.03 |
+| ACS-Income | DiCiccio 2020 (studentized max-T) | flag | 4.373 | max |T| (studentized) | <= 1.0e-04 | -- | -- | -- | -- | 11.28 |
+| ACS-Income | Lum 2022 (V_dc, closed-form z) | flag | 0.001318 | V_dc (double-corrected variance) | 2.1e-37 | -- | -- | -- | -- | 0.01 |
+| ACS-Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.001318 | tau2 (DerSimonian-Laird) | 3.7e-05 | -- | -- | -- | -- | 0.01 |
+| ACS-Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001318 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.01 |
+| ACS-Income | Four-fifths (0.80 ratio) | no_flag | 0.9405 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.50 |
+| ACS-Income | Fixed threshold (Delta >= 0.05) | flag | 0.05273 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| Synthetic baseline | Permutation null (incumbent) | no_flag | 0.04555 | max-min AUROC gap | 0.1651 | -- | -- | -- | -- | 19.16 |
+| Synthetic baseline | DiCiccio 2020 (studentized max-T) | flag | 5.224 | max |T| (studentized) | 0.0142 | -- | -- | -- | -- | 14.40 |
+| Synthetic baseline | Lum 2022 (V_dc, closed-form z) | flag | 0.0004068 | V_dc (double-corrected variance) | 0.0001 | -- | -- | -- | -- | 0.03 |
+| Synthetic baseline | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.0004663 | tau2 (DerSimonian-Laird) | 1.9e-05 | -- | -- | -- | -- | 0.03 |
+| Synthetic baseline | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0004068 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.03 |
+| Synthetic baseline | Four-fifths (0.80 ratio) | no_flag | 0.9535 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.43 |
+| Synthetic baseline | Fixed threshold (Delta >= 0.05) | no_flag | 0.04555 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHANES 21-23 | Permutation null (incumbent) | no_flag | 0.07484 | max-min AUROC gap | 0.3094 | -- | -- | -- | -- | 13.52 |
+| NHANES 21-23 | DiCiccio 2020 (studentized max-T) | no_flag | 2.805 | max |T| (studentized) | 0.3430 | -- | -- | -- | -- | 10.33 |
+| NHANES 21-23 | Lum 2022 (V_dc, closed-form z) | flag | 0.000521 | V_dc (double-corrected variance) | 2.4e-06 | -- | -- | -- | -- | 0.01 |
+| NHANES 21-23 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0 | tau2 (DerSimonian-Laird) | 0.0202 | -- | -- | -- | -- | 0.01 |
+| NHANES 21-23 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.000521 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.01 |
+| NHANES 21-23 | Four-fifths (0.80 ratio) | no_flag | 0.9252 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.30 |
+| NHANES 21-23 | Fixed threshold (Delta >= 0.05) | flag | 0.07484 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| German Credit | Permutation null (incumbent) | no_flag | 0.02914 | max-min AUROC gap | 0.9357 | -- | -- | -- | -- | 3.29 |
+| German Credit | DiCiccio 2020 (studentized max-T) | no_flag | 0.3336 | max |T| (studentized) | 0.9288 | -- | -- | -- | -- | 3.01 |
+| German Credit | Lum 2022 (V_dc, closed-form z) | no_flag | -0.00339 | V_dc (double-corrected variance) | 1.0000 | -- | -- | -- | -- | 0.01 |
+| German Credit | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0 | tau2 (DerSimonian-Laird) | 1.0000 | -- | -- | -- | -- | 0.01 |
+| German Credit | Lum 2022 (V_dc, bootstrap CI) | no_flag | -0.00339 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.01 |
+| German Credit | Four-fifths (0.80 ratio) | no_flag | 0.9578 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.10 |
+| German Credit | Fixed threshold (Delta >= 0.05) | no_flag | 0.02914 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Permutation null (incumbent) | not_evaluable | -- | max-min AUROC gap | -- | -- | -- | -- | -- | 3.62 |
+| UCI Heart | DiCiccio 2020 (studentized max-T) | not_evaluable | -- | max |T| | -- | -- | -- | -- | -- | 2.97 |
+| UCI Heart | Lum 2022 (V_dc, closed-form z) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Lum 2022 inputs, Cochran Q (our addition) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Lum 2022 (V_dc, bootstrap CI) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Four-fifths (0.80 ratio) | not_evaluable | -- | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Fixed threshold (Delta >= 0.05) | not_evaluable | -- | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
 
 ## T9. Full detail, ev10
 
-| cohort | method | conclusion | statistic | stat name | p | runtime s |
-|---|---|---|---|---|---|---|
-| Diabetes 130 | Permutation null (incumbent) | no_flag | 0.216 | max-min AUROC gap | 0.0506 | 78.78 |
-| Diabetes 130 | DiCiccio 2020 (studentized max-T) | flag | 5.882 | max |T| (studentized) | 0.0012 | 52.25 |
-| Diabetes 130 | Lum 2022 (V_dc, closed-form z) | flag | 0.004127 | V_dc (double-corrected variance) | 0.0042 | 0.16 |
-| Diabetes 130 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 1.6e-10 | 0.16 |
-| Diabetes 130 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004127 | V_dc (double-corrected variance) | -- | 0.16 |
-| Diabetes 130 | Four-fifths (0.80 ratio) | flag | 0.7256 | min/max AUROC ratio | -- | 4.79 |
-| Diabetes 130 | Fixed threshold (Delta >= 0.05) | flag | 0.216 | max-min AUROC gap | -- | 0.02 |
-| BRFSS 2024 | Permutation null (incumbent) | no_flag | 0.2237 | max-min AUROC gap | 0.0575 | 88.74 |
-| BRFSS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.052 | max |T| (studentized) | 0.0017 | 44.01 |
-| BRFSS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.004239 | V_dc (double-corrected variance) | 2.1e-08 | 0.24 |
-| BRFSS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.004231 | tau2 (DerSimonian-Laird) | 9.1e-11 | 0.24 |
-| BRFSS 2024 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004239 | V_dc (double-corrected variance) | -- | 0.24 |
-| BRFSS 2024 | Four-fifths (0.80 ratio) | flag | 0.7646 | min/max AUROC ratio | -- | 3.94 |
-| BRFSS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.2237 | max-min AUROC gap | -- | 0.02 |
-| Adult Income | Permutation null (incumbent) | no_flag | 0.08081 | max-min AUROC gap | 0.1208 | 39.73 |
-| Adult Income | DiCiccio 2020 (studentized max-T) | flag | 8.707 | max |T| (studentized) | 0.0007 | 21.94 |
-| Adult Income | Lum 2022 (V_dc, closed-form z) | flag | 0.002233 | V_dc (double-corrected variance) | 0.0e+00 | 0.05 |
-| Adult Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002233 | tau2 (DerSimonian-Laird) | 9.4e-18 | 0.05 |
-| Adult Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.002233 | V_dc (double-corrected variance) | -- | 0.05 |
-| Adult Income | Four-fifths (0.80 ratio) | no_flag | 0.9152 | min/max AUROC ratio | -- | 2.26 |
-| Adult Income | Fixed threshold (Delta >= 0.05) | flag | 0.08081 | max-min AUROC gap | -- | 0.01 |
-| NHIS 2023 | Permutation null (incumbent) | flag | 0.128 | max-min AUROC gap | 0.0179 | 40.99 |
-| NHIS 2023 | DiCiccio 2020 (studentized max-T) | flag | 4.218 | max |T| (studentized) | 0.0183 | 23.21 |
-| NHIS 2023 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.001829 | V_dc (double-corrected variance) | 0.2078 | 0.04 |
-| NHIS 2023 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 0.0004 | 0.04 |
-| NHIS 2023 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001829 | V_dc (double-corrected variance) | -- | 0.04 |
-| NHIS 2023 | Four-fifths (0.80 ratio) | no_flag | 0.8522 | min/max AUROC ratio | -- | 2.08 |
-| NHIS 2023 | Fixed threshold (Delta >= 0.05) | flag | 0.128 | max-min AUROC gap | -- | 0.01 |
-| NHIS 2024 | Permutation null (incumbent) | flag | 0.1809 | max-min AUROC gap | 0.0245 | 29.37 |
-| NHIS 2024 | DiCiccio 2020 (studentized max-T) | no_flag | 3.533 | max |T| (studentized) | 0.0582 | 18.41 |
-| NHIS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.00686 | V_dc (double-corrected variance) | 7.9e-07 | 0.05 |
-| NHIS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.00696 | tau2 (DerSimonian-Laird) | 0.0063 | 0.05 |
-| NHIS 2024 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.00686 | V_dc (double-corrected variance) | -- | 0.05 |
-| NHIS 2024 | Four-fifths (0.80 ratio) | flag | 0.7954 | min/max AUROC ratio | -- | 1.23 |
-| NHIS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.1809 | max-min AUROC gap | -- | 0.01 |
-| ACS-Income | Permutation null (incumbent) | flag | 0.05273 | max-min AUROC gap | <= 1.0e-04 | 29.03 |
-| ACS-Income | DiCiccio 2020 (studentized max-T) | flag | 4.373 | max |T| (studentized) | <= 1.0e-04 | 11.28 |
-| ACS-Income | Lum 2022 (V_dc, closed-form z) | flag | 0.001318 | V_dc (double-corrected variance) | 2.1e-37 | 0.02 |
-| ACS-Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.001318 | tau2 (DerSimonian-Laird) | 3.7e-05 | 0.02 |
-| ACS-Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001318 | V_dc (double-corrected variance) | -- | 0.02 |
-| ACS-Income | Four-fifths (0.80 ratio) | no_flag | 0.9405 | min/max AUROC ratio | -- | 1.16 |
-| ACS-Income | Fixed threshold (Delta >= 0.05) | flag | 0.05273 | max-min AUROC gap | -- | 0.00 |
-| Synthetic baseline | Permutation null (incumbent) | no_flag | 0.04555 | max-min AUROC gap | 0.1651 | 19.16 |
-| Synthetic baseline | DiCiccio 2020 (studentized max-T) | flag | 5.224 | max |T| (studentized) | 0.0142 | 14.40 |
-| Synthetic baseline | Lum 2022 (V_dc, closed-form z) | flag | 0.0004068 | V_dc (double-corrected variance) | 0.0001 | 0.05 |
-| Synthetic baseline | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.0004663 | tau2 (DerSimonian-Laird) | 1.9e-05 | 0.05 |
-| Synthetic baseline | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0004068 | V_dc (double-corrected variance) | -- | 0.05 |
-| Synthetic baseline | Four-fifths (0.80 ratio) | no_flag | 0.9535 | min/max AUROC ratio | -- | 1.04 |
-| Synthetic baseline | Fixed threshold (Delta >= 0.05) | no_flag | 0.04555 | max-min AUROC gap | -- | 0.01 |
-| NHANES 21-23 | Permutation null (incumbent) | no_flag | 0.0465 | max-min AUROC gap | 0.5480 | 13.52 |
-| NHANES 21-23 | DiCiccio 2020 (studentized max-T) | no_flag | 2.426 | max |T| (studentized) | 0.2503 | 10.33 |
-| NHANES 21-23 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.0001637 | V_dc (double-corrected variance) | 0.9328 | 0.02 |
-| NHANES 21-23 | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0.0003094 | tau2 (DerSimonian-Laird) | 0.1543 | 0.02 |
-| NHANES 21-23 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0001637 | V_dc (double-corrected variance) | -- | 0.02 |
-| NHANES 21-23 | Four-fifths (0.80 ratio) | no_flag | 0.9532 | min/max AUROC ratio | -- | 0.65 |
-| NHANES 21-23 | Fixed threshold (Delta >= 0.05) | no_flag | 0.0465 | max-min AUROC gap | -- | 0.00 |
-| German Credit | Permutation null (incumbent) | no_flag | 0.02914 | max-min AUROC gap | 0.9357 | 3.29 |
-| German Credit | DiCiccio 2020 (studentized max-T) | no_flag | 0.3336 | max |T| (studentized) | 0.9288 | 3.01 |
-| German Credit | Lum 2022 (V_dc, closed-form z) | no_flag | -0.00339 | V_dc (double-corrected variance) | 1.0000 | 0.02 |
-| German Credit | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0 | tau2 (DerSimonian-Laird) | 1.0000 | 0.02 |
-| German Credit | Lum 2022 (V_dc, bootstrap CI) | no_flag | -0.00339 | V_dc (double-corrected variance) | -- | 0.02 |
-| German Credit | Four-fifths (0.80 ratio) | no_flag | 0.9578 | min/max AUROC ratio | -- | 0.18 |
-| German Credit | Fixed threshold (Delta >= 0.05) | no_flag | 0.02914 | max-min AUROC gap | -- | 0.00 |
-| UCI Heart | Permutation null (incumbent) | not_evaluable | -- | max-min AUROC gap | -- | 3.62 |
-| UCI Heart | DiCiccio 2020 (studentized max-T) | not_evaluable | -- | max |T| | -- | 2.97 |
-| UCI Heart | Lum 2022 (V_dc, closed-form z) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Lum 2022 inputs, Cochran Q (our addition) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Lum 2022 (V_dc, bootstrap CI) | not_evaluable | -- | V_dc (double-corrected variance) | -- | 0.00 |
-| UCI Heart | Four-fifths (0.80 ratio) | not_evaluable | -- | min/max AUROC ratio | -- | 0.00 |
-| UCI Heart | Fixed threshold (Delta >= 0.05) | not_evaluable | -- | max-min AUROC gap | -- | 0.00 |
+| cohort | method | conclusion | statistic | stat name | p | p Holm (x cohorts) | p BH (x cohorts) | flag after Holm | flag after BH | runtime s |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Diabetes 130 | Permutation null (incumbent) | no_flag | 0.216 | max-min AUROC gap | 0.0506 | -- | -- | -- | -- | 78.78 |
+| Diabetes 130 | DiCiccio 2020 (studentized max-T) | flag | 5.882 | max |T| (studentized) | 0.0012 | -- | -- | -- | -- | 52.25 |
+| Diabetes 130 | Lum 2022 (V_dc, closed-form z) | flag | 0.004127 | V_dc (double-corrected variance) | 0.0042 | -- | -- | -- | -- | 0.16 |
+| Diabetes 130 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 1.6e-10 | -- | -- | -- | -- | 0.16 |
+| Diabetes 130 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004127 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.16 |
+| Diabetes 130 | Four-fifths (0.80 ratio) | flag | 0.7256 | min/max AUROC ratio | -- | -- | -- | -- | -- | 4.79 |
+| Diabetes 130 | Fixed threshold (Delta >= 0.05) | flag | 0.216 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.02 |
+| BRFSS 2024 | Permutation null (incumbent) | no_flag | 0.2237 | max-min AUROC gap | 0.0575 | -- | -- | -- | -- | 88.74 |
+| BRFSS 2024 | DiCiccio 2020 (studentized max-T) | flag | 7.052 | max |T| (studentized) | 0.0017 | -- | -- | -- | -- | 44.01 |
+| BRFSS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.004239 | V_dc (double-corrected variance) | 2.1e-08 | -- | -- | -- | -- | 0.24 |
+| BRFSS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.004231 | tau2 (DerSimonian-Laird) | 9.1e-11 | -- | -- | -- | -- | 0.24 |
+| BRFSS 2024 | Lum 2022 (V_dc, bootstrap CI) | flag | 0.004239 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.24 |
+| BRFSS 2024 | Four-fifths (0.80 ratio) | flag | 0.7646 | min/max AUROC ratio | -- | -- | -- | -- | -- | 3.94 |
+| BRFSS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.2237 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.02 |
+| Adult Income | Permutation null (incumbent) | no_flag | 0.08081 | max-min AUROC gap | 0.1208 | -- | -- | -- | -- | 39.73 |
+| Adult Income | DiCiccio 2020 (studentized max-T) | flag | 8.707 | max |T| (studentized) | 0.0007 | -- | -- | -- | -- | 21.94 |
+| Adult Income | Lum 2022 (V_dc, closed-form z) | flag | 0.002233 | V_dc (double-corrected variance) | 0.0e+00 | -- | -- | -- | -- | 0.05 |
+| Adult Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002233 | tau2 (DerSimonian-Laird) | 9.4e-18 | -- | -- | -- | -- | 0.05 |
+| Adult Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.002233 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.05 |
+| Adult Income | Four-fifths (0.80 ratio) | no_flag | 0.9152 | min/max AUROC ratio | -- | -- | -- | -- | -- | 2.26 |
+| Adult Income | Fixed threshold (Delta >= 0.05) | flag | 0.08081 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHIS 2023 | Permutation null (incumbent) | flag | 0.128 | max-min AUROC gap | 0.0179 | -- | -- | -- | -- | 40.99 |
+| NHIS 2023 | DiCiccio 2020 (studentized max-T) | flag | 4.218 | max |T| (studentized) | 0.0183 | -- | -- | -- | -- | 23.21 |
+| NHIS 2023 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.001829 | V_dc (double-corrected variance) | 0.2078 | -- | -- | -- | -- | 0.04 |
+| NHIS 2023 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.002627 | tau2 (DerSimonian-Laird) | 0.0004 | -- | -- | -- | -- | 0.04 |
+| NHIS 2023 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001829 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.04 |
+| NHIS 2023 | Four-fifths (0.80 ratio) | no_flag | 0.8522 | min/max AUROC ratio | -- | -- | -- | -- | -- | 2.08 |
+| NHIS 2023 | Fixed threshold (Delta >= 0.05) | flag | 0.128 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHIS 2024 | Permutation null (incumbent) | flag | 0.1809 | max-min AUROC gap | 0.0245 | -- | -- | -- | -- | 29.37 |
+| NHIS 2024 | DiCiccio 2020 (studentized max-T) | no_flag | 3.533 | max |T| (studentized) | 0.0582 | -- | -- | -- | -- | 18.41 |
+| NHIS 2024 | Lum 2022 (V_dc, closed-form z) | flag | 0.00686 | V_dc (double-corrected variance) | 7.9e-07 | -- | -- | -- | -- | 0.05 |
+| NHIS 2024 | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.00696 | tau2 (DerSimonian-Laird) | 0.0063 | -- | -- | -- | -- | 0.05 |
+| NHIS 2024 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.00686 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.05 |
+| NHIS 2024 | Four-fifths (0.80 ratio) | flag | 0.7954 | min/max AUROC ratio | -- | -- | -- | -- | -- | 1.23 |
+| NHIS 2024 | Fixed threshold (Delta >= 0.05) | flag | 0.1809 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| ACS-Income | Permutation null (incumbent) | flag | 0.05273 | max-min AUROC gap | <= 1.0e-04 | -- | -- | -- | -- | 29.03 |
+| ACS-Income | DiCiccio 2020 (studentized max-T) | flag | 4.373 | max |T| (studentized) | <= 1.0e-04 | -- | -- | -- | -- | 11.28 |
+| ACS-Income | Lum 2022 (V_dc, closed-form z) | flag | 0.001318 | V_dc (double-corrected variance) | 2.1e-37 | -- | -- | -- | -- | 0.02 |
+| ACS-Income | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.001318 | tau2 (DerSimonian-Laird) | 3.7e-05 | -- | -- | -- | -- | 0.02 |
+| ACS-Income | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.001318 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.02 |
+| ACS-Income | Four-fifths (0.80 ratio) | no_flag | 0.9405 | min/max AUROC ratio | -- | -- | -- | -- | -- | 1.16 |
+| ACS-Income | Fixed threshold (Delta >= 0.05) | flag | 0.05273 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| Synthetic baseline | Permutation null (incumbent) | no_flag | 0.04555 | max-min AUROC gap | 0.1651 | -- | -- | -- | -- | 19.16 |
+| Synthetic baseline | DiCiccio 2020 (studentized max-T) | flag | 5.224 | max |T| (studentized) | 0.0142 | -- | -- | -- | -- | 14.40 |
+| Synthetic baseline | Lum 2022 (V_dc, closed-form z) | flag | 0.0004068 | V_dc (double-corrected variance) | 0.0001 | -- | -- | -- | -- | 0.05 |
+| Synthetic baseline | Lum 2022 inputs, Cochran Q (our addition) | flag | 0.0004663 | tau2 (DerSimonian-Laird) | 1.9e-05 | -- | -- | -- | -- | 0.05 |
+| Synthetic baseline | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0004068 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.05 |
+| Synthetic baseline | Four-fifths (0.80 ratio) | no_flag | 0.9535 | min/max AUROC ratio | -- | -- | -- | -- | -- | 1.04 |
+| Synthetic baseline | Fixed threshold (Delta >= 0.05) | no_flag | 0.04555 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.01 |
+| NHANES 21-23 | Permutation null (incumbent) | no_flag | 0.0465 | max-min AUROC gap | 0.5480 | -- | -- | -- | -- | 13.52 |
+| NHANES 21-23 | DiCiccio 2020 (studentized max-T) | no_flag | 2.426 | max |T| (studentized) | 0.2503 | -- | -- | -- | -- | 10.33 |
+| NHANES 21-23 | Lum 2022 (V_dc, closed-form z) | no_flag | 0.0001637 | V_dc (double-corrected variance) | 0.9328 | -- | -- | -- | -- | 0.02 |
+| NHANES 21-23 | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0.0003094 | tau2 (DerSimonian-Laird) | 0.1543 | -- | -- | -- | -- | 0.02 |
+| NHANES 21-23 | Lum 2022 (V_dc, bootstrap CI) | no_flag | 0.0001637 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.02 |
+| NHANES 21-23 | Four-fifths (0.80 ratio) | no_flag | 0.9532 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.65 |
+| NHANES 21-23 | Fixed threshold (Delta >= 0.05) | no_flag | 0.0465 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| German Credit | Permutation null (incumbent) | no_flag | 0.02914 | max-min AUROC gap | 0.9357 | -- | -- | -- | -- | 3.29 |
+| German Credit | DiCiccio 2020 (studentized max-T) | no_flag | 0.3336 | max |T| (studentized) | 0.9288 | -- | -- | -- | -- | 3.01 |
+| German Credit | Lum 2022 (V_dc, closed-form z) | no_flag | -0.00339 | V_dc (double-corrected variance) | 1.0000 | -- | -- | -- | -- | 0.02 |
+| German Credit | Lum 2022 inputs, Cochran Q (our addition) | no_flag | 0 | tau2 (DerSimonian-Laird) | 1.0000 | -- | -- | -- | -- | 0.02 |
+| German Credit | Lum 2022 (V_dc, bootstrap CI) | no_flag | -0.00339 | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.02 |
+| German Credit | Four-fifths (0.80 ratio) | no_flag | 0.9578 | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.18 |
+| German Credit | Fixed threshold (Delta >= 0.05) | no_flag | 0.02914 | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Permutation null (incumbent) | not_evaluable | -- | max-min AUROC gap | -- | -- | -- | -- | -- | 3.62 |
+| UCI Heart | DiCiccio 2020 (studentized max-T) | not_evaluable | -- | max |T| | -- | -- | -- | -- | -- | 2.97 |
+| UCI Heart | Lum 2022 (V_dc, closed-form z) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Lum 2022 inputs, Cochran Q (our addition) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Lum 2022 (V_dc, bootstrap CI) | not_evaluable | -- | V_dc (double-corrected variance) | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Four-fifths (0.80 ratio) | not_evaluable | -- | min/max AUROC ratio | -- | -- | -- | -- | -- | 0.00 |
+| UCI Heart | Fixed threshold (Delta >= 0.05) | not_evaluable | -- | max-min AUROC gap | -- | -- | -- | -- | -- | 0.00 |
+
+## T10. Simulated-null geometries
+
+| geometry | family | n | prevalence | partitions | max levels | smallest level | transform | true AUROC gap | description |
+|---|---|---|---|---|---|---|---|---|---|
+| multi_partition | simple | 2000 | 0.200 | 5 | 5 | 0.10 | -- | 0.000 | 5 partitions -- exercises the maximum over columns |
+| many_10 | simple | 2000 | 0.200 | 1 | 10 | 0.10 | -- | 0.000 | 10 equal levels of 200 -- maximum-of-many pressure |
+| rare_outcome | simple | 2000 | 0.075 | 1 | 5 | 0.03 | -- | 0.000 | NHIS 2024's prevalence: the smallest level carries ~4 events |
+| composite_shift_skewed | composite | 2000 | 0.200 | 1 | 5 | 0.03 | -- | 0.000 | composite null with skewed level sizes -- the hardest cell |
+| composite_shift_4 | composite | 2000 | 0.200 | 1 | 4 | 0.25 | -- | 0.000 | 4 equal levels, per-level strictly monotone score map: equal true AUROC, very different score distributions |
+| skewed_5 | simple | 2000 | 0.200 | 1 | 5 | 0.03 | -- | 0.000 | 5 levels, sizes 1100/500/200/140/60 -- realistic skew |
+| balanced_3x1000 | simple | 3000 | 0.200 | 1 | 3 | 0.33 | -- | 0.000 | 3 equal levels of 1000, one partition -- the easy case |
+| balanced_5x200 | simple | 1000 | 0.200 | 1 | 5 | 0.20 | -- | 0.000 | 5 equal levels of 200 -- small but balanced |
+
+## T11. Type I error, calibration summary (equal-true-AUROC nulls only)
+
+Case-mix cells are **excluded** from this table: there the true subgroup AUROCs differ by construction, so a flag is not a Type I error and must not be averaged into one. See T14.
+
+Every rate in the per-cell tables carries its Monte-Carlo standard error in parentheses. At 1000 simulations the MC SE of a rate at 0.05 is 0.0069. The `overall worst` column is a maximum over many positively correlated cells, and the maximum of twelve such cells drawn from an exactly-sized procedure lands around 0.06-0.07; `(worst - 0.05) / SE` is given so that excess can be judged instead of eyeballed.
+
+| method | nominal level? | cells | simple null: median | simple null: worst | composite null: median | composite null: worst | overall worst | MC SE at worst | (worst - 0.05) / SE | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Permutation null (incumbent) | yes | 16 | 0.047 | 0.058 | 0.021 | 0.025 | 0.058 | 0.0074 | +1.1 | calibrated |
+| DiCiccio 2020 (studentized max-T) | yes | 16 | 0.048 | 0.054 | 0.048 | 0.060 | 0.060 | 0.0075 | +1.3 | calibrated |
+| Lum 2022 (V_dc, closed-form z) | yes | 16 | 0.077 | 0.191 | 0.078 | 0.089 | 0.191 | 0.0124 | +11.3 | **anti-conservative** |
+| Lum 2022 inputs, Cochran Q (our addition) | yes | 16 | 0.069 | 0.184 | 0.067 | 0.097 | 0.184 | 0.0123 | +10.9 | **anti-conservative** |
+| Lum 2022 (V_dc, bootstrap CI) | yes | 16 | 0.000 | 0.003 | 0.001 | 0.002 | 0.003 | 0.0017 | -27.2 | calibrated |
+| Four-fifths (0.80 ratio) | no (screen) | 16 | 0.075 | 0.447 | 0.055 | 0.133 | 0.447 | 0.0157 | +25.3 | n/a -- no error control claimed |
+| Fixed threshold (Delta >= 0.05) | no (screen) | 16 | 0.929 | 1.000 | 0.709 | 0.922 | 1.000 | 0.0000 | -- | n/a -- no error control claimed |
+
+## T12. Type I error at nominal 0.05, rule ev10 -- simple and composite nulls
+
+_rate (Monte-Carlo SE)_
+
+| geometry | family | Permutation null (incumbent) | DiCiccio 2020 (studentized max-T) | Lum 2022 (V_dc, closed-form z) | Lum 2022 inputs, Cochran Q (our addition) | Lum 2022 (V_dc, bootstrap CI) | Four-fifths (0.80 ratio) | Fixed threshold (Delta >= 0.05) |
+|---|---|---|---|---|---|---|---|---|
+| multi_partition | simple | 0.058 (0.0074) | 0.054 (0.0071) | 0.191 (0.0124) | 0.066 (0.0079) | 0.000 (0.0000) | 0.009 (0.0030) | 0.950 (0.0069) |
+| many_10 | simple | 0.044 (0.0065) | 0.044 (0.0065) | 0.055 (0.0072) | 0.069 (0.0080) | 0.002 (0.0014) | 0.157 (0.0115) | 0.998 (0.0014) |
+| rare_outcome | simple | 0.046 (0.0066) | 0.051 (0.0070) | 0.095 (0.0093) | 0.084 (0.0088) | 0.000 (0.0000) | 0.101 (0.0095) | 0.841 (0.0116) |
+| composite_shift_skewed | composite | 0.020 (0.0044) | 0.060 (0.0075) | 0.089 (0.0090) | 0.097 (0.0094) | 0.001 (0.0010) | 0.110 (0.0099) | 0.878 (0.0103) |
+| composite_shift_4 | composite | 0.017 (0.0041) | 0.044 (0.0065) | 0.062 (0.0076) | 0.045 (0.0066) | 0.000 (0.0000) | 0.000 (0.0000) | 0.539 (0.0158) |
+| skewed_5 | simple | 0.037 (0.0060) | 0.047 (0.0067) | 0.083 (0.0087) | 0.077 (0.0084) | 0.000 (0.0000) | 0.100 (0.0095) | 0.890 (0.0099) |
+| balanced_3x1000 | simple | 0.047 (0.0067) | 0.045 (0.0066) | 0.069 (0.0080) | 0.051 (0.0070) | 0.000 (0.0000) | 0.000 (0.0000) | 0.147 (0.0112) |
+| balanced_5x200 | simple | 0.044 (0.0065) | 0.042 (0.0063) | 0.057 (0.0073) | 0.053 (0.0071) | 0.000 (0.0000) | 0.051 (0.0070) | 0.930 (0.0081) |
+
+## T13. Type I error at nominal 0.05, rule m30 -- simple and composite nulls
+
+_rate (Monte-Carlo SE)_
+
+| geometry | family | Permutation null (incumbent) | DiCiccio 2020 (studentized max-T) | Lum 2022 (V_dc, closed-form z) | Lum 2022 inputs, Cochran Q (our addition) | Lum 2022 (V_dc, bootstrap CI) | Four-fifths (0.80 ratio) | Fixed threshold (Delta >= 0.05) |
+|---|---|---|---|---|---|---|---|---|
+| multi_partition | simple | 0.054 (0.0071) | 0.048 (0.0068) | 0.172 (0.0119) | 0.069 (0.0080) | 0.000 (0.0000) | 0.006 (0.0024) | 0.969 (0.0055) |
+| many_10 | simple | 0.054 (0.0071) | 0.053 (0.0071) | 0.070 (0.0081) | 0.090 (0.0090) | 0.002 (0.0014) | 0.166 (0.0118) | 1.000 (0.0000) |
+| rare_outcome | simple | 0.049 (0.0068) | 0.048 (0.0068) | 0.121 (0.0103) | 0.184 (0.0123) | 0.003 (0.0017) | 0.447 (0.0157) | 0.979 (0.0045) |
+| composite_shift_skewed | composite | 0.025 (0.0049) | 0.037 (0.0060) | 0.081 (0.0086) | 0.073 (0.0082) | 0.002 (0.0014) | 0.133 (0.0107) | 0.922 (0.0085) |
+| composite_shift_4 | composite | 0.021 (0.0045) | 0.052 (0.0070) | 0.075 (0.0083) | 0.060 (0.0075) | 0.000 (0.0000) | 0.000 (0.0000) | 0.540 (0.0158) |
+| skewed_5 | simple | 0.047 (0.0067) | 0.040 (0.0062) | 0.096 (0.0093) | 0.088 (0.0090) | 0.000 (0.0000) | 0.152 (0.0114) | 0.920 (0.0086) |
+| balanced_3x1000 | simple | 0.041 (0.0063) | 0.043 (0.0064) | 0.069 (0.0080) | 0.046 (0.0066) | 0.000 (0.0000) | 0.000 (0.0000) | 0.143 (0.0111) |
+| balanced_5x200 | simple | 0.048 (0.0068) | 0.050 (0.0069) | 0.063 (0.0077) | 0.058 (0.0074) | 0.000 (0.0000) | 0.046 (0.0066) | 0.927 (0.0082) |

@@ -1,11 +1,11 @@
-scheme,rule,cohorts,k,stouffer_z,stouffer_p,fisher_chi2,fisher_df,fisher_p,any_p_at_floor
-independent,m20,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6632921027664869,0.04812698937838985,17.067336518867357,10,0.07288721018470015,False
-independent,m30,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6632921027664869,0.04812698937838985,17.067336518867357,10,0.07288721018470015,False
-independent,m50,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.312397367025934,0.01037789766628703,19.499597996988054,10,0.034357133104601006,False
-independent,m100,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.9897133788806602,0.001396196677612637,25.926483925463447,10,0.003840329122548767,False
-independent,ev10,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,3.168758998427518,0.0007654564022969385,28.01026216882653,10,0.0017984318748176242,False
-joint,m20,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6592771140766904,0.048529982374794764,16.918295075685855,10,0.0761915654541324,False
-joint,m30,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6592771140766904,0.048529982374794764,16.918295075685855,10,0.0761915654541324,False
-joint,m50,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.2888262457135977,0.0110447249495173,19.310941676635775,10,0.03648643310797359,False
-joint,m100,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.9792282750067214,0.00144487702859939,25.773842567339543,10,0.004056561273525406,False
-joint,ev10,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,3.2031301629690585,0.0006797126155014538,28.347216526732332,10,0.0015879505365344918,False
+scheme,scheme_means,rule,cohorts,k,stouffer_z,stouffer_p,combination_assumes,fisher_chi2,fisher_df,fisher_p,any_p_at_floor
+independent,demographic-column permutation scheme used to compute the per-cohort p-values,m20,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6632921027664869,0.04812698937838985,independent p-values across cohorts,17.067336518867357,10,0.07288721018470015,False
+independent,demographic-column permutation scheme used to compute the per-cohort p-values,m30,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6632921027664869,0.04812698937838985,independent p-values across cohorts,17.067336518867357,10,0.07288721018470015,False
+independent,demographic-column permutation scheme used to compute the per-cohort p-values,m50,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.312397367025934,0.01037789766628703,independent p-values across cohorts,19.499597996988054,10,0.034357133104601006,False
+independent,demographic-column permutation scheme used to compute the per-cohort p-values,m100,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.9897133788806602,0.001396196677612637,independent p-values across cohorts,25.926483925463447,10,0.003840329122548767,False
+independent,demographic-column permutation scheme used to compute the per-cohort p-values,ev10,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,3.168758998427518,0.0007654564022969385,independent p-values across cohorts,28.01026216882653,10,0.0017984318748176242,False
+joint,demographic-column permutation scheme used to compute the per-cohort p-values,m20,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6592771140766904,0.048529982374794764,independent p-values across cohorts,16.918295075685855,10,0.0761915654541324,False
+joint,demographic-column permutation scheme used to compute the per-cohort p-values,m30,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,1.6592771140766904,0.048529982374794764,independent p-values across cohorts,16.918295075685855,10,0.0761915654541324,False
+joint,demographic-column permutation scheme used to compute the per-cohort p-values,m50,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.2888262457135977,0.0110447249495173,independent p-values across cohorts,19.310941676635775,10,0.03648643310797359,False
+joint,demographic-column permutation scheme used to compute the per-cohort p-values,m100,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,2.9792282750067214,0.00144487702859939,independent p-values across cohorts,25.773842567339543,10,0.004056561273525406,False
+joint,demographic-column permutation scheme used to compute the per-cohort p-values,ev10,diabetes130;nhis2024;nhis2023;nhanes2123;brfss2024,5,3.2031301629690585,0.0006797126155014538,independent p-values across cohorts,28.347216526732332,10,0.0015879505365344918,False

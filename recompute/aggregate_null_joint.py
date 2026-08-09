@@ -13,6 +13,37 @@ Reads ``recompute/results/null_joint/*.json`` and writes
 
 Multiplicity is controlled across the estimable cohorts within each
 (scheme, rule) cell -- nine tests at the published m30 rule.
+
+What the ``scheme`` column means, and what it does not
+------------------------------------------------------
+``scheme`` appears in ``null_sweep_mmin.csv``, ``null_joint_combined.csv`` and
+``null_joint_sign_tests.csv``, and in all three it means exactly one thing: **how
+the demographic columns were permuted when the per-cohort p-values were
+computed.**
+
+``independent``
+    a fresh within-outcome-class permutation for each demographic column
+    separately, which destroys the association between age, sex, race,
+    insurance and income.
+``joint``
+    one within-outcome-class permutation of the row indices per replicate,
+    carried across every demographic column, which preserves the joint
+    contingency table exactly.
+
+It is **not** a statement about the combination step. In
+``null_joint_combined.csv`` both rows -- ``scheme=independent`` and
+``scheme=joint`` -- combine their k cohort p-values with the *same* estimator:
+:func:`stouffer` computes ``z = sum(z_i) / sqrt(k)`` with equal weights, which is
+Stouffer's method **under the assumption that the k p-values are independent**,
+and :func:`fisher` likewise assumes independence. Neither row uses a
+dependence-corrected combination. That independence assumption concerns the ten
+cohorts being separate datasets -- which they are, so the assumption is
+reasonable -- and is entirely unrelated to the permutation scheme. The two rows
+differ only in how the inputs to the combination were generated, never in how
+they were combined.
+
+``recompute/scheme_provenance.py`` writes the same statement to
+``recompute/results/scheme_provenance.csv`` for every published artefact.
 """
 
 from __future__ import annotations
@@ -70,14 +101,22 @@ def benjamini_hochberg(p: List[float]) -> List[float]:
 
 
 def stouffer(p: List[float]) -> Dict[str, float]:
-    """Stouffer's z for one-sided p-values, equal weights."""
+    """Stouffer's z for one-sided p-values, equal weights.
+
+    ``z = sum(z_i) / sqrt(k)`` is the variance of the sum under **independence**
+    of the k p-values. This is used identically for both permutation schemes;
+    the ``scheme`` column of the output says how the inputs were generated and
+    says nothing about this step. ``combination_assumes`` is emitted alongside so
+    the assumption travels with the number.
+    """
     z = np.array([norm.isf(v) for v in p], dtype=float)
     zc = float(np.sum(z) / math.sqrt(len(z)))
-    return {"stouffer_z": zc, "stouffer_p": float(norm.sf(zc)), "k": len(p)}
+    return {"stouffer_z": zc, "stouffer_p": float(norm.sf(zc)), "k": len(p),
+            "combination_assumes": "independent p-values across cohorts"}
 
 
 def fisher(p: List[float]) -> Dict[str, float]:
-    """Fisher's combined probability test."""
+    """Fisher's combined probability test; also assumes independent p-values."""
     stat = float(-2.0 * np.sum(np.log(np.asarray(p, dtype=float))))
     return {"fisher_chi2": stat, "fisher_df": 2 * len(p),
             "fisher_p": float(chi2.sf(stat, 2 * len(p))), "k": len(p)}
@@ -213,7 +252,13 @@ def combined_frame(df: pd.DataFrame) -> pd.DataFrame:
             if len(g) == 0:
                 continue
             pv = list(g["p_value"].astype(float))
-            r = {"scheme": scheme, "rule": rule,
+            r = {"scheme": scheme,
+                 # Spelled out in the row itself so a reader of the CSV alone
+                 # cannot mistake `scheme` for an assumption about the
+                 # combination step. See the module docstring.
+                 "scheme_means": ("demographic-column permutation scheme used "
+                                  "to compute the per-cohort p-values"),
+                 "rule": rule,
                  "cohorts": ";".join(g["cohort"]), "k": len(pv)}
             r.update(stouffer(pv))
             r.update(fisher(pv))
