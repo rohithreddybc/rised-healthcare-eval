@@ -75,6 +75,7 @@ from __future__ import annotations
 
 import zlib
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -89,10 +90,86 @@ class CaseMix:
     ``scales`` are the per-level mean and standard deviation of the *single*
     linear predictor. The model has one coefficient vector for everybody; only
     the population it is applied to differs.
+
+    Structural limitation (not lifted)
+    ---------------------------------
+    ``CaseMix`` attaches to partition 0 only: ``locs`` and ``scales`` are indexed
+    by the level codes of ``geom.partitions[0]``, and every other partition is a
+    pure noise column drawn independently. The class therefore **cannot express
+    case mix on two partitions at once**, which is what a real cohort has (age
+    and race both shift the predictor distribution, and they are correlated).
+    Lifting it needs a joint covariate model per cell of the partition cross,
+    which is a different DGP; until then every simulated case-mix result is a
+    *single*-partition result and the multi-partition cells vary only the number
+    of noise columns the maximum runs over.
+
+    Round-3 additions (all default to the round-2 behaviour, so every pre-existing
+    geometry draws bit-identical data)
+    ----------------------------------------------------------------------------
+    ``unfair_w``
+        Per-level coefficient on a second covariate ``x2 ~ N(0, 1)`` that drives
+        the outcome but that **the deployed model does not use**. With ``w_g > 0``
+        level ``g``'s outcome is genuinely partly determined by something the
+        model ignores, so the model is worse for that subgroup *than it could
+        be*: an oracle model fitted for that subgroup alone would discriminate
+        better. This is the positive control -- genuine, subgroup-specific
+        differential model performance -- and it is the one thing the round-2
+        study contained none of. ``None`` (the default) means ``w = 0``
+        everywhere, no second covariate is drawn, and the model is Bayes-optimal
+        in every level.
+    ``miscal_intercept`` / ``miscal_slope``
+        Per-level ``a_g`` and ``lambda_g`` applied to the *deployed* linear
+        predictor only: ``score = expit(a_g + lambda_g * lp)``. The outcome is
+        still drawn from ``expit(lp)``, so the model is genuinely miscalibrated
+        in level ``g`` -- and because ``a_g + lambda_g * lp`` is strictly
+        increasing in ``lp`` for ``lambda_g > 0``, every subgroup's AUROC is
+        exactly unchanged. This is the *other* positive control: real unfairness
+        that a discrimination-based procedure is structurally blind to.
+    ``lp_dist``
+        Which standardised (zero mean, unit variance) family the linear
+        predictor's noise is drawn from: ``normal``, ``t5`` (heavy tails),
+        ``laplace`` (peaked) or ``skewnorm5`` (asymmetric).
+    ``equalize_prevalence``
+        Solve a per-level intercept so that **every level has the target event
+        prevalence**, instead of solving one intercept for the mixture. Level
+        prevalence and predictor spread otherwise move together by construction
+        (``casemix_location_3`` has level prevalences 0.022 / 0.129 / 0.449), and
+        nothing in the round-2 design separates them. A subgroup intercept is not
+        unfairness: sex and age are model *inputs* in every real cohort here, so
+        a model with a subgroup-specific intercept is still one correctly
+        specified shared model.
     """
 
     locs: Tuple[float, ...]
     scales: Tuple[float, ...]
+    unfair_w: Optional[Tuple[float, ...]] = None
+    miscal_intercept: Optional[Tuple[float, ...]] = None
+    miscal_slope: Optional[Tuple[float, ...]] = None
+    lp_dist: str = "normal"
+    equalize_prevalence: bool = False
+
+    @property
+    def has_unfair_coef(self) -> bool:
+        return self.unfair_w is not None and any(w != 0.0 for w in self.unfair_w)
+
+    @property
+    def has_miscalibration(self) -> bool:
+        return (self.miscal_intercept is not None
+                or self.miscal_slope is not None)
+
+    @property
+    def sd_ratio(self) -> float:
+        """max/min of the per-level linear-predictor SD -- the headline knob.
+
+        This is the quantity the manuscript's "moderate and clinically ordinary"
+        claim is really about, and the quantity
+        ``recompute/results/cohort_sd_ratios.csv`` measures in the ten real
+        cohorts. With ``unfair_w`` present the *total* per-level SD of the true
+        linear predictor is ``sqrt(scale^2 + w^2)``; ``scales`` alone is the SD
+        of the part the deployed model sees.
+        """
+        s = np.asarray(self.scales, dtype=float)
+        return float(s.max() / s.min())
 
 
 @dataclass(frozen=True)
@@ -261,38 +338,121 @@ GEOMETRIES += [
     Geometry(
         "casemix_mild_3", n=2000, prevalence=0.20, partitions=(_equal(3),),
         case_mix=CaseMix(locs=(0.0, 0.0, 0.0), scales=(0.9, 1.0, 1.1)),
-        description=("3 levels, predictor SD 0.9/1.0/1.1: true AUROC "
-                     "0.727/0.745/0.763, gap 0.036 -- mild case-mix "
+        description=("3 levels, predictor SD 0.9/1.0/1.1 (SD ratio 1.22): true "
+                     "AUROC 0.726/0.745/0.762, gap 0.036 -- mild case-mix "
                      "heterogeneity, BELOW the 0.05 convention")),
     Geometry(
         "casemix_moderate_3", n=2000, prevalence=0.20, partitions=(_equal(3),),
         case_mix=CaseMix(locs=(0.0, 0.0, 0.0), scales=(0.7, 1.0, 1.4)),
-        description=("3 levels, predictor SD 0.7/1.0/1.4: true AUROC "
-                     "0.684/0.745/0.807, gap 0.123 -- moderate case-mix "
-                     "heterogeneity, the realistic clinical case")),
+        description=("3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true "
+                     "AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this "
+                     "'the realistic clinical case'; that claim had no empirical "
+                     "anchor and round 3 measured one -- see "
+                     "recompute/results/cohort_sd_ratios.csv and "
+                     "CASEMIX_ROUND3.md. It is NOT the median real geometry")),
     Geometry(
         "casemix_strong_4", n=2000, prevalence=0.20, partitions=(_equal(4),),
         case_mix=CaseMix(locs=(0.0,) * 4, scales=(0.6, 0.9, 1.3, 1.9)),
-        description=("4 levels, predictor SD 0.6 to 1.9: true AUROC 0.661 to "
-                     "0.860, gap 0.199 -- strong case-mix heterogeneity")),
+        description=("4 levels, predictor SD 0.6 to 1.9 (SD ratio 3.17): true "
+                     "AUROC 0.661 to 0.860, gap 0.199 -- strong case-mix "
+                     "heterogeneity")),
     Geometry(
         "casemix_location_3", n=2000, prevalence=0.20, partitions=(_equal(3),),
         case_mix=CaseMix(locs=(-2.0, 0.0, 2.0), scales=(1.0, 1.0, 1.0)),
         description=("3 levels differing in predictor LOCATION only, equal "
                      "spread: true AUROC gap 0.017 -- separates case-mix "
-                     "location from case-mix spread")),
+                     "location from case-mix spread. CAUTION: the induced level "
+                     "prevalences are 0.022/0.129/0.449, a 20-fold ratio, so "
+                     "level 0 carries ~15 expected events and is DROPPED by the "
+                     "ev10 rule in a few percent of replicates; m30 and ev10 do "
+                     "NOT agree on this geometry. See casemix_location_mild_3")),
     Geometry(
         "casemix_moderate_3_n10000", n=10_000, prevalence=0.20,
         partitions=(_equal(3),),
         case_mix=CaseMix(locs=(0.0, 0.0, 0.0), scales=(0.7, 1.0, 1.4)),
-        description=("moderate case-mix at n=10,000 -- the same true gap of "
-                     "0.123 with five times the data")),
+        description=("moderate case-mix at n=10,000 -- five times the data. The "
+                     "true gap is 0.122986 against 0.122985 at n=2,000: level "
+                     "sizes round differently, so the solved intercept differs "
+                     "in the fifth decimal (-1.6714541 vs -1.6713141) and the "
+                     "gaps are equal to 1e-6, not identical")),
     Geometry(
         "casemix_moderate_3part", n=2000, prevalence=0.20,
         partitions=(_equal(3), _equal(2), (0.5, 0.3, 0.2)),
         case_mix=CaseMix(locs=(0.0, 0.0, 0.0), scales=(0.7, 1.0, 1.4)),
         description=("moderate case-mix on the first of 3 partitions -- the "
                      "other two are pure noise columns")),
+]
+
+# ── Round-3 additions: the case-mix family swept as hard as the composite one ─
+# Round 2 expanded the composite null over n, prevalence, partitions and
+# transform family, and left the case-mix family at a single n, a single
+# prevalence, equal level sizes and a Gaussian linear predictor -- while the
+# case-mix family is the one the paper's conclusion rests on. Every cell below is
+# EXPECTED to lower the flag rate relative to casemix_moderate_3 (less data,
+# fewer events, or a level that the inclusion rule can drop), which is precisely
+# why they have to be reported: an untested axis that can only move the headline
+# down is the same failure mode this project has now hit three times.
+_CM_MOD = (0.7, 1.0, 1.4)                       # the headline SD ratio of 2.00
+
+GEOMETRIES += [
+    # ── M1: sample size, level balance, prevalence, predictor family ─────────
+    Geometry(
+        "casemix_moderate_n500", n=500, prevalence=0.20, partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD),
+        description=("moderate case mix at n=500 -- ~33 events per level, the "
+                     "smallest cohort size the study brackets")),
+    Geometry(
+        "casemix_moderate_unequal", n=2000, prevalence=0.20,
+        partitions=((0.55, 0.30, 0.15),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD),
+        description=("moderate case mix with unequal level sizes 1100/600/300 "
+                     "-- the widest-spread level is also the smallest")),
+    Geometry(
+        "casemix_moderate_prev005", n=2000, prevalence=0.05,
+        partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD),
+        description="moderate case mix at prevalence 0.05 -- ~33 events/level"),
+    Geometry(
+        "casemix_moderate_prev050", n=2000, prevalence=0.50,
+        partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD),
+        description="moderate case mix at prevalence 0.50 -- balanced outcome"),
+    Geometry(
+        "casemix_moderate_t5", n=2000, prevalence=0.20, partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD, lp_dist="t5"),
+        description=("moderate case mix with a heavy-tailed (standardised t_5) "
+                     "linear predictor -- same per-level SD, different shape")),
+    Geometry(
+        "casemix_moderate_laplace", n=2000, prevalence=0.20,
+        partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD, lp_dist="laplace"),
+        description=("moderate case mix with a peaked (standardised Laplace) "
+                     "linear predictor")),
+    Geometry(
+        "casemix_moderate_skew", n=2000, prevalence=0.20, partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD, lp_dist="skewnorm5"),
+        description=("moderate case mix with an asymmetric (standardised "
+                     "skew-normal, shape 5) linear predictor")),
+    # ── M3: spread and prevalence separated ──────────────────────────────────
+    Geometry(
+        "casemix_spread_prevfixed", n=2000, prevalence=0.20,
+        partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(0.0,) * 3, scales=_CM_MOD,
+                         equalize_prevalence=True),
+        description=("SPREAD ONLY: predictor SD 0.7/1.0/1.4 with a per-level "
+                     "intercept holding every level's prevalence at 0.20 "
+                     "exactly. The other half of the M3 pair with "
+                     "casemix_location_3 (prevalence only, spread fixed); "
+                     "casemix_moderate_3 confounds the two")),
+    Geometry(
+        "casemix_location_mild_3", n=2000, prevalence=0.20,
+        partitions=(_equal(3),),
+        case_mix=CaseMix(locs=(-1.0, 0.0, 1.0), scales=(1.0, 1.0, 1.0)),
+        description=("PREVALENCE ONLY, mild: locations -1/0/+1, equal spread. "
+                     "Level prevalences ~0.09/0.20/0.38, a 4-fold rather than "
+                     "20-fold ratio, so no level is near the ev10 boundary and "
+                     "the two inclusion rules can be compared without the "
+                     "level-dropping confound that afflicts casemix_location_3")),
 ]
 
 GEOMETRY_BY_NAME = {g.name: g for g in GEOMETRIES}
@@ -372,81 +532,411 @@ _GH_Z = np.linspace(-9.0, 9.0, 3601)
 _GH_W = np.exp(-0.5 * _GH_Z ** 2) / np.sqrt(2.0 * np.pi)
 
 
+def _hermite_nodes(n: int = 96):
+    """Probabilists' Gauss-Hermite nodes and normalised weights for N(0, 1)."""
+    from numpy.polynomial.hermite_e import hermegauss
+
+    x, w = hermegauss(n)
+    return x, w / w.sum()
+
+
+_HERMITE = _hermite_nodes()
+
+#: The standardised (zero mean, unit variance) linear-predictor noise families.
+LP_FAMILIES = ("normal", "t5", "laplace", "skewnorm5")
+
+_SKEW_A = 5.0
+_SKEW_D = _SKEW_A / np.sqrt(1.0 + _SKEW_A ** 2)
+_SKEW_M = _SKEW_D * np.sqrt(2.0 / np.pi)
+_SKEW_S = np.sqrt(1.0 - 2.0 * _SKEW_D ** 2 / np.pi)
+
+
+def lp_standard_pdf(z: np.ndarray, family: str) -> np.ndarray:
+    """Density of the standardised linear-predictor noise, mean 0 variance 1."""
+    z = np.asarray(z, dtype=float)
+    if family == "normal":
+        return np.exp(-0.5 * z ** 2) / np.sqrt(2.0 * np.pi)
+    if family == "t5":
+        from scipy.stats import t as _t
+        c = np.sqrt(5.0 / 3.0)                 # SD of a t_5 variate
+        return _t.pdf(z * c, 5) * c
+    if family == "laplace":
+        b = 1.0 / np.sqrt(2.0)
+        return np.exp(-np.abs(z) / b) / (2.0 * b)
+    if family == "skewnorm5":
+        from scipy.stats import skewnorm
+        return skewnorm.pdf(z * _SKEW_S + _SKEW_M, _SKEW_A) * _SKEW_S
+    raise ValueError(f"unknown linear-predictor family {family!r}")
+
+
+def lp_standard_draw(rng: np.random.Generator, family: str,
+                     size: int) -> np.ndarray:
+    """Draw from the same standardised family :func:`lp_standard_pdf` describes."""
+    if family == "normal":
+        return rng.standard_normal(size)
+    if family == "t5":
+        return rng.standard_t(5, size) / np.sqrt(5.0 / 3.0)
+    if family == "laplace":
+        return rng.laplace(0.0, 1.0 / np.sqrt(2.0), size)
+    if family == "skewnorm5":
+        # Azzalini's construction: delta |U0| + sqrt(1 - delta^2) U1, standardised.
+        u0 = np.abs(rng.standard_normal(size))
+        u1 = rng.standard_normal(size)
+        v = _SKEW_D * u0 + np.sqrt(1.0 - _SKEW_D ** 2) * u1
+        return (v - _SKEW_M) / _SKEW_S
+    raise ValueError(f"unknown linear-predictor family {family!r}")
+
+
+def lp_standard_sf(z: float, family: str) -> float:
+    """Upper-tail mass of the standardised family beyond ``z`` (``z >= 0``)."""
+    if family == "normal":
+        return float(norm.sf(z))
+    if family == "t5":
+        from scipy.stats import t as _t
+        return float(_t.sf(z * np.sqrt(5.0 / 3.0), 5))
+    if family == "laplace":
+        return float(0.5 * np.exp(-z * np.sqrt(2.0)))
+    if family == "skewnorm5":
+        from scipy.stats import skewnorm
+        return float(skewnorm.sf(z * _SKEW_S + _SKEW_M, _SKEW_A))
+    raise ValueError(f"unknown linear-predictor family {family!r}")
+
+
+#: Tail mass a quadrature grid is allowed to omit. The round-2 code hardcoded
+#: ``t = +-40`` with no check at all, which is safe for a standard normal at
+#: scale <= 2 and silently wrong for a heavy-tailed family or a wide scale: a
+#: truncated tail biases both the level prevalence and the level AUROC, and
+#: neither error is visible in the output it corrupts. Everything below goes
+#: through :func:`_lp_grid`, which widens until this bound is met and raises if it
+#: cannot be -- the case-mix analogue of the composite path's tie assertion.
+#: Truncation is bounded by the family's own survival function rather than by a
+#: numerical mass check, so the guard measures truncation only and is not
+#: confounded with the trapezoid rule's discretisation error (which is O(dz^2)
+#: and, for the cusped Laplace density, is the larger of the two at any usable
+#: grid size).
+_TAIL_TOL = 1e-10
+
+#: Grid points per level. Non-smooth or heavy-tailed families get a finer grid;
+#: ``normal`` keeps 40,001, the round-2 value, so its numbers do not move.
+_GRID_POINTS = {"normal": 40_001, "skewnorm5": 80_001,
+                "t5": 120_001, "laplace": 160_001}
+
+
+def _lp_grid(centre: float, scale: float, family: str, w: float = 0.0,
+             n_points: Optional[int] = None) -> np.ndarray:
+    """A grid whose omitted tail mass is at most :data:`_TAIL_TOL`."""
+    if n_points is None:
+        n_points = _GRID_POINTS.get(family, 40_001)
+    span = 12.0
+    for _ in range(40):
+        # The extra 8w covers the N(0, w^2) the unfair covariate convolves in.
+        tail = lp_standard_sf(span, family) + norm.sf(8.0) if w else (
+            lp_standard_sf(span, family))
+        if tail <= _TAIL_TOL:
+            half = span * scale + 8.0 * w + 1.0
+            return np.linspace(centre - half, centre + half, n_points)
+        span *= 1.5
+    raise AssertionError(
+        f"no usable quadrature grid for family {family!r}: the tail beyond "
+        f"{span} standardised units still holds {tail!r} of the mass, so the "
+        "reported AUROC and prevalence would be biased by the truncation.")
+
+
+def _outcome_prob_given_deployed(u: np.ndarray, w: float) -> np.ndarray:
+    """``E[expit(u + w Z)]`` with ``Z ~ N(0,1)``: P(Y=1 | deployed lp = u).
+
+    With ``w = 0`` the deployed linear predictor *is* the true one and this is
+    just ``expit(u)``. With ``w > 0`` the outcome also depends on a covariate the
+    model never sees, so the model's implied risk is an attenuated version of the
+    truth -- which is exactly what makes the deployed score sub-optimal in that
+    subgroup rather than merely differently distributed.
+    """
+    if w == 0.0:
+        return _expit(u)
+    # Gauss-Hermite, not the trapezoid grid used elsewhere: ``u`` has tens of
+    # thousands of points and the outer product with a 3,601-point grid is a
+    # gigabyte per call. 96 probabilists' nodes agree with that grid to 2e-13 on
+    # this integrand (``tests/test_casemix_round3.py`` pins the comparison) at
+    # 1/40th of the memory and about 500x the speed.
+    x, wt = _HERMITE
+    return _expit(u[:, None] + w * x[None, :]) @ wt
+
+
+def _auc_from_density(grid: np.ndarray, dens: np.ndarray,
+                      p_event: np.ndarray) -> float:
+    """AUROC of ranking by ``grid`` when P(Y=1|grid) = ``p_event``."""
+    f_pos = dens * p_event
+    f_neg = dens * (1.0 - p_event)
+    m_pos = float(np.trapz(f_pos, grid))
+    m_neg = float(np.trapz(f_neg, grid))
+    if m_pos <= 0 or m_neg <= 0:
+        return float("nan")
+    f_pos = f_pos / m_pos
+    f_neg = f_neg / m_neg
+    dt = grid[1] - grid[0]
+    # Midpoint-corrected CDF: the coincident mass contributes one half, which
+    # removes the O(dt) bias of a plain cumulative sum.
+    cdf_neg = np.cumsum(f_neg) * dt - 0.5 * f_neg * dt
+    return float(np.trapz(f_pos * cdf_neg, grid))
+
+
+def _case_mix_is_round2_shaped(cm: "CaseMix") -> bool:
+    """True when the round-2 code path must be reproduced bit-for-bit.
+
+    The intercept ``b0`` feeds straight into the simulated linear predictor, so
+    changing how it is solved changes every drawn dataset. Every geometry that
+    existed before round 3 therefore keeps the original solve, to the last bit,
+    and only the new knobs take the generalised path.
+    """
+    return (cm.lp_dist == "normal" and not cm.equalize_prevalence
+            and not cm.has_unfair_coef)
+
+
 def case_mix_intercept(geom: Geometry) -> float:
     """Intercept ``b0`` of the shared model that hits the target prevalence.
 
     Solved deterministically by quadrature on the level-size-weighted mixture of
     the linear predictor, so the same geometry always yields the same intercept
     and the prevalence column of the results table is exact rather than nominal.
+
+    Note that this matches the *mixture* prevalence only. Each level's own
+    prevalence is then whatever the geometry implies, and they can differ by an
+    order of magnitude -- ``casemix_location_3``'s levels sit at 0.022 / 0.129 /
+    0.449. Use ``CaseMix(equalize_prevalence=True)`` for the per-level solve;
+    :func:`case_mix_offsets` returns both.
+    """
+    return case_mix_offsets(geom)[0]
+
+
+@lru_cache(maxsize=None)
+def _case_mix_offsets_cached(geom: Geometry) -> Tuple[float, Tuple[float, ...]]:
+    return _case_mix_offsets(geom)
+
+
+def case_mix_offsets(geom: Geometry) -> Tuple[float, np.ndarray]:
+    """``(b0, d)``: the shared intercept and the per-level intercept offsets.
+
+    Memoised on the geometry, which is a frozen dataclass of tuples and
+    therefore hashable. This is not an optimisation of convenience: the solve
+    runs inside :func:`make_dataset`, i.e. once per simulated dataset, and the
+    per-level solve required by ``equalize_prevalence`` costs more than the
+    permutation test that consumes its output. Memoising it cuts the round-3
+    study from roughly 33 core-hours to 13. The value is a deterministic
+    function of the geometry, so caching cannot change any result.
+    """
+    b0, d = _case_mix_offsets_cached(geom)
+    return b0, np.asarray(d, dtype=float)
+
+
+def _case_mix_offsets(geom: Geometry) -> Tuple[float, Tuple[float, ...]]:
+    """``(b0, d)``: the shared intercept and the per-level intercept offsets.
+
+    ``d`` is all zeros unless ``equalize_prevalence`` is set, in which case
+    ``b0`` is fixed at zero and each ``d_g`` is solved so that level ``g``'s own
+    event prevalence equals ``geom.prevalence`` exactly. That is what separates
+    the spread mechanism from the prevalence mechanism: with the offsets in place
+    the levels differ *only* in the spread of the linear predictor.
     """
     from scipy.optimize import brentq
 
     cm = geom.case_mix
     assert cm is not None
-    w = _mixture_weights(geom)
     locs = np.asarray(cm.locs, dtype=float)
     scales = np.asarray(cm.scales, dtype=float)
+    ws = (np.asarray(cm.unfair_w, dtype=float) if cm.unfair_w is not None
+          else np.zeros_like(scales))
 
-    def mean_p(b0: float) -> float:
-        # E[expit(b0 + loc_g + scale_g Z)] averaged over levels with weights w.
-        lp = b0 + locs[:, None] + scales[:, None] * _GH_Z[None, :]
-        per_level = np.trapz(_expit(lp) * _GH_W[None, :], _GH_Z, axis=1)
-        return float(np.dot(w, per_level))
+    if cm.equalize_prevalence:
+        d = np.empty_like(scales)
+        for k in range(len(scales)):
+            def lvl_p(dk: float, k: int = k) -> float:
+                return _level_prevalence(0.0, float(locs[k] + dk),
+                                         float(scales[k]), float(ws[k]),
+                                         cm.lp_dist)
+            d[k] = brentq(lambda x: lvl_p(x) - geom.prevalence, -40.0, 40.0,
+                          xtol=1e-12, rtol=1e-14)
+        return 0.0, tuple(float(v) for v in d)
 
-    return float(brentq(lambda b: mean_p(b) - geom.prevalence, -30.0, 30.0,
-                        xtol=1e-12, rtol=1e-14))
+    if _case_mix_is_round2_shaped(cm):
+        # ── the round-2 solve, preserved verbatim: it feeds the DGP ───────────
+        w = _mixture_weights(geom)
+
+        def mean_p(b0: float) -> float:
+            # E[expit(b0 + loc_g + scale_g Z)] averaged over levels, weights w.
+            lp = b0 + locs[:, None] + scales[:, None] * _GH_Z[None, :]
+            per_level = np.trapz(_expit(lp) * _GH_W[None, :], _GH_Z, axis=1)
+            return float(np.dot(w, per_level))
+
+        b0 = float(brentq(lambda b: mean_p(b) - geom.prevalence, -30.0, 30.0,
+                          xtol=1e-12, rtol=1e-14))
+        return b0, tuple(0.0 for _ in scales)
+
+    wts = _mixture_weights(geom)
+
+    def mixture_p(b0: float) -> float:
+        return float(sum(
+            wts[k] * _level_prevalence(b0, float(locs[k]), float(scales[k]),
+                                       float(ws[k]), cm.lp_dist)
+            for k in range(len(scales))))
+
+    b0 = float(brentq(lambda b: mixture_p(b) - geom.prevalence, -30.0, 30.0,
+                      xtol=1e-12, rtol=1e-14))
+    return b0, tuple(0.0 for _ in scales)
+
+
+def _level_prevalence(b0: float, loc: float, scale: float, w: float,
+                      family: str) -> float:
+    """``E[expit(b0 + loc + scale Z + w Z2)]`` for one level, by quadrature."""
+    centre = b0 + loc
+    grid = _lp_grid(centre, scale, family, w)
+    dens = lp_standard_pdf((grid - centre) / scale, family) / scale
+    return float(np.trapz(dens * _outcome_prob_given_deployed(grid, w), grid))
 
 
 def true_subgroup_auc(geom: Geometry) -> Dict[str, float]:
-    """Exact true AUROC of every level of partition 0, by quadrature.
+    """Exact true behaviour of every level of partition 0, by quadrature.
 
-    For a case-mix geometry the score is a strictly increasing function of the
-    linear predictor ``L ~ N(loc_g, scale_g^2)``, so within level ``g``
+    For a fair case-mix geometry the deployed score is a strictly increasing
+    function of the linear predictor ``L``, so within level ``g``
 
         AUROC_g = P(L_case > L_control) = int f_pos(t) F_neg(t) dt
 
-    with ``f_pos(t) prop. phi_g(t) p(t)`` and ``f_neg(t) prop. phi_g(t)(1-p(t))``,
-    ``p(t) = expit(t)``. This is computed on a fine grid rather than simulated,
-    so the reported unequal-AUROC magnitudes carry no Monte-Carlo error.
+    with ``f_pos(t) prop. f_g(t) p(t)`` and ``f_neg(t) prop. f_g(t)(1 - p(t))``,
+    ``p(t) = P(Y = 1 | deployed lp = t)``. Computed on a checked grid rather than
+    simulated, so the reported magnitudes carry no Monte-Carlo error.
+
+    Keys
+    ----
+    ``level_k``      true AUROC of the **deployed** score in level ``k``
+    ``oracle_k``     true AUROC of the best possible score in level ``k``, i.e.
+                     of ranking by the true linear predictor. Equal to
+                     ``level_k`` whenever the model is Bayes-optimal there;
+                     strictly larger when ``unfair_w`` is on.
+    ``excess_k``     ``oracle_k - level_k``: the discrimination the deployed
+                     model *throws away* in level ``k``. This is the definition
+                     of genuine unfairness used by the positive control -- a gap
+                     between what is achievable for a subgroup and what is
+                     delivered to it -- and it is exactly zero for every
+                     case-mix geometry, however large that geometry's AUROC gap.
+    ``prev_k``       level ``k``'s own event prevalence (M3: reported for every
+                     geometry, because it moves with the spread by construction).
+    ``max_gap``      max-min of ``level_k`` -- the observable AUROC gap.
+    ``max_excess``   max of ``excess_k`` -- the unobservable unfairness.
+    ``prev_ratio``   max/min of ``prev_k``.
+    ``sd_ratio``     max/min of the per-level deployed linear-predictor SD.
     """
     if geom.case_mix is None:
         return {}
     cm = geom.case_mix
-    b0 = case_mix_intercept(geom)
+    b0, d = case_mix_offsets(geom)
+    locs = np.asarray(cm.locs, dtype=float)
+    scales = np.asarray(cm.scales, dtype=float)
+    ws = (np.asarray(cm.unfair_w, dtype=float) if cm.unfair_w is not None
+          else np.zeros_like(scales))
+
     out: Dict[str, float] = {}
-    t = np.linspace(-40.0, 40.0, 40_001)
-    for k, (loc, scale) in enumerate(zip(cm.locs, cm.scales)):
-        phi = np.exp(-0.5 * ((t - loc) / scale) ** 2) / (scale * np.sqrt(2 * np.pi))
-        p = _expit(b0 + t)
-        f_pos = phi * p
-        f_neg = phi * (1.0 - p)
-        m_pos = np.trapz(f_pos, t)
-        m_neg = np.trapz(f_neg, t)
-        if m_pos <= 0 or m_neg <= 0:
-            out[f"level_{k}"] = float("nan")
-            continue
-        f_pos = f_pos / m_pos
-        f_neg = f_neg / m_neg
-        # F_neg evaluated at the same grid, midpoint-corrected so the coincident
-        # mass at t contributes one half (there is none for continuous L, but the
-        # correction removes the O(dt) bias of a plain cumulative sum).
-        dt = t[1] - t[0]
-        cdf_neg = np.cumsum(f_neg) * dt - 0.5 * f_neg * dt
-        out[f"level_{k}"] = float(np.trapz(f_pos * cdf_neg, t))
-    vals = [v for v in out.values() if np.isfinite(v)]
+    for k in range(len(scales)):
+        centre = b0 + d[k] + locs[k]
+        scale = float(scales[k])
+        w = float(ws[k])
+        grid = _lp_grid(centre, scale, cm.lp_dist, w)
+        dens = lp_standard_pdf((grid - centre) / scale, cm.lp_dist) / scale
+        p_event = _outcome_prob_given_deployed(grid, w)
+        out[f"level_{k}"] = _auc_from_density(grid, dens, p_event)
+        out[f"prev_{k}"] = float(np.trapz(dens * p_event, grid))
+        if w == 0.0:
+            out[f"oracle_{k}"] = out[f"level_{k}"]
+        else:
+            # The oracle ranks by the TRUE linear predictor v = u + w Z2, whose
+            # density is the convolution of the level's density with N(0, w^2).
+            sd_v = float(np.sqrt(scale ** 2 + w ** 2))
+            vgrid = _lp_grid(centre, sd_v, "normal" if cm.lp_dist == "normal"
+                             else cm.lp_dist, 0.0)
+            dv = vgrid[1] - vgrid[0]
+            kern = np.exp(-0.5 * ((vgrid - vgrid.mean()) / w) ** 2) / (
+                w * np.sqrt(2 * np.pi))
+            base = lp_standard_pdf((vgrid - centre) / scale, cm.lp_dist) / scale
+            dens_v = np.convolve(base, kern, mode="same") * dv
+            dens_v = dens_v / float(np.trapz(dens_v, vgrid))
+            out[f"oracle_{k}"] = _auc_from_density(vgrid, dens_v, _expit(vgrid))
+        out[f"excess_{k}"] = out[f"oracle_{k}"] - out[f"level_{k}"]
+
+    vals = [out[f"level_{k}"] for k in range(len(scales))
+            if np.isfinite(out[f"level_{k}"])]
+    prevs = [out[f"prev_{k}"] for k in range(len(scales))]
     if len(vals) >= 2:
         out["max_gap"] = float(max(vals) - min(vals))
         out["mean_auc"] = float(np.mean(vals))
+    out["max_excess"] = float(max(out[f"excess_{k}"] for k in range(len(scales))))
+    out["prev_min"] = float(min(prevs))
+    out["prev_max"] = float(max(prevs))
+    out["prev_ratio"] = float(max(prevs) / min(prevs)) if min(prevs) > 0 else (
+        float("inf"))
+    out["sd_ratio"] = cm.sd_ratio
     out["intercept"] = b0
     return out
 
 
-def make_dataset(geom: Geometry, rep: int, seed: int = 42
-                 ) -> Tuple[np.ndarray, np.ndarray, Dict[str, np.ndarray]]:
+def verify_case_mix(geom: Geometry, n_check: int = 400_000, seed: int = 11
+                    ) -> Dict[str, float]:
+    """Integrity check for a case-mix geometry -- the one the round-2 study lacked.
+
+    :func:`verify_null` refuses case-mix geometries (their subgroups do *not*
+    share one true AUROC, by design) and the test suite skipped them, so the
+    family carrying the entire thesis was the only family never checked for
+    smuggling in a real effect. The right assertion here is not equal AUROC; it
+    is that **no unfairness is present**, which is two checkable claims:
+
+    ``max_calibration_error``
+        the deployed score is the true event probability in every level, so
+        within-level mean predicted risk matches the observed event rate.
+    ``max_excess_auc``
+        the deployed score is *Bayes-optimal* in every level: the AUROC obtained
+        by ranking on the true linear predictor is no higher than the AUROC of
+        the deployed score. A geometry that quietly handicapped one subgroup's
+        model would show up here as a positive excess.
+
+    Both are returned rather than asserted, so the caller decides the tolerance;
+    ``tests/test_casemix_round3.py`` pins them.
+    """
+    from dataclasses import replace
+
+    from recompute.comparators.core import auc_delong
+
+    cm = geom.case_mix
+    if cm is None:
+        raise ValueError(f"{geom.name} is not a case-mix geometry")
+    big = replace(geom, n=n_check)
+    y, s, codes, aux = make_dataset(big, rep=0, seed=seed, return_aux=True)
+    truth = true_subgroup_auc(geom)
+
+    calib = 0.0
+    excess = -np.inf
+    prev_err = 0.0
+    for k in np.unique(codes["p0"]):
+        m = codes["p0"] == k
+        calib = max(calib, abs(float(s[m].mean()) - float(y[m].mean())))
+        prev_err = max(prev_err,
+                       abs(float(y[m].mean()) - truth[f"prev_{k}"]))
+        a_dep = auc_delong(y[m], s[m])[0]
+        a_orc = auc_delong(y[m], aux["true_lp"][m])[0]
+        excess = max(excess, float(a_orc - a_dep))
+    return {
+        "max_calibration_error": float(calib),
+        "max_excess_auc": float(excess),
+        "max_level_prevalence_error": float(prev_err),
+    }
+
+
+def make_dataset(geom: Geometry, rep: int, seed: int = 42,
+                 return_aux: bool = False):
     """One simulated cohort under the null. Pure in ``(geom, rep, seed)``.
 
     Returns ``(y, s, codes_by_col)`` in exactly the form every comparator's
-    ``decide`` / ``pvalue_only`` entry point expects.
+    ``decide`` / ``pvalue_only`` entry point expects. With ``return_aux`` a
+    fourth element carries the quantities an *auditor* never sees but a
+    verification test needs -- the true linear predictor and the true event
+    probability -- so that Bayes-optimality can be checked rather than asserted.
 
     The seed word for the geometry is :func:`geometry_seed_word` (a ``crc32``
     digest), not ``hash``: see the module docstring. This function is a pure
@@ -456,7 +946,8 @@ def make_dataset(geom: Geometry, rep: int, seed: int = 42
     rng = np.random.default_rng([seed, rep, geometry_seed_word(geom.name)])
 
     if geom.case_mix is not None:
-        return _make_case_mix(geom, rng)
+        y, s, codes, aux = _make_case_mix(geom, rng)
+        return (y, s, codes, aux) if return_aux else (y, s, codes)
 
     y = (rng.random(geom.n) < geom.prevalence).astype(int)
     # Binormal scores with the requested cohort AUROC, then squashed to (0, 1)
@@ -494,36 +985,72 @@ def make_dataset(geom: Geometry, rep: int, seed: int = 42
                 "float64 and the true subgroup AUROC is no longer preserved.")
         s = s_new
 
-    return y, s, codes_by_col
+    return (y, s, codes_by_col, {}) if return_aux else (y, s, codes_by_col)
 
 
 def _make_case_mix(geom: Geometry, rng: np.random.Generator
-                   ) -> Tuple[np.ndarray, np.ndarray, Dict[str, np.ndarray]]:
-    """One cohort under the case-mix null: one shared model, unequal spread.
+                   ) -> Tuple[np.ndarray, np.ndarray,
+                              Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    """One cohort under the case-mix DGP: one shared model, unequal spread.
 
     Order of draws differs from the equal-AUROC path (the subgroup codes have to
     exist before the predictor can be drawn), which is why the two paths are
     separate functions rather than one with a branch in the middle.
+
+    Draw order is chosen so that every geometry that existed before round 3
+    consumes exactly the stream it consumed then: the second covariate is drawn
+    only when ``unfair_w`` is on, and the ``normal`` family keeps the original
+    ``rng.normal(loc=, scale=)`` call rather than a standardise-and-rescale.
     """
     cm = geom.case_mix
     assert cm is not None
-    b0 = case_mix_intercept(geom)
+    b0, d = case_mix_offsets(geom)
 
     codes_by_col: Dict[str, np.ndarray] = {}
     for c, props in enumerate(geom.partitions):
         codes_by_col[f"p{c}"] = _level_codes(geom.n, props, rng)
 
     g = codes_by_col["p0"]
-    locs = np.asarray(cm.locs, dtype=float)[g]
+    locs = np.asarray(cm.locs, dtype=float)[g] + np.asarray(d, dtype=float)[g]
     scales = np.asarray(cm.scales, dtype=float)[g]
     # The single shared linear predictor. One coefficient vector for everyone:
-    # the only thing that varies across subgroups is the covariate distribution.
-    lp = b0 + rng.normal(loc=locs, scale=scales)
-    p = _expit(lp)
-    y = (rng.random(geom.n) < p).astype(int)
-    # The score IS the true probability. The model is not merely fair, it is
-    # correct and perfectly calibrated in every subgroup.
-    return y, p, codes_by_col
+    # the only thing that varies across subgroups is the covariate distribution
+    # (and, when equalize_prevalence is on, a subgroup intercept the model has).
+    if cm.lp_dist == "normal":
+        lp = b0 + rng.normal(loc=locs, scale=scales)
+    else:
+        lp = b0 + locs + scales * lp_standard_draw(rng, cm.lp_dist, geom.n)
+
+    # The covariate the deployed model does not use. Only drawn when it is
+    # actually needed, so that the fair geometries' random stream is untouched.
+    if cm.has_unfair_coef:
+        ws = np.asarray(cm.unfair_w, dtype=float)[g]
+        true_lp = lp + ws * rng.standard_normal(geom.n)
+    else:
+        true_lp = lp
+
+    p_true = _expit(true_lp)
+    y = (rng.random(geom.n) < p_true).astype(int)
+
+    # The deployed score. Without miscalibration it IS the model's implied
+    # probability, expit(lp); with it, a strictly increasing per-level distortion
+    # of that -- which leaves every subgroup's AUROC exactly unchanged while
+    # genuinely breaking calibration for that subgroup.
+    if cm.has_miscalibration:
+        a = (np.asarray(cm.miscal_intercept, dtype=float)[g]
+             if cm.miscal_intercept is not None else 0.0)
+        lam = (np.asarray(cm.miscal_slope, dtype=float)[g]
+               if cm.miscal_slope is not None else 1.0)
+        if np.any(np.asarray(lam) <= 0):
+            raise ValueError(f"{geom.name}: miscal_slope must be > 0, else the "
+                             "deployed score is not a monotone distortion and "
+                             "the subgroup AUROC is not preserved.")
+        s = _expit(a + lam * lp)
+    else:
+        s = _expit(lp)
+
+    aux = {"true_lp": true_lp, "deployed_lp": lp, "p_true": p_true}
+    return y, s, codes_by_col, aux
 
 
 def verify_null(geom: Geometry, n_check: int = 200_000, seed: int = 7

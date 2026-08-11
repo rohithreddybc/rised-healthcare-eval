@@ -118,6 +118,24 @@ def test_net_benefit_se_is_the_sample_mean_se():
         np.sqrt(c.var(ddof=1) / c.size), rel=1e-12)
 
 
+@pytest.mark.parametrize("n,t", [(500, 0.10), (2000, 0.20)])
+def test_standardised_net_benefit_se_matches_a_bootstrap(n, t):
+    """The delta-method SE is what the Wald flag rates are computed from.
+
+    sNB is a ratio of two means over the same rows, so its standard error
+    carries a ``cov(c, y)`` term that a naive "divide the NB standard error by
+    the prevalence" would drop. Checked against a nonparametric bootstrap of the
+    whole ratio, which makes no such approximation.
+    """
+    rng = np.random.default_rng(20 + n)
+    s = _expit(rng.normal(-1.4, 1.0, n))
+    y = (rng.random(n) < s).astype(int)
+    boot = [R.net_benefit(y[i], s[i], t)[1].value
+            for i in (rng.integers(0, n, n) for _ in range(3000))]
+    assert R.net_benefit(y, s, t)[1].se == pytest.approx(
+        float(np.std(boot, ddof=1)), rel=0.06)
+
+
 def test_degenerate_subgroups_return_nan_not_a_number():
     """One-class outcomes, constant scores and separation must not fabricate."""
     y1 = np.ones(50, int)

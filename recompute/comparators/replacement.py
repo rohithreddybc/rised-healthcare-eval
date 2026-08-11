@@ -103,6 +103,15 @@ ECE_BINS = 10
 _MAX_NEWTON = 50
 _NEWTON_TOL = 1e-10
 
+#: Target number of (replicate x row) cells evaluated per batch inside the
+#: permutation loop. Purely a time/memory trade: the permutation *draws* are
+#: still taken one replicate at a time in the same order from the same
+#: generator, so batching cannot change a single p-value. It exists because the
+#: per-replicate Python overhead -- a few dozen small array operations per
+#: partition -- was costing more than an order of magnitude over the bincounts
+#: doing the actual arithmetic.
+PERM_BATCH_CELLS = 1_000_000
+
 #: Fixed-threshold "conventional" flag rules, one per metric family. These are
 #: the decision rules an auditor would plausibly write down, and they are the
 #: direct analogue of the manuscript's ``fixed_threshold_005`` AUROC rule.
@@ -443,6 +452,26 @@ def fixed_rule_flag(gap: float, metric: str) -> float:
 
 
 # ── permutation null on the gap, the exact analogue of the incumbent ─────────
+def _accumulate(best: np.ndarray, v: np.ndarray) -> None:
+    """Fold one partition's per-replicate gaps into the running max, in place.
+
+    ``v`` is ``(n_replicates, n_levels)`` with ``nan`` in every inadmissible or
+    unestimable cell. A replicate's gap needs at least two surviving levels,
+    exactly as :func:`max_min_gap` requires. ``np.fmax`` then treats ``nan`` as
+    "not yet set", which reproduces the scalar loop's ``best = g if not
+    isfinite(best) else max(best, g)`` semantics.
+
+    The infinities substituted for ``nan`` avoid ``np.nanmax``'s all-NaN-slice
+    warning and are cheaper; they can never leak into a reported gap because the
+    ``count >= 2`` mask discards precisely the rows where they would survive.
+    """
+    ok = np.isfinite(v)
+    count = ok.sum(axis=1)
+    hi = np.max(np.where(ok, v, -np.inf), axis=1)
+    lo = np.min(np.where(ok, v, np.inf), axis=1)
+    np.fmax(best, np.where(count >= 2, hi - lo, np.nan), out=best)
+
+
 def permutation_pvalue(y: np.ndarray, s: np.ndarray,
                        codes_by_col: Dict[str, np.ndarray],
                        observed: Dict[str, float], rule: str,
@@ -494,54 +523,78 @@ def permutation_pvalue(y: np.ndarray, s: np.ndarray,
     r = INCLUSION_RULES[rule]
     ge = {k: 0 for k in observed}
     n_valid = {k: 0 for k in observed}
+    n_lv = {c: int(codes.max()) + 1 for c, codes in codes_by_col.items()}
 
-    for _ in range(n_perm):
-        permuted = draw_permuted_codes(codes_by_col, pos_idx, neg_idx, rng,
-                                       scheme="joint")
-        best: Dict[str, float] = {k: float("nan") for k in observed}
-        for codes in permuted.values():
-            k_max = int(codes.max()) + 1
-            cnt = np.bincount(codes, minlength=k_max).astype(float)
-            n_pos = np.bincount(codes, weights=y, minlength=k_max)
-            adm = np.array([_rule_admits(r, int(c), int(p), int(c - p))
-                            for c, p in zip(cnt, n_pos)])
-            if adm.sum() < 2:
-                continue
-            sums = {k: np.bincount(codes, weights=contrib[k], minlength=k_max)
-                    for k in keys}
-            with np.errstate(invalid="ignore", divide="ignore"):
-                means = {k: sums[k] / cnt for k in keys}
-                prev = n_pos / cnt
+    # Replicates are evaluated in chunks rather than one at a time. The draws
+    # themselves are still taken one replicate at a time, in the same order,
+    # from the same generator, so the permutation sequence is bit-for-bit the
+    # one the incumbent consumes; only the arithmetic on those draws is batched.
+    # This matters because the per-replicate Python overhead -- a few dozen
+    # small array operations per partition -- dominated the cost by more than an
+    # order of magnitude over the bincounts that do the actual work.
+    n = y.size
+    step = max(1, min(n_perm, PERM_BATCH_CELLS // max(n, 1)))
+    tiled: Dict[int, Dict[str, np.ndarray]] = {}
+
+    for start in range(0, n_perm, step):
+        chunk = min(step, n_perm - start)
+        if chunk not in tiled:
+            tiled[chunk] = {"__y": np.tile(y, chunk), "__s": np.tile(s, chunk)}
             for k in keys:
-                v = means[k][adm]
-                g = max_min_gap(v)
-                if np.isfinite(g):
-                    best[k] = g if not np.isfinite(best[k]) else max(best[k], g)
-                if k == "mean_cal":
-                    continue
-                sk = "s" + k
-                with np.errstate(invalid="ignore", divide="ignore"):
-                    vs = np.where(prev[adm] > 0, means[k][adm] / prev[adm], np.nan)
-                gs = max_min_gap(vs)
-                if np.isfinite(gs):
-                    best[sk] = gs if not np.isfinite(best[sk]) else max(best[sk], gs)
+                tiled[chunk][k] = np.tile(contrib[k], chunk)
+        tw = tiled[chunk]
+        mats = {c: np.empty((chunk, n), dtype=np.int64) for c in codes_by_col}
+        for i in range(chunk):
+            permuted = draw_permuted_codes(codes_by_col, pos_idx, neg_idx, rng,
+                                           scheme="joint")
+            for c, v in permuted.items():
+                mats[c][i] = v
+
+        best = {k: np.full(chunk, np.nan) for k in observed}
+        for c, mat in mats.items():
+            k_max = n_lv[c]
+            # One flat bincount per quantity over the whole chunk: replicate i
+            # level k lands in slot i * k_max + k.
+            off = (np.arange(chunk)[:, None] * k_max + mat).ravel()
+            m = chunk * k_max
+            cnt = np.bincount(off, minlength=m).astype(float).reshape(chunk, k_max)
+            n_pos = np.bincount(off, weights=tw["__y"],
+                                minlength=m).reshape(chunk, k_max)
+            n_neg = cnt - n_pos
+            if r["kind"] == "size":
+                adm = cnt >= int(r["min_n"])
+            else:
+                adm = np.minimum(n_pos, n_neg) >= int(r["min_events"])
+            adm &= (n_pos >= 2) & (n_neg >= 2)
+
+            with np.errstate(invalid="ignore", divide="ignore"):
+                prev = np.where(adm, n_pos / cnt, np.nan)
+                for k in keys:
+                    tot = np.bincount(off, weights=tw[k],
+                                      minlength=m).reshape(chunk, k_max)
+                    v = np.where(adm, tot / cnt, np.nan)
+                    _accumulate(best[k], v)
+                    if k != "mean_cal":
+                        _accumulate(best["s" + k],
+                                    np.where(prev > 0, v / prev, np.nan))
             if want_ece:
-                joint = codes * ECE_BINS + bin_idx
-                m = k_max * ECE_BINS
-                sy = np.bincount(joint, weights=y, minlength=m).reshape(k_max, -1)
-                ss = np.bincount(joint, weights=s, minlength=m).reshape(k_max, -1)
+                mb = m * ECE_BINS
+                joint = ((np.arange(chunk)[:, None] * k_max + mat) * ECE_BINS
+                         + bin_idx[None, :]).ravel()
+                sy = np.bincount(joint, weights=tw["__y"], minlength=mb)
+                ss = np.bincount(joint, weights=tw["__s"], minlength=mb)
                 # Empty bins contribute |0 - 0| = 0, so no mask is needed.
+                e = np.abs(sy - ss).reshape(chunk, k_max, ECE_BINS).sum(axis=2)
                 with np.errstate(invalid="ignore", divide="ignore"):
-                    e = np.abs(sy - ss).sum(axis=1) / cnt
-                ge_ = max_min_gap(e[adm])
-                if np.isfinite(ge_):
-                    best["ece"] = (ge_ if not np.isfinite(best["ece"])
-                                   else max(best["ece"], ge_))
+                    _accumulate(best["ece"], np.where(adm, e / cnt, np.nan))
+
         for k, obs in observed.items():
-            b = best.get(k, float("nan"))
-            if np.isfinite(b) and np.isfinite(obs):
-                n_valid[k] += 1
-                ge[k] += int(b >= obs)
+            if not np.isfinite(obs):
+                continue
+            b = best[k]
+            ok = np.isfinite(b)
+            n_valid[k] += int(ok.sum())
+            ge[k] += int(np.sum(b[ok] >= obs))
 
     out: Dict[str, float] = {}
     for k in observed:
