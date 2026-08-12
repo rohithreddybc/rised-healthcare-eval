@@ -1,7 +1,5 @@
 # API Reference
 
-<!-- Populated in Session 3 once implementations are complete. -->
-
 ## Top-level entry point
 
 - `rised.evaluate_all(model, X, y_true, demographic_df, ...)` → `FrameworkReport`

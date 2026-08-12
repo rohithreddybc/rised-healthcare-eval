@@ -5,6 +5,13 @@ version: 0.2.0
 date-released: "2026-07-28"
 license: MIT
 repository-code: "https://github.com/rohithreddybc/rised-healthcare-eval"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.PLACEHOLDER
+    description: >-
+      Archived software release (Zenodo). PLACEHOLDER: the Zenodo deposit has
+      not been minted yet. Replace this value with the real DOI before
+      submission and update the badge in README.md.
 authors:
   - family-names: "Bellibatlu"
     given-names: "Rohith Reddy"
@@ -30,7 +37,7 @@ keywords:
   - model robustness
 preferred-citation:
   type: unpublished
-  title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems, with Application to Healthcare"
+  title: "Subgroup AUROC-gap tests are not evidence of unfairness in clinical prediction models: case-mix differences make the equal-discrimination null false"
   authors:
     - family-names: "Bellibatlu"
       given-names: "Rohith Reddy"
@@ -43,4 +50,4 @@ preferred-citation:
     - family-names: "Israni"
       given-names: "Abhishek"
   year: 2026
-  notes: "Manuscript in preparation for submission to the Journal of Biomedical Informatics. Not currently under review anywhere."
+  notes: "Manuscript in preparation for submission to BMC Medical Research Methodology. This repository's recompute/ pipeline and docs/ reports are the code and results behind this manuscript; the rised/ package is a separate evaluation library used to produce the ten fitted cohorts the manuscript analyses."

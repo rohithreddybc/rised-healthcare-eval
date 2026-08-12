@@ -1,10 +1,12 @@
+# Version floors for general use. For an exact reproduction of the results
+# in this repository, use requirements-lock.txt instead.
 numpy>=1.26
 pandas>=2.1
 scipy>=1.13
 scikit-learn>=1.5
 matplotlib>=3.8
 seaborn>=0.13
-shap>=0.46
+shap>=0.44
 xgboost>=2.0
 fairlearn>=0.10
 folktables>=0.0.12

@@ -3,29 +3,32 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.11
-  # Numerical / data stack pinned to the versions reported in the paper's
-  # Computational Reproducibility section.
-  - numpy>=1.26
-  - pandas>=2.1
-  - scipy>=1.13
-  - scikit-learn>=1.5
-  - matplotlib>=3.8
-  - seaborn>=0.13
+  - python=3.11.7
+  # Exact versions used to produce the results in this repository. numpy,
+  # scipy and pandas are built against OpenBLAS (openblas64, version
+  # 0.3.23.dev; see recompute/results/comparator_runtime_env.json). If your
+  # conda-forge build links a different BLAS, floating-point results at the
+  # 1e-10 to 1e-16 level may differ; nothing reported here depends on
+  # precision finer than that.
+  - numpy=1.26.4
+  - pandas=3.0.2
+  - scipy=1.15.3
+  - scikit-learn=1.8.0
+  - matplotlib=3.10.9
+  - seaborn=0.13.2
   - pip
   - pip:
     # ML libraries (cross-platform binary wheels)
-    - xgboost>=2.0
-    - shap>=0.46
-    - fairlearn>=0.10
-    # Cross-domain demo (Section 5)
-    - folktables>=0.0.12
-    # Hugging Face dataset loader (optional, for synthetic cohort mirror)
-    - datasets>=2.20
+    - xgboost==3.2.0
+    - shap==0.44.1
+    - fairlearn==0.13.0
+    # Cross-domain demo
+    - folktables==0.0.12
+    # Hugging Face dataset loader (optional, for the synthetic cohort mirror)
+    - datasets==2.21.0
     # Tests / linting
-    - pytest>=7.4
-    - pytest-cov>=4.1
-    - black>=24.0
-    - ruff>=0.5
+    - pytest==8.4.2
+    - pytest-cov==5.0.0
+    - ruff==0.15.12
     # Editable install of the rised package itself
     - -e .

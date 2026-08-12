@@ -10,7 +10,6 @@ RISED evaluates AI decision-support systems across five complementary dimensions
 | **Equity** | Alignment between model-predicted need and observed clinical need |
 | **Deployability** | Operational feasibility: interpretability, explanation faithfulness, latency |
 
-Full API reference and framework specification will be populated in Sessions 3–5.
-
 - [API Reference](api_reference.md)
 - [Framework Specification](framework.md)
+- [Reproducing the paper's results](../README.md#reproduction-instructions)

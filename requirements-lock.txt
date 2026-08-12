@@ -1,0 +1,28 @@
+# Exact versions used to produce the results in this repository.
+#
+# This is the reproduction environment, not the minimum-supported one:
+# requirements.txt and environment.yml give version floors for general use;
+# this file pins every version to the one recorded in
+# recompute/results/comparator_runtime_env.json (Python 3.11.7, Windows,
+# numpy/scipy/pandas built against OpenBLAS -- see README.md, "Environment
+# and installation").
+#
+# Regenerate after an environment change with:
+#   python -m pip freeze | grep -iE "^(numpy|scipy|pandas|scikit-learn|xgboost|fairlearn|matplotlib|seaborn|shap|folktables|datasets|pytest|pytest-cov|ruff|joblib|threadpoolctl)=="
+
+numpy==1.26.4
+scipy==1.15.3
+pandas==3.0.2
+scikit-learn==1.8.0
+xgboost==3.2.0
+fairlearn==0.13.0
+matplotlib==3.10.9
+seaborn==0.13.2
+shap==0.44.1
+folktables==0.0.12
+datasets==2.21.0
+joblib==1.5.3
+threadpoolctl==3.6.0
+pytest==8.4.2
+pytest-cov==5.0.0
+ruff==0.15.12
