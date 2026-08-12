@@ -486,6 +486,22 @@ def build_report(path: Path = OUT_CSV) -> str:
       "the ordering in every cohort.")
     A("")
 
+    mx = spread.iloc[0]
+    # How often is this partition actually the argmax, rather than merely the
+    # partition with the largest median?
+    argmax_key = ref.loc[ref.groupby("spec_id")["partition_sd_ratio"].idxmax(),
+                         "partition_key"]
+    n_argmax = int((argmax_key == spread.index[0]).sum())
+    A("**(c) The maximum does NOT hold.** The largest rho-hat is")
+    A(f"`{spread.index[0]}` in {n_argmax} of "
+      f"{len(specs)} specifications, so its *identity* is stable -- but its")
+    A(f"*value* runs from **{_fmt(mx['min'])}** to **{_fmt(mx['max'])}**, a")
+    A(f"factor of {_fmt(mx['max_over_min'], 1)}. The published 3.304 is one")
+    A("draw from that range and is not a property of the cohort. This is the")
+    A("one headline quantity the check does not support, and it is the one the")
+    A("simulation's most extreme geometry was anchored to.")
+    A("")
+
     # ── methods ──────────────────────────────────────────────────────────────
     A("## Methods")
     A("")
@@ -571,6 +587,55 @@ def build_report(path: Path = OUT_CSV) -> str:
       f"{_fmt(float(pub['partition_sd_ratio'].max()))} |")
     A("")
 
+    # Class against seed: is the median moved more by which algorithm or by
+    # which split? Both are visible in the table above; state them.
+    by_class = specs.groupby("model_class")["median"].agg(
+        ["min", "median", "max", "std"])
+    A("Splitting that by what moved: within a single class, changing only the")
+    A("seed moves the median by")
+    for c, r in by_class.iterrows():
+        A(f"* `{c}`: {_fmt(r['min'])} to {_fmt(r['max'])} "
+          f"(sd over {len(seeds)} seeds {_fmt(r['std'], 4)})")
+    A("")
+    A(f"and switching class moves the *class* medians across "
+      f"{_fmt(float(by_class['median'].min()))} to "
+      f"{_fmt(float(by_class['median'].max()))}. Seed and class contribute")
+    A("comparably; neither alone accounts for the spread.")
+    A("")
+    A("### Does the maximum, 3.304, hold?")
+    A("")
+    A("No. The partition that carries the maximum is nearly always the same "
+      "one, but the number is not.")
+    A("")
+    A("| model class | min | median | max |")
+    A("|---|---|---|---|")
+    top = ref[ref["partition_key"] == spread.index[0]]
+    for c, r in top.groupby("model_class")["partition_sd_ratio"].agg(
+            ["min", "median", "max"]).iterrows():
+        A(f"| `{c}` | {_fmt(r['min'])} | {_fmt(r['median'])} | "
+          f"{_fmt(r['max'])} |")
+    A(f"| **published** | {_fmt(mx['published'])} | {_fmt(mx['published'])} | "
+      f"{_fmt(mx['published'])} |")
+    A("")
+    A("The penalised logistic regression puts this partition between "
+      f"{_fmt(float(top[top['model_class'] == 'logreg_l2']['partition_sd_ratio'].min()))} and "
+      f"{_fmt(float(top[top['model_class'] == 'logreg_l2']['partition_sd_ratio'].max()))}; "
+      "the random forest puts it between "
+      f"{_fmt(float(top[top['model_class'] == 'random_forest']['partition_sd_ratio'].min()))} and "
+      f"{_fmt(float(top[top['model_class'] == 'random_forest']['partition_sd_ratio'].max()))}. "
+      "Those two ranges do not overlap. Whatever else rho-hat is at this "
+      "partition, it is not a measurement of the cohort.")
+    A("")
+    n_extrap = int(ref[f"induced_flag_rate_extrapolated_{HEADLINE_METHOD}"].sum())
+    if n_extrap:
+        A(f"{n_extrap} of {len(ref)} refit rows have a rho-hat beyond the "
+          "sweep grid's last node (3.167); their induced flag rate is clamped "
+          "to the endpoint and flagged in the CSV. Every one of them is "
+          "already at or near a flag rate of 1.0, so the clamp does not change "
+          "any conclusion -- but the sweep carries no information out there and "
+          "the manuscript's most extreme anchor now sits outside it.")
+        A("")
+
     # ── (2) rank stability ───────────────────────────────────────────────────
     A("## 2. Does the ordinal age-versus-sex pattern survive?")
     A("")
@@ -614,6 +679,25 @@ def build_report(path: Path = OUT_CSV) -> str:
     A(f"Per-specification paired sign test over cohorts: "
       f"{avs['n_specs_sig05']} of {avs['n_specs']} specifications reach "
       "p <= 0.05.")
+    A("")
+    A("### What survives and what does not")
+    A("")
+    A("**The age-versus-sex contrast survives and does not need withdrawing.**")
+    A(f"It holds in {avs['frac_total'] * 100:.0f}% of "
+      f"{avs['n_pairs_total']} (specification, cohort) pairs, in "
+      f"{int((avs['by_cohort']['frac'] == 1.0).sum())} of "
+      f"{len(avs['by_cohort'])} cohorts without a single exception, and the")
+    A("effect is large on the log scale in every cohort. It is the one claim")
+    A("here that the refits strengthen rather than weaken.")
+    A("")
+    A("**The finer ordering does not.** Kendall's W of "
+      f"{_fmt(W['W'])} is far above chance but far below reproducible: "
+      f"{ps['frac_below_0.7'] * 100:.0f}% of specification pairs rank the")
+    A("partitions at Spearman below 0.7 and "
+      f"{ps['frac_below_0.5'] * 100:.0f}% below 0.5. Any claim that reads off")
+    A("the ordering *between* the middle partitions -- which race partition")
+    A("sits above which income partition, say -- is not supported. Only the")
+    A("coarse age-high / sex-low contrast is.")
     A("")
 
     # ── (3) induced flag rate ────────────────────────────────────────────────
@@ -672,6 +756,51 @@ def build_report(path: Path = OUT_CSV) -> str:
         A(f"* Negative component estimates summing to "
           f"{dec['sum_negative_components']:.5f} were set to zero for the share "
           "column only; they are reported as estimated in the variance column.")
+    A("")
+    A("The partition main effect is the largest single component, so the")
+    A("editor's framing is half right: rho-hat *is* substantially a property of")
+    A("the cohort-partition. But the model side is not a rounding error, and")
+    A("almost all of it is the **partition x class interaction** "
+      f"({dec['share_partition_x_class'] * 100:.1f}%), not a class main effect")
+    A(f"({dec['share_model_class'] * 100:.1f}%). That is the worst shape this")
+    A("could have taken. A class main effect would mean every model class")
+    A("rescales rho-hat by roughly the same factor, and the *ordering* -- the")
+    A("part the manuscript actually uses -- would be untouched. An interaction")
+    A("means the class changes rho-hat by different amounts at different")
+    A("partitions, which is precisely what reorders them and precisely what")
+    A("makes a per-partition value like 3.304 non-transferable.")
+    A("")
+    A("## Does the anchor survive?")
+    A("")
+    A("**Partly, and the parts must be separated.**")
+    A("")
+    A("| claim | verdict |")
+    A("|---|---|")
+    A(f"| median rho-hat ~ 1.145 | **survives**: {_fmt(med_lo)}-{_fmt(med_hi)} "
+      "across 24 specifications. Report it as a range, not a point. |")
+    A(f"| min rho-hat ~ 1.022 | **survives**: the floor is near 1.0 under every "
+      "specification, as it must be -- a ratio of standard deviations cannot go "
+      "below 1. It was never an informative number. |")
+    A(f"| max rho-hat = 3.304 | **does not survive**: "
+      f"{_fmt(mx['min'])}-{_fmt(mx['max'])} across specifications, and "
+      "non-overlapping between model classes. |")
+    A("| age partitions high, sex partitions low | **survives**, strongly. |")
+    A("| the full 21-partition ordering | **does not survive** beyond the "
+      "coarse age/sex contrast. |")
+    A("| induced false-flag median ~ double nominal | **survives** as a "
+      "statement about the median; the range across specifications is wider "
+      "than the sweep's own Monte-Carlo error, so it is a range too. |")
+    A("| rho-hat is a property of the cohort | **mostly true but not safe to "
+      f"assume**: {dec['share_partition'] * 100:.0f}% cohort, "
+      f"{dec['model_side_share'] * 100:.0f}% model, and the model share is "
+      "concentrated in the interaction that moves individual partitions. |")
+    A("")
+    A("The honest summary is that the *distributional* claims about rho-hat --")
+    A("its median, its ordinal age/sex contrast, the induced flag rate near")
+    A("twice nominal -- hold up under refitting, while the *per-partition*")
+    A("claims do not. The manuscript should stop quoting 3.304, quote the")
+    A("median as a range over specifications, and state that the anchor was")
+    A("measured under a specification panel rather than a single fit.")
     A("")
     A("---")
     A("")

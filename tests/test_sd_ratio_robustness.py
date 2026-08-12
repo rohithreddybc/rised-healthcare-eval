@@ -161,15 +161,34 @@ def test_anova3_sums_of_squares_partition_the_total():
 
 
 def test_anova3_recovers_a_dominant_partition_component():
-    """A cube whose only real signal is the partition effect."""
+    """A cube whose only real signal is the partition effect.
+
+    The target is the **realised** sample variance of the drawn effects, not
+    the nominal 1.0: with only 21 levels the sample variance of 21 standard
+    normals has a standard deviation near 0.32, so comparing to the nominal
+    value tests the draw rather than the estimator.
+    """
     rng = np.random.default_rng(1)
     a, b, c = 21, 4, 6
     A = rng.normal(0.0, 1.0, size=a)
     y = A[:, None, None] + rng.normal(0.0, 0.05, size=(a, b, c))
     res = anova3_random(y)
-    assert res["var_partition"] == pytest.approx(1.0, rel=0.5)
+    assert res["var_partition"] == pytest.approx(float(A.var(ddof=1)), rel=0.05)
     assert res["share_partition"] > 0.95
     assert res["model_side_share"] < 0.05
+
+
+def test_anova3_partition_component_is_unbiased():
+    """Averaged over draws, the estimator recovers the generating variance."""
+    est = []
+    for s in range(200):
+        g = np.random.default_rng(s)
+        A = g.normal(0.0, 1.0, size=21)
+        y = A[:, None, None] + g.normal(0.0, 0.05, size=(21, 4, 6))
+        est.append(anova3_random(y)["var_partition"])
+    # SE of the mean of 200 draws of a chi-square-like statistic with 20 df is
+    # about 0.32 / sqrt(200) = 0.023; allow four of those.
+    assert float(np.mean(est)) == pytest.approx(1.0, abs=0.10)
 
 
 def test_anova3_recovers_a_dominant_class_component():

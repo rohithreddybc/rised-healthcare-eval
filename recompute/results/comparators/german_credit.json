@@ -2,7 +2,7 @@
   "cohort": "german_credit",
   "n_test": 200,
   "prevalence": 0.7,
-  "load_runtime_s": 0.041061000010813586,
+  "load_runtime_s": 0.03570039995247498,
   "n_perm": 60,
   "seed": 42,
   "diciccio": {
