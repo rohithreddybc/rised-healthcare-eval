@@ -446,12 +446,14 @@ def build_markdown(data: Dict[str, Dict[str, Any]], summary: pd.DataFrame,
                    nulldf: pd.DataFrame, excl: pd.DataFrame) -> str:
     ok = summary[summary["status"] == "ok"] if len(summary) else summary
     L: List[str] = []
-    L.append("# Recomputed RISED results: 0.1.0 → 0.2.0")
+    L.append("# RISED cohort evaluation results")
     L.append("")
-    L.append("Every cohort re-run under the corrected measurement pipeline, "
-             "against the same data, split, seed and fitted model as the 0.1.0 "
-             "run, so each difference is attributable to the measurement change "
-             "alone.")
+    L.append("Every cohort run under the measurement pipeline described below. "
+             "Results are also shown against an earlier, less careful "
+             "measurement pipeline (labelled 0.1.0) on the same data, split, "
+             "seed and fitted model as the current one (0.2.0), so each "
+             "difference between the two columns is attributable to the "
+             "measurement change alone, not to the data or the model.")
     L.append("")
     L.append("Reproduce with `python -m recompute.run_all` then "
              "`python -m recompute.aggregate`. Seeds fixed at 42; B = 1000 "

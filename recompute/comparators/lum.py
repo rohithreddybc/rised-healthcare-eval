@@ -76,7 +76,7 @@ because they behave very differently and the difference is itself a finding:
   clears zero. With five subgroups this has four degrees of freedom and almost no
   power; it flags nothing anywhere in this study, including cohorts whose
   subgroup AUROCs are twelve standard errors apart. Reported, not used as the
-  verdict, and the reason is stated in COMPARATOR_EVALUATION.md.
+  verdict, and the reason is stated in docs/comparator_evaluation.md.
 
   *Cochran's Q* -- the precision-weighted homogeneity test, ``our addition``.
 

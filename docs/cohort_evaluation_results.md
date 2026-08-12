@@ -1,6 +1,6 @@
-# Recomputed RISED results: 0.1.0 → 0.2.0
+# RISED cohort evaluation results
 
-Every cohort re-run under the corrected measurement pipeline, against the same data, split, seed and fitted model as the 0.1.0 run, so each difference is attributable to the measurement change alone.
+Every cohort run under the measurement pipeline described below. Results are also shown against an earlier, less careful measurement pipeline (labelled 0.1.0) on the same data, split, seed and fitted model as the current one (0.2.0), so each difference between the two columns is attributable to the measurement change alone, not to the data or the model.
 
 Reproduce with `python -m recompute.run_all` then `python -m recompute.aggregate`. Seeds fixed at 42; B = 1000 bootstrap replicates with a full delete-one-unit jackknife for the BCa acceleration (delete-one-*patient* on Diabetes 130).
 
