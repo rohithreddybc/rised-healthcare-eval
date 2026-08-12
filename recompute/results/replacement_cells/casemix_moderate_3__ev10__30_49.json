@@ -1,7 +1,7 @@
 [
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -47,7 +47,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -93,7 +93,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -139,7 +139,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -185,7 +185,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -232,7 +232,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -279,7 +279,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -325,7 +325,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -371,7 +371,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -417,7 +417,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -463,7 +463,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -510,7 +510,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -557,7 +557,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -604,7 +604,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -650,7 +650,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -696,7 +696,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -742,7 +742,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -788,7 +788,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -835,7 +835,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -882,7 +882,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -928,7 +928,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -974,7 +974,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1020,7 +1020,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1066,7 +1066,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1113,7 +1113,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1160,7 +1160,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1207,7 +1207,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1253,7 +1253,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1299,7 +1299,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1345,7 +1345,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1391,7 +1391,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1438,7 +1438,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1485,7 +1485,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1532,7 +1532,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1578,7 +1578,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1624,7 +1624,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1670,7 +1670,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1716,7 +1716,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1763,7 +1763,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1810,7 +1810,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1857,7 +1857,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1903,7 +1903,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1949,7 +1949,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -1995,7 +1995,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2041,7 +2041,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2088,7 +2088,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2135,7 +2135,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2182,7 +2182,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2228,7 +2228,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2274,7 +2274,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2320,7 +2320,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2366,7 +2366,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2413,7 +2413,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2460,7 +2460,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2507,7 +2507,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2553,7 +2553,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2599,7 +2599,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2645,7 +2645,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2691,7 +2691,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2738,7 +2738,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2785,7 +2785,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2832,7 +2832,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2878,7 +2878,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2924,7 +2924,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -2970,7 +2970,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3016,7 +3016,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3063,7 +3063,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3110,7 +3110,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3157,7 +3157,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3203,7 +3203,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3249,7 +3249,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3295,7 +3295,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3341,7 +3341,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3388,7 +3388,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3435,7 +3435,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3482,7 +3482,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3528,7 +3528,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3574,7 +3574,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3620,7 +3620,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3666,7 +3666,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3713,7 +3713,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3760,7 +3760,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3806,7 +3806,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3852,7 +3852,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3898,7 +3898,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3944,7 +3944,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -3990,7 +3990,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -4036,7 +4036,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,
@@ -4082,7 +4082,7 @@
  },
  {
   "geometry": "casemix_moderate_3",
-  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this 'the realistic clinical case'; that claim had no empirical anchor and round 3 measured one -- see recompute/results/cohort_sd_ratios.csv and CASEMIX_ROUND3.md. It is NOT the median real geometry",
+  "description": "3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is called 'the realistic clinical case'; the empirical SD ratios measured from the ten fitted cohorts (see recompute/results/cohort_sd_ratios.csv and docs/sd_ratio_robustness.md) show it is NOT the median real geometry",
   "null_family": "case_mix",
   "n": 2000,
   "prevalence": 0.2,

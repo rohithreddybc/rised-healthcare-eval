@@ -223,8 +223,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     df = pd.read_csv(src)
     df = df[df["rule"].isin(RULES)]
     if "permutation_scheme" not in df.columns:
-        # Pre-round-2 tables carry no scheme column; every permutation-based row
-        # in them was produced under the joint scheme (verified in
+        # Older tables carry no scheme column; every permutation-based row in
+        # them was produced under the joint scheme (verified in
         # recompute/scheme_provenance.py).
         df["permutation_scheme"] = np.where(
             df["method"].isin(["permutation_null", "diciccio2020"]), "joint", "")

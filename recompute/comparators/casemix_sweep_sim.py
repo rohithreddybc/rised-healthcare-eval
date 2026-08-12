@@ -1,28 +1,28 @@
 """
-Cell runner for the round-3 case-mix work: the SD-ratio sweep and the positive
-controls.
+Cell runner for the case-mix SD-ratio sweep and the positive controls.
 
 It reuses :func:`recompute.comparators.type1._one_sim` verbatim, so the five
 procedures see exactly the code path -- and, for a given ``(geometry, replicate,
 seed)``, exactly the data -- that the published Type I table was produced with.
 Three things are added on top, all of them diagnostics rather than alterations:
 
-**Per-replicate statistics are kept.** The round-2 study aggregated each cell to
-a flag rate and discarded everything else. The question "can any procedure
-distinguish case mix from unfairness" cannot be answered from two saturated flag
-rates (0.92 against 0.92 is not evidence of *anything*); it needs the underlying
-statistic, replicate by replicate, on both arms. :func:`discrimination_auc` then
-asks the only question that matters: given one dataset from each arm, how often
-does the statistic order them correctly? 0.5 means the procedure carries no
-information about the mechanism at all.
+**Per-replicate statistics are kept.** The six-geometry case-mix study
+(:mod:`recompute.comparators.simulate`) aggregated each cell to a flag rate and
+discarded everything else. The question "can any procedure distinguish case mix
+from unfairness" cannot be answered from two saturated flag rates (0.92 against
+0.92 is not evidence of *anything*); it needs the underlying statistic, replicate
+by replicate, on both arms. :func:`discrimination_auc` then asks the only
+question that matters: given one dataset from each arm, how often does the
+statistic order them correctly? 0.5 means the procedure carries no information
+about the mechanism at all.
 
-**Level drops are counted.** ``FIXES_ROUND2.md`` asserted that m30 and ev10 give
-identical numbers on every case-mix geometry, "as they must: both admit every
-level there". That is false for ``casemix_location_3``, whose level 0 has true
-prevalence 0.0223 -- about 15 expected events in 668 rows -- and which ev10
-therefore drops in a few percent of replicates. The dropped level is the one with
-the *highest* true AUROC, i.e. the one generating the gap, so the inclusion rule
-is silently interacting with the geometry in the very cell built to isolate
+**Level drops are counted.** The six-geometry case-mix study assumed that m30
+and ev10 give identical numbers on every case-mix geometry, "as they must: both
+admit every level there". That is false for ``casemix_location_3``, whose level
+0 has true prevalence 0.0223 -- about 15 expected events in 668 rows -- and which
+ev10 therefore drops in a few percent of replicates. The dropped level is the one
+with the *highest* true AUROC, i.e. the one generating the gap, so the inclusion
+rule is silently interacting with the geometry in the very cell built to isolate
 location from spread. ``n_admissible_p0`` records it per replicate.
 
 **Two things that are not among the five procedures are measured anyway.** Both
@@ -59,7 +59,7 @@ import numpy as np
 from recompute.comparators.core import REPO
 
 RESULTS = REPO / "recompute" / "results"
-CELL_DIR = RESULTS / "round3_cells"
+CELL_DIR = RESULTS / "casemix_sweep_cells"
 
 #: The five procedures under study, plus the two secondary Lum readings, exactly
 #: as :mod:`recompute.comparators.type1` names them.
@@ -243,9 +243,10 @@ def run_cell(args) -> Dict[str, object]:
     """Run one ``(geometry, rule)`` cell and checkpoint it.
 
     ``args`` is ``(geometry, rule, n_sims, n_perm, seed, alpha, force)``. The
-    geometry is passed as an object rather than a name so that the round-3
-    registries do not have to be merged into ``simulate.GEOMETRY_BY_NAME`` and
-    the published 23-geometry table stays exactly the table it is.
+    geometry is passed as an object rather than a name so that the sweep's own
+    geometry registries do not have to be merged into
+    ``simulate.GEOMETRY_BY_NAME`` and the published 23-geometry table stays
+    exactly the table it is.
     """
     geom, rule, n_sims, n_perm, seed, alpha, force = args
     path = cell_path(geom.name, rule, n_sims, n_perm)

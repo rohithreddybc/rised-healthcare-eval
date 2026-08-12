@@ -7,9 +7,10 @@ Two questions, two outputs
 **How much case-mix heterogeneity is there really?**
 (``recompute/results/cohort_sd_ratios.csv``.) The simulation's whole geometry is
 one number: the ratio of the largest to the smallest per-level standard deviation
-of the linear predictor. Round 2 set it to 1.22, 2.00 and 3.17 and called 2.00
-"a moderate and clinically ordinary amount of case-mix heterogeneity", with no
-citation and no measurement. The authors have ten fitted models and ten real
+of the linear predictor. The six-geometry case-mix study
+(:mod:`recompute.comparators.simulate`) sets it to 1.22, 2.00 and 3.17 and calls
+2.00 "a moderate and clinically ordinary amount of case-mix heterogeneity", with
+no citation and no measurement. The authors have ten fitted models and ten real
 cohorts, so the quantity is directly measurable: for every demographic partition
 of every cohort, take ``logit`` of the fitted model's predicted probability --
 which *is* the linear predictor, exactly, for the logistic models, and is the
@@ -58,7 +59,7 @@ Caveats that must travel with the number
   observed AUROC exactly unchanged while forcing MBC onto it; the resulting
   "attributable fraction" is driven to 1 by the recalibration step rather than by
   case mix. ``max_abs_mbc_recalibrated_minus_obs_auc`` quantifies the collapse.
-  See ``MBC_FIX.md``.
+  See ``docs/case_mix_attribution.md``.
 * Predictions are in-sample for the *case mix* (the same held-out rows the AUROC
   is computed on), so the two quantities are not independent.
 * The bootstrap resamples rows within (level, outcome). For Diabetes 130 a
@@ -87,7 +88,7 @@ from recompute.comparators.core import (
     auc_delong,
     load_cohort,
 )
-from recompute.comparators.round3_sim import (
+from recompute.comparators.casemix_sweep_sim import (
     cox_calibration_test,
     model_based_concordance,
 )
@@ -167,8 +168,9 @@ def _recalibrated(y: np.ndarray, s: np.ndarray) -> np.ndarray:
 
     Note that this is a *monotone* transform of ``s`` whenever ``b > 0``, so it
     leaves the level's observed AUROC exactly unchanged while forcing the
-    predictions to be calibrated in that level. See ``MBC_FIX.md`` -- that is
-    precisely why the recalibrated attributable fraction is near-tautological.
+    predictions to be calibrated in that level. See
+    ``docs/case_mix_attribution.md`` -- that is precisely why the recalibrated
+    attributable fraction is near-tautological.
     """
     x = linear_predictor(s)
     y = np.asarray(y, dtype=float)
@@ -322,8 +324,8 @@ def mbc_rows(cohort, n_boot: int = 2000, seed: int = 42) -> List[Dict]:
             # The extreme pair is selected ONCE, on the observed data, and is
             # then held fixed inside every bootstrap replicate. Point estimate
             # and replicates therefore target the same estimand: the gap between
-            # these two named levels. See MBC_FIX.md 2.1 for why the interval is
-            # conditional on this selection.
+            # these two named levels. See docs/case_mix_attribution.md for why
+            # the interval is conditional on this selection.
             k_hi = max(ks, key=lambda k: per[k]["obs_auc"])
             k_lo = min(ks, key=lambda k: per[k]["obs_auc"])
             obs_gap = per[k_hi]["obs_auc"] - per[k_lo]["obs_auc"]
@@ -373,7 +375,7 @@ def mbc_rows(cohort, n_boot: int = 2000, seed: int = 42) -> List[Dict]:
 
             # ── sensitivity: the shipped max-min functional, re-selecting the
             # extreme pair in every replicate. Reported for comparison only; its
-            # denominator is winner's-curse inflated (MBC_FIX.md 1.2).
+            # denominator is winner's-curse inflated (docs/case_mix_attribution.md).
             with np.errstate(divide="ignore", invalid="ignore"):
                 sel = np.where(bt["gap_sel"] > 0,
                                bt["mbc_raw_sel"] / bt["gap_sel"], np.nan)

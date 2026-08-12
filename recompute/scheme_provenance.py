@@ -182,7 +182,7 @@ def build() -> pd.DataFrame:
               "recompute/results/summary.json",
               "recompute/results/null_comparison.csv",
               "recompute/results/findings.json",
-              "RECOMPUTED_RESULTS.md"):
+              "docs/cohort_evaluation_results.md"):
         _row(result_file=f, scheme_used="independent",
              n_perm=reps[0] if len(reps) == 1 else ";".join(map(str, reps)),
              rules="m30 only", produced_by="recompute/run_cohort.py -> "
@@ -227,7 +227,7 @@ def build() -> pd.DataFrame:
          n_perm=";".join(map(str, nreps)), rules="m30 only",
          produced_by="recompute/aggregate_null_joint.py",
          evidence=both_ev + "; column prefixes carry it")
-    _row(result_file="RECOMPUTED_NULL_JOINT.md",
+    _row(result_file="docs/permutation_null_specification.md",
          scheme_used="BOTH (reported side by side)",
          n_perm=";".join(map(str, nreps)), rules="m20,m30,m50,m100,ev10",
          produced_by="recompute/report_null_joint.py", evidence=both_ev)
@@ -281,7 +281,7 @@ def build() -> pd.DataFrame:
          evidence="code path: incumbent.recompute_null and diciccio.run_cohort "
                   "both default to scheme='joint'; the stored-kernel column is "
                   "read from results['joint']['runtime_s']")
-    _row(result_file="COMPARATOR_EVALUATION.md / .tables.md",
+    _row(result_file="docs/comparator_evaluation.md / .tables.md",
          scheme_used="joint", n_perm="10000 (cohorts); 999 (Type I)",
          rules="m20,m30,m50,m100,ev10",
          produced_by="recompute/comparators/report.py",

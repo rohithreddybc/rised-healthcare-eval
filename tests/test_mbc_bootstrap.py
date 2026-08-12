@@ -1,14 +1,16 @@
 """Regression tests for the model-based-concordance case-mix bootstrap.
 
-The defect these guard against (``MBC_FIX.md``): the shipped
-``_bootstrap_fraction`` resampled only the *raw* model-based concordance, while
-``mbc_rows`` reported that single interval next to both the raw and the
-*recalibrated* point estimate. 26 of 64 partitions ended up with a 95% interval
-that did not contain its own point estimate -- the signature of a point estimate
-and a resampling distribution targeting different estimands.
+The estimand each bootstrap replicate targets (see
+``docs/case_mix_attribution.md``) must match the point estimate it is reported
+next to: ``_bootstrap_partition`` resamples and recalibrates inside every
+replicate, so the raw and recalibrated point estimates each get their own
+interval rather than sharing one computed only from the raw statistic. Mixing
+the two -- pairing a recalibrated point estimate with a raw-only interval --
+produces a 95% interval that does not contain its own point estimate; that
+mismatch is what these tests would catch by mutation.
 
-The invariant asserted here is the one that was violated: **every reported 95%
-interval must contain its own point estimate.**
+The invariant asserted here: **every reported 95% interval must contain its own
+point estimate.**
 """
 
 from __future__ import annotations

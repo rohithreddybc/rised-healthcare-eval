@@ -1,13 +1,14 @@
 """
-Render ``COMPARATOR_EVALUATION.md`` from the two result CSVs.
+Render the tables for ``docs/comparator_evaluation.md`` from the two result CSVs.
 
     python -m recompute.comparators.report
 
 Reads ``recompute/results/comparator_comparison.csv`` and
 ``recompute/results/comparator_type1.csv`` and writes the tables of the report to
-``COMPARATOR_EVALUATION.tables.md`` at the repo root. The narrative sections of
-the report are written by hand around these tables; keeping the tables generated
-means no number in the document is transcribed by hand.
+``docs/comparator_evaluation_tables.md``. The narrative sections of the report
+(``docs/comparator_evaluation.md``) are written by hand around these tables;
+keeping the tables generated means no number in the document is transcribed by
+hand.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ import pandas as pd
 from recompute.comparators.core import COHORT_ORDER, RULE_NAMES, REPO
 
 RESULTS = REPO / "recompute" / "results"
-OUT = REPO / "COMPARATOR_EVALUATION.tables.md"
+OUT = REPO / "docs" / "comparator_evaluation_tables.md"
 
 METHOD_ORDER = [
     "permutation_null", "diciccio2020", "lum2022", "lum2022_cochranQ",
@@ -454,7 +455,7 @@ def runtime_table(df: pd.DataFrame) -> str:
 
 
 def _family(t1: pd.DataFrame) -> pd.Series:
-    """simple / composite / case_mix, tolerating pre-round-2 CSVs."""
+    """simple / composite / case_mix, tolerating CSVs from before ``null_family`` was added."""
     if "null_family" in t1.columns:
         return t1["null_family"].astype(str)
     return pd.Series(
@@ -678,7 +679,7 @@ def type1_geometry_key(t1: pd.DataFrame) -> str:
 
 
 def stability_tables() -> Dict[str, str]:
-    """The round-2 rule-stability tables, from rule_stability.py's output."""
+    """The rule-stability tables, from rule_stability.py's output."""
     per = RESULTS / "rule_stability.csv"
     by_m = RESULTS / "rule_stability_by_method.csv"
     if not (per.exists() and by_m.exists()):

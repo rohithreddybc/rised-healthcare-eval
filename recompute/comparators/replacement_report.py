@@ -1,11 +1,12 @@
 """
-Render ``replacement_metrics.csv`` into the tables of ``REPLACEMENT_METRICS.md``.
+Render ``replacement_metrics.csv`` into the tables of
+``docs/replacement_metrics_evaluation.md``.
 
 Every number in the report is produced here from the CSV. Nothing is typed by
 hand, so the report cannot drift from the run that backs it: re-running the study
 and re-running this module is the whole update path.
 
-    python -m recompute.comparators.replacement_report > REPLACEMENT_METRICS.tables.md
+    python -m recompute.comparators.replacement_report > docs/replacement_metrics_evaluation.tables.md
 """
 
 from __future__ import annotations

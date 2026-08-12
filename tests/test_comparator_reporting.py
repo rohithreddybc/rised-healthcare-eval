@@ -1,7 +1,6 @@
-"""Guards for the round-2 reviewer fixes.
+"""Guards for the comparator reporting layer.
 
-One test (or group) per reported defect, each written so that it fails against
-the pre-fix behaviour:
+One test (or group) per invariant the reported tables depend on:
 
   * the p-value floor is rendered as an inequality, never as an attained value;
   * the Lum bootstrap-CI rule runs at the same family-wise level as the z-test
@@ -11,7 +10,7 @@ the pre-fix behaviour:
   * cross-cohort Holm and BH adjustment is attached to the main table;
   * the scheme-provenance and model-provenance artefacts say what they found.
 
-The Type I reproducibility defect has its own file,
+Permutation-null reproducibility has its own file,
 ``tests/test_type1_reproducibility.py``.
 """
 

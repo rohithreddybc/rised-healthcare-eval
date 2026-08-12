@@ -1,14 +1,15 @@
 """
-Driver for the round-3 case-mix work.
+Driver for the case-mix SD-ratio sweep and positive controls.
 
 Produces
 --------
 ``recompute/results/casemix_sweep.csv``
     Flag rate as a function of the per-level linear-predictor SD ratio, for every
-    procedure, on a 16-point grid from 1.0 (an exact null) to 3.167 (the round-2
-    "strong" geometry), run twice: once with level prevalence free to move with
-    the spread as it does throughout round 2, and once with every level's
-    prevalence pinned at 0.20 so the curve is a function of spread alone.
+    procedure, on a 16-point grid from 1.0 (an exact null) to 3.167 (the
+    "strong" case-mix geometry in :mod:`recompute.comparators.simulate`), run
+    twice: once with level prevalence free to move with the spread as it does in
+    the six-geometry case-mix study, and once with every level's prevalence
+    pinned at 0.20 so the curve is a function of spread alone.
 
 ``recompute/results/casemix_positive_control.csv``
     Two row types. ``row_type="cell"`` is the flag rate of every procedure on
@@ -21,15 +22,15 @@ Produces
     mechanism produced the gap.
 
 Everything is checkpointed per ``(geometry, rule)`` cell in
-``recompute/results/round3_cells/``, so an interrupted run loses at most one cell
-and re-invoking the same command resumes. Replicate counts are the study's:
-1,000 simulated datasets and B=999 permutations, never reduced. Monte-Carlo
-standard errors are in every row.
+``recompute/results/casemix_sweep_cells/``, so an interrupted run loses at most
+one cell and re-invoking the same command resumes. Replicate counts are the
+study's: 1,000 simulated datasets and B=999 permutations, never reduced.
+Monte-Carlo standard errors are in every row.
 
 Usage
 -----
-    python -m recompute.comparators.run_round3 --jobs 10
-    python -m recompute.comparators.run_round3 --retune     # re-solve the pairs
+    python -m recompute.comparators.run_casemix_sweep --jobs 10
+    python -m recompute.comparators.run_casemix_sweep --retune  # re-solve the pairs
 """
 
 from __future__ import annotations
@@ -55,7 +56,7 @@ from recompute.comparators.casemix_grid import (
     solve_matched_pair,
 )
 from recompute.comparators.core import REPO
-from recompute.comparators.round3_sim import (
+from recompute.comparators.casemix_sweep_sim import (
     DIAGNOSTICS,
     METHODS,
     STATISTIC_SIGN,
@@ -232,7 +233,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     n_cached = sum(1 for j in jobs
                    if cell_path(j[0].name, j[1], j[2], j[3]).exists()
                    and not args.force)
-    print(f"round-3 case-mix study: {len(jobs)} cells, rule={args.rule}, "
+    print(f"case-mix SD-ratio sweep: {len(jobs)} cells, rule={args.rule}, "
           f"{args.sims} sims, B={args.perm}, {args.jobs} worker(s); "
           f"{n_cached}/{len(jobs)} already checkpointed", flush=True)
     print(f"  seed={args.seed}  PYTHONHASHSEED={os.environ['PYTHONHASHSEED']}  "
@@ -284,6 +285,6 @@ if __name__ == "__main__":
         env = dict(os.environ, PYTHONHASHSEED=HASHSEED,
                    _RISED_HASHSEED_REEXEC="1")
         raise SystemExit(subprocess.run(
-            [sys.executable, "-m", "recompute.comparators.run_round3",
+            [sys.executable, "-m", "recompute.comparators.run_casemix_sweep",
              *sys.argv[1:]], env=env, cwd=str(REPO)).returncode)
     raise SystemExit(main())

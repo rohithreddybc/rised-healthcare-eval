@@ -391,7 +391,7 @@ def run_cohort(data: CohortData, rules: Optional[List[str]] = None,
     for rule in rules:
         keep_by_col = {col: admissible(lv, rule) for col, lv in obs_levels.items()}
         keep_by_col = {c: k for c, k in keep_by_col.items() if len(k) >= 2}
-        # EQUAL FOOTING (round-2 fix). The bootstrap-CI rule flags iff lo > 0,
+        # EQUAL FOOTING. The bootstrap-CI rule flags iff lo > 0,
         # which is one-sided, so its lower bound is placed at the one-sided level
         # alpha / P -- Bonferroni across the cohort's P partitions. That gives it
         # the same family-wise level alpha as the Holm-adjusted z-test and Q.
@@ -510,7 +510,7 @@ def decide(ctx, rule: str, alpha: float = 0.05, n_boot: int = 1000,
         zps.append(dc_ztest(th, v)["p_value"])
         qps.append(cochran_q(th, v)["p_value"])
         if n_boot:
-            # EQUAL FOOTING (round-2 fix): the rule `lo > 0` is one-sided, so the
+            # EQUAL FOOTING: the rule `lo > 0` is one-sided, so the
             # lower bound goes at one-sided level alpha/P. `conf = 1 - alpha/P`
             # put it at alpha/2P, i.e. half the intended level. See
             # bootstrap_ci's docstring.

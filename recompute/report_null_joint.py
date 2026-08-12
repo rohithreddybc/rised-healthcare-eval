@@ -1,5 +1,5 @@
 """
-Render ``RECOMPUTED_NULL_JOINT.md`` from the aggregated null tables.
+Render ``docs/permutation_null_specification.md`` from the aggregated null tables.
 
     python -m recompute.aggregate_null_joint && python -m recompute.report_null_joint
 
@@ -20,7 +20,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 RESULTS = HERE / "results"
 IN_DIR = RESULTS / "null_joint"
-OUT_MD = REPO / "RECOMPUTED_NULL_JOINT.md"
+OUT_MD = REPO / "docs" / "permutation_null_specification.md"
 
 RULES = ("m20", "m30", "m50", "m100", "ev10")
 RULE_LABEL = {
@@ -441,10 +441,10 @@ def build() -> str:
     A("")
     A("Every null is right-skewed (skew ~0.9-1.3), so its mean sits above its "
       "median and a **majority** of draws fall below their own mean under H0. "
-      "`RECOMPUTED_RESULTS.md` reports that two of nine cohorts measure a gap "
-      "*below* their own null mean and presents this as reassurance. Under H0 "
-      "the expected number is about five. Two is not reassurance; it is a "
-      "deficit of five-ish in the direction of the alternative.")
+      "`docs/cohort_evaluation_results.md` reports that two of nine cohorts "
+      "measure a gap *below* their own null mean. Under H0 the expected number "
+      "is about five. Two cohorts is a deficit of five-ish in the direction of "
+      "the alternative, not reassurance that the gaps are small.")
     A("")
     rows = []
     for _, r in comp.iterrows():

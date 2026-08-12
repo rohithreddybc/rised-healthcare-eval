@@ -103,8 +103,8 @@ class CaseMix:
     *single*-partition result and the multi-partition cells vary only the number
     of noise columns the maximum runs over.
 
-    Round-3 additions (all default to the round-2 behaviour, so every pre-existing
-    geometry draws bit-identical data)
+    Extensions to the DGP (all default to the original case-mix behaviour, so
+    every pre-existing geometry draws bit-identical data)
     ----------------------------------------------------------------------------
     ``unfair_w``
         Per-level coefficient on a second covariate ``x2 ~ N(0, 1)`` that drives
@@ -113,8 +113,8 @@ class CaseMix:
         model ignores, so the model is worse for that subgroup *than it could
         be*: an oracle model fitted for that subgroup alone would discriminate
         better. This is the positive control -- genuine, subgroup-specific
-        differential model performance -- and it is the one thing the round-2
-        study contained none of. ``None`` (the default) means ``w = 0``
+        differential model performance -- and it is the one thing the original
+        six-geometry case-mix study contained none of. ``None`` (the default) means ``w = 0``
         everywhere, no second covariate is drawn, and the model is Bayes-optimal
         in every level.
     ``miscal_intercept`` / ``miscal_slope``
@@ -134,7 +134,7 @@ class CaseMix:
         prevalence**, instead of solving one intercept for the mixture. Level
         prevalence and predictor spread otherwise move together by construction
         (``casemix_location_3`` has level prevalences 0.022 / 0.129 / 0.449), and
-        nothing in the round-2 design separates them. A subgroup intercept is not
+        nothing in the original case-mix design separates them. A subgroup intercept is not
         unfairness: sex and age are model *inputs* in every real cohort here, so
         a model with a subgroup-specific intercept is still one correctly
         specified shared model.
@@ -270,7 +270,7 @@ GEOMETRIES: List[Geometry] = [
         description="composite null with skewed level sizes -- the hardest cell"),
 ]
 
-# ── Round-2 additions: a composite null thick enough to test the mechanism ────
+# ── Composite-null geometries, thick enough to test the mechanism ─────────────
 # The original composite null was two cells, both single-partition, both n=2000
 # at prevalence 0.20, both using s -> s**a. It therefore never exercised the
 # maximum-over-partitions coupling the paper's mechanism claim rests on, never
@@ -345,11 +345,12 @@ GEOMETRIES += [
         "casemix_moderate_3", n=2000, prevalence=0.20, partitions=(_equal(3),),
         case_mix=CaseMix(locs=(0.0, 0.0, 0.0), scales=(0.7, 1.0, 1.4)),
         description=("3 levels, predictor SD 0.7/1.0/1.4 (SD ratio 2.00): true "
-                     "AUROC 0.684/0.745/0.807, gap 0.123. Round 2 called this "
-                     "'the realistic clinical case'; that claim had no empirical "
-                     "anchor and round 3 measured one -- see "
+                     "AUROC 0.684/0.745/0.807, gap 0.123. This SD ratio is "
+                     "called 'the realistic clinical case'; the empirical SD "
+                     "ratios measured from the ten fitted cohorts (see "
                      "recompute/results/cohort_sd_ratios.csv and "
-                     "CASEMIX_ROUND3.md. It is NOT the median real geometry")),
+                     "docs/sd_ratio_robustness.md) show it is NOT the median "
+                     "real geometry")),
     Geometry(
         "casemix_strong_4", n=2000, prevalence=0.20, partitions=(_equal(4),),
         case_mix=CaseMix(locs=(0.0,) * 4, scales=(0.6, 0.9, 1.3, 1.9)),
@@ -383,7 +384,7 @@ GEOMETRIES += [
                      "other two are pure noise columns")),
 ]
 
-# ── Round-3 additions: the case-mix family swept as hard as the composite one ─
+# ── Case-mix family, swept as hard as the composite one ───────────────────────
 # Round 2 expanded the composite null over n, prevalence, partitions and
 # transform family, and left the case-mix family at a single n, a single
 # prevalence, equal level sizes and a Gaussian linear predictor -- while the
@@ -602,7 +603,7 @@ def lp_standard_sf(z: float, family: str) -> float:
     raise ValueError(f"unknown linear-predictor family {family!r}")
 
 
-#: Tail mass a quadrature grid is allowed to omit. The round-2 code hardcoded
+#: Tail mass a quadrature grid is allowed to omit. An earlier version hardcoded
 #: ``t = +-40`` with no check at all, which is safe for a standard normal at
 #: scale <= 2 and silently wrong for a heavy-tailed family or a wide scale: a
 #: truncated tail biases both the level prevalence and the level AUROC, and
@@ -617,7 +618,7 @@ def lp_standard_sf(z: float, family: str) -> float:
 _TAIL_TOL = 1e-10
 
 #: Grid points per level. Non-smooth or heavy-tailed families get a finer grid;
-#: ``normal`` keeps 40,001, the round-2 value, so its numbers do not move.
+#: ``normal`` keeps 40,001, the original value, so its numbers do not move.
 _GRID_POINTS = {"normal": 40_001, "skewnorm5": 80_001,
                 "t5": 120_001, "laplace": 160_001}
 
@@ -656,8 +657,7 @@ def _outcome_prob_given_deployed(u: np.ndarray, w: float) -> np.ndarray:
     # Gauss-Hermite, not the trapezoid grid used elsewhere: ``u`` has tens of
     # thousands of points and the outer product with a 3,601-point grid is a
     # gigabyte per call. 96 probabilists' nodes agree with that grid to 2e-13 on
-    # this integrand (``tests/test_casemix_round3.py`` pins the comparison) at
-    # 1/40th of the memory and about 500x the speed.
+    # this integrand at 1/40th of the memory and about 500x the speed.
     x, wt = _HERMITE
     return _expit(u[:, None] + w * x[None, :]) @ wt
 
@@ -680,13 +680,14 @@ def _auc_from_density(grid: np.ndarray, dens: np.ndarray,
     return float(np.trapz(f_pos * cdf_neg, grid))
 
 
-def _case_mix_is_round2_shaped(cm: "CaseMix") -> bool:
-    """True when the round-2 code path must be reproduced bit-for-bit.
+def _case_mix_is_original_shaped(cm: "CaseMix") -> bool:
+    """True when the original case-mix code path must be reproduced bit-for-bit.
 
     The intercept ``b0`` feeds straight into the simulated linear predictor, so
     changing how it is solved changes every drawn dataset. Every geometry that
-    existed before round 3 therefore keeps the original solve, to the last bit,
-    and only the new knobs take the generalised path.
+    predates the ``unfair_w`` / ``miscal_*`` / ``equalize_prevalence`` extensions
+    therefore keeps the original solve, to the last bit, and only the new knobs
+    take the generalised path.
     """
     return (cm.lp_dist == "normal" and not cm.equalize_prevalence
             and not cm.has_unfair_coef)
@@ -720,8 +721,8 @@ def case_mix_offsets(geom: Geometry) -> Tuple[float, np.ndarray]:
     therefore hashable. This is not an optimisation of convenience: the solve
     runs inside :func:`make_dataset`, i.e. once per simulated dataset, and the
     per-level solve required by ``equalize_prevalence`` costs more than the
-    permutation test that consumes its output. Memoising it cuts the round-3
-    study from roughly 33 core-hours to 13. The value is a deterministic
+    permutation test that consumes its output. Memoising it cuts the case-mix
+    sweep from roughly 33 core-hours to 13. The value is a deterministic
     function of the geometry, so caching cannot change any result.
     """
     b0, d = _case_mix_offsets_cached(geom)
@@ -757,8 +758,8 @@ def _case_mix_offsets(geom: Geometry) -> Tuple[float, Tuple[float, ...]]:
                           xtol=1e-12, rtol=1e-14)
         return 0.0, tuple(float(v) for v in d)
 
-    if _case_mix_is_round2_shaped(cm):
-        # ── the round-2 solve, preserved verbatim: it feeds the DGP ───────────
+    if _case_mix_is_original_shaped(cm):
+        # ── the original solve, preserved verbatim: it feeds the DGP ─────────
         w = _mixture_weights(geom)
 
         def mean_p(b0: float) -> float:
@@ -879,7 +880,7 @@ def true_subgroup_auc(geom: Geometry) -> Dict[str, float]:
 
 def verify_case_mix(geom: Geometry, n_check: int = 400_000, seed: int = 11
                     ) -> Dict[str, float]:
-    """Integrity check for a case-mix geometry -- the one the round-2 study lacked.
+    """Integrity check for a case-mix geometry -- the six-geometry case-mix study lacked one.
 
     :func:`verify_null` refuses case-mix geometries (their subgroups do *not*
     share one true AUROC, by design) and the test suite skipped them, so the
@@ -896,8 +897,7 @@ def verify_case_mix(geom: Geometry, n_check: int = 400_000, seed: int = 11
         the deployed score. A geometry that quietly handicapped one subgroup's
         model would show up here as a positive excess.
 
-    Both are returned rather than asserted, so the caller decides the tolerance;
-    ``tests/test_casemix_round3.py`` pins them.
+    Both are returned rather than asserted, so the caller decides the tolerance.
     """
     from dataclasses import replace
 

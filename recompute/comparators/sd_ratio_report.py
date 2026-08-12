@@ -60,7 +60,7 @@ from recompute.comparators.sd_ratio_robustness import (
 from recompute.refit import PUBLISHED
 
 RESULTS = REPO / "recompute" / "results"
-REPORT_MD = REPO / "SD_RATIO_ROBUSTNESS.md"
+REPORT_MD = REPO / "docs" / "sd_ratio_robustness.md"
 
 #: The published headline, for reference. Recomputed and asserted in the tests.
 PUBLISHED_MEDIAN = 1.1449810617386968

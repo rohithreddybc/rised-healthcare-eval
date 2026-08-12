@@ -3,15 +3,16 @@ The SD-ratio sweep and the positive controls.
 
 Why this module exists
 ----------------------
-Round 2 reported the case-mix false-alarm rate at **three** hand-chosen
-geometries -- per-level linear-predictor SD ratios 1.22, 2.00 and 3.17, giving
-flag rates 0.162, 0.920 and 0.999 for the incumbent -- and the manuscript
-headlined the middle one, describing that geometry as "a moderate and clinically
-ordinary amount of case-mix heterogeneity". No citation, no empirical anchor,
-and ``simulate.py`` simply asserted "the realistic clinical case". The headline
-number is therefore a *choice*, and it sits on the steepest part of a curve: the
-flag rate moves from 0.162 to 0.920 across a stretch of the SD-ratio axis that
-round 2 sampled at exactly two points.
+The six-geometry case-mix study in ``simulate.py`` reports the case-mix
+false-alarm rate at **three** hand-chosen geometries -- per-level
+linear-predictor SD ratios 1.22, 2.00 and 3.17, giving flag rates 0.162, 0.920
+and 0.999 for the incumbent -- and the manuscript headlines the middle one,
+describing that geometry as "a moderate and clinically ordinary amount of
+case-mix heterogeneity". No citation, no empirical anchor, and ``simulate.py``
+simply asserts "the realistic clinical case". The headline number is therefore a
+*choice*, and it sits on the steepest part of a curve: the flag rate moves from
+0.162 to 0.920 across a stretch of the SD-ratio axis sampled at exactly two
+points.
 
 Two things follow, and this module supplies both.
 
@@ -19,11 +20,12 @@ Two things follow, and this module supplies both.
 a function of the SD ratio on a grid dense enough to resolve the interval where
 it actually moves. The grid deliberately includes ratio 1.0 -- an exact
 equal-AUROC null with the case-mix machinery still switched on -- so the sweep
-carries its own negative control, and includes the three round-2 anchors so the
-published numbers appear on the curve rather than beside it.
+carries its own negative control, and includes the three hand-chosen anchors so
+the published numbers appear on the curve rather than beside it.
 
-**A positive control** (:data:`POSITIVE_CONTROL_GEOMETRIES`). All 23 round-2
-geometries are nulls: no unfairness of any kind is present anywhere in the study.
+**A positive control** (:data:`POSITIVE_CONTROL_GEOMETRIES`). All 23 geometries
+in the equal-AUROC and case-mix studies are nulls: no unfairness of any kind is
+present anywhere in the study.
 A study with no positive control cannot distinguish "these procedures flag case
 mix" from "these procedures flag everything", and cannot say anything at all
 about whether an auditor could tell the two apart. Three unfairness mechanisms
@@ -60,9 +62,8 @@ Pinned parameters
 The matched-pair parameters are solved by quadrature and **pinned as literals**
 below rather than solved at import, so that every worker process, every rerun and
 every reader gets the same geometry without depending on the local scipy's root
-finder. :func:`solve_matched_pair` is the solver that produced them and
-``tests/test_casemix_round3.py`` re-runs it and asserts the pinned values still
-hit their targets.
+finder. :func:`solve_matched_pair` is the solver that produced them, and
+re-running it should reproduce the pinned values below to the stated tolerance.
 """
 
 from __future__ import annotations
@@ -79,11 +80,12 @@ from recompute.comparators.simulate import (
 )
 
 # ── (a) the SD-ratio sweep ───────────────────────────────────────────────────
-#: The grid. 1.0 is the exact null; 1.222, 2.000 and 3.167 are the three round-2
-#: geometries (casemix_mild_3, casemix_moderate_3, casemix_strong_4) so the
-#: published points land on the curve. The interval 1.25-2.0 is sampled densely
-#: because that is where the flag rate travels from 0.16 to 0.92, and where a
-#: reader will want the true gaps near 0.06 and 0.09 that round 2 skipped over.
+#: The grid. 1.0 is the exact null; 1.222, 2.000 and 3.167 are the three
+#: hand-chosen geometries (casemix_mild_3, casemix_moderate_3, casemix_strong_4)
+#: so the published points land on the curve. The interval 1.25-2.0 is sampled
+#: densely because that is where the flag rate travels from 0.16 to 0.92, and
+#: where a reader will want the true gaps near 0.06 and 0.09 that the
+#: hand-chosen anchors skipped over.
 SD_RATIO_GRID: Tuple[float, ...] = (
     1.0, 1.1, 1.222, 1.25, 1.35, 1.45, 1.5, 1.6, 1.75, 1.9, 2.0, 2.25, 2.5,
     2.75, 3.0, 3.167,
@@ -180,7 +182,7 @@ def solve_matched_pair(delta: float) -> Dict[str, float]:
 
 
 #: Pinned solutions of :func:`solve_matched_pair`, to 1e-10 in the realised gap.
-#: 0.123 is the round-2 headline geometry's gap; 0.05 is the conventional
+#: 0.123 is the headline case-mix geometry's gap; 0.05 is the conventional
 #: "material difference" threshold the manuscript's own rules use; 0.20 is the
 #: strong case. Regenerate with ``python -m recompute.comparators.positive_control
 #: --retune`` and pin the printed values.
@@ -250,8 +252,8 @@ POSITIVE_CONTROL_GEOMETRIES += [
                      "the remaining 0.073 is case mix")),
 ]
 
-ALL_ROUND3_GEOMETRIES: List[Geometry] = (
+ALL_SWEEP_GEOMETRIES: List[Geometry] = (
     SWEEP_GEOMETRIES + SWEEP_PREVFIXED_GEOMETRIES + POSITIVE_CONTROL_GEOMETRIES)
 
-ROUND3_BY_NAME: Dict[str, Geometry] = {g.name: g
-                                       for g in ALL_ROUND3_GEOMETRIES}
+SWEEP_GEOMETRY_BY_NAME: Dict[str, Geometry] = {g.name: g
+                                       for g in ALL_SWEEP_GEOMETRIES}

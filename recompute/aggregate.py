@@ -1,16 +1,16 @@
 """
 Aggregate the per-cohort JSON into machine-readable tables and
-``RECOMPUTED_RESULTS.md``.
+``docs/cohort_evaluation_results.md``.
 
     python -m recompute.aggregate
 
 Reads ``recompute/results/*.json`` and writes:
 
-  recompute/results/summary.csv             one row per cohort, old vs new
-  recompute/results/excluded_subgroups.csv  every n<30 / degenerate exclusion
-  recompute/results/null_comparison.csv     observed gap vs the equality null
-  recompute/results/summary.json            everything, combined
-  RECOMPUTED_RESULTS.md                     the report
+  recompute/results/summary.csv               one row per cohort
+  recompute/results/excluded_subgroups.csv    every n<30 / degenerate exclusion
+  recompute/results/null_comparison.csv       observed gap vs the equality null
+  recompute/results/summary.json              everything, combined
+  docs/cohort_evaluation_results.md           the report
 
 Illustrative thresholds
 -----------------------
@@ -853,10 +853,10 @@ def main() -> int:
         json.dump(findings, fh, indent=2)
 
     md = build_markdown(data, summary, nulldf, excl)
-    (REPO / "RECOMPUTED_RESULTS.md").write_text(md, encoding="utf-8")
+    (REPO / "docs" / "cohort_evaluation_results.md").write_text(md, encoding="utf-8")
     print(f"Wrote {RESULTS}/summary.csv, excluded_subgroups.csv, "
           f"null_comparison.csv, summary.json, findings.json")
-    print(f"Wrote {REPO / 'RECOMPUTED_RESULTS.md'}")
+    print(f"Wrote {REPO / 'docs' / 'cohort_evaluation_results.md'}")
     print(f"Cohorts aggregated: {len(data)}")
     missing = [c for c in ORDER if c not in data]
     if missing:

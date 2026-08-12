@@ -9,7 +9,7 @@ Reads ``recompute/results/null_joint/*.json`` and writes
     independent vs joint side by side, with MC SEs and multiplicity control
   * ``recompute/results/null_sweep_mmin.csv``        -- every scheme x rule
   * ``recompute/results/null_joint_combined.csv``    -- Stouffer / Fisher
-  * ``RECOMPUTED_NULL_JOINT.md``                     -- the write-up
+  * ``docs/permutation_null_specification.md``       -- the write-up
 
 Multiplicity is controlled across the estimable cohorts within each
 (scheme, rule) cell -- nine tests at the published m30 rule.

@@ -2,8 +2,9 @@
 Tests for the replacement-metric study.
 
 The claim under test is not "the code runs". It is that the numbers in
-``recompute/results/replacement_metrics.csv`` mean what ``REPLACEMENT_METRICS.md``
-says they mean. Three things therefore have to hold, and each has its own
+``recompute/results/replacement_metrics.csv`` mean what
+``docs/replacement_metrics_evaluation.md`` says they mean. Three things
+therefore have to hold, and each has its own
 section below:
 
 1. **The estimators are the textbook ones.** Calibration-in-the-large, the
