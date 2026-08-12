@@ -19,19 +19,19 @@ every one.
 What is written
 ---------------
 ``recompute/results/sd_ratio_robustness.csv``: one row per
-(cohort, rule, partition, model_class, seed). ``partition_sd_ratio`` is computed
+(cohort, rule, partition, model_class, seed). Earlier versions of this file also
+carried ``induced_flag_rate_<method>`` columns, obtained by interpolating each
+rho-hat onto ``casemix_sweep.csv``. That mapping is withdrawn and the columns are
+gone; ``recompute.casemix_implied_gap_robustness`` propagates this grid through
+to the implied case-mix gap instead, from each partition's own per-level
+geometry. ``partition_sd_ratio`` is computed
 by the *same* code path as the published table -- ``linear_predictor`` and the
 level admissibility predicate are imported from
 ``recompute.comparators.cohort_casemix``, not reimplemented -- so any difference
 between the published number and a refit is the fit and nothing else.
 
-Two mapped quantities travel with each row:
+One diagnostic travels with each row:
 
-``induced_flag_rate_<method>``
-    The case-mix false-alarm rate this rho-hat implies, read off the existing
-    ``recompute/results/casemix_sweep.csv`` curve by linear interpolation in
-    the SD ratio. This is the quantity the manuscript's "median roughly double
-    nominal" claim is about.
 ``frac_lp_clipped``
     The fraction of test rows whose predicted probability hit the 1e-12 clip in
     ``linear_predictor``. Random forests can return exactly 0 or 1 for a leaf;
@@ -50,7 +50,7 @@ from __future__ import annotations
 import argparse
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -77,66 +77,13 @@ from recompute.refit import (
 
 RESULTS = REPO / "recompute" / "results"
 OUT_CSV = RESULTS / "sd_ratio_robustness.csv"
-SWEEP_CSV = RESULTS / "casemix_sweep.csv"
 
 #: Clip used by :func:`linear_predictor`; a score at the clip has its logit
 #: bounded by the clip rather than by the model.
 _CLIP = 1e-12
 
-#: Methods whose induced false-flag rate is carried on every row. All are
-#: "one of the five" on the sweep except ``calibration_cox``; ``permutation_null``
-#: is the incumbent, i.e. the manuscript's own procedure.
-SWEEP_METHODS: Tuple[str, ...] = (
-    "permutation_null", "diciccio2020", "lum2022", "fixed_threshold_005",
-    "four_fifths",
-)
-
-#: The sweep family to read the curve from. ``sd_ratio_sweep`` is the main
-#: sweep, in which level prevalence moves with spread by construction, and is
-#: the one the published claim is stated on. ``sd_ratio_sweep_prevalence_fixed``
-#: is carried as a sensitivity.
-SWEEP_FAMILY = "sd_ratio_sweep"
-
-
-# ── the sweep curve ──────────────────────────────────────────────────────────
-def load_sweep_curves(path: Path = SWEEP_CSV, family: str = SWEEP_FAMILY
-                      ) -> Dict[str, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """``method -> (sd_ratio, flag_rate, flag_rate_mc_se)``, ascending in ratio."""
-    df = pd.read_csv(path)
-    df = df[df["family"] == family]
-    out: Dict[str, Tuple[np.ndarray, np.ndarray, np.ndarray]] = {}
-    for m, g in df.groupby("method"):
-        g = g.dropna(subset=["flag_rate"]).sort_values("sd_ratio")
-        if g.empty:
-            continue
-        out[str(m)] = (g["sd_ratio"].to_numpy(dtype=float),
-                       g["flag_rate"].to_numpy(dtype=float),
-                       g["flag_rate_mc_se"].to_numpy(dtype=float))
-    return out
-
-
-def induced_flag_rate(curve: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                      ratio: float) -> Tuple[float, float, bool]:
-    """Interpolate a flag rate, and its Monte-Carlo SE, at one SD ratio.
-
-    Returns ``(rate, mc_se, extrapolated)``. The sweep grid stops at 3.167; a
-    rho-hat above that is clamped to the endpoint and flagged, because the
-    curve carries no information beyond its last node. ``mc_se`` is the linear
-    interpolation of the two neighbouring cells' binomial Monte-Carlo SEs --
-    the resampling noise the sweep itself has at 1,000 simulations -- and is
-    the floor on how finely two induced rates can be told apart.
-    """
-    x, f, se = curve
-    r = float(ratio)
-    extrap = bool(r < x[0] or r > x[-1])
-    return (float(np.interp(r, x, f)), float(np.interp(r, x, se)), extrap)
-
-
 # ── rho-hat for one fit ──────────────────────────────────────────────────────
-def sd_ratio_rows_for_fit(fit, subgroup_columns: Sequence[str],
-                          curves: Dict[str, Tuple[np.ndarray, np.ndarray,
-                                                  np.ndarray]],
-                          ) -> List[Dict]:
+def sd_ratio_rows_for_fit(fit, subgroup_columns: Sequence[str]) -> List[Dict]:
     """One row per (rule, partition) for a single fitted specification.
 
     The linear predictor, the level admissibility predicate and the SD-ratio
@@ -194,13 +141,6 @@ def sd_ratio_rows_for_fit(fit, subgroup_columns: Sequence[str],
                 "frac_lp_clipped": frac_clipped,
                 "fit_runtime_s": fit.fit_runtime_s,
             }
-            for m in SWEEP_METHODS:
-                if m not in curves:
-                    continue
-                rate, se, extrap = induced_flag_rate(curves[m], ratio)
-                row[f"induced_flag_rate_{m}"] = rate
-                row[f"induced_flag_rate_mc_se_{m}"] = se
-                row[f"induced_flag_rate_extrapolated_{m}"] = extrap
             rows.append(row)
     return rows
 
@@ -210,7 +150,6 @@ def run(cohorts: Sequence[str] = tuple(COHORT_ORDER),
         seeds: Sequence[int] = SEEDS,
         classes: Sequence[str] = tuple(MODEL_CLASSES),
         verbose: bool = True) -> pd.DataFrame:
-    curves = load_sweep_curves()
     specs = iter_specs(seeds, classes)
     rows: List[Dict] = []
     for name in cohorts:
@@ -224,7 +163,7 @@ def run(cohorts: Sequence[str] = tuple(COHORT_ORDER),
             f = (published_fit(fc) if mc == PUBLISHED
                  else fit_spec(fc, mc, int(seed)))
             n_before = len(rows)
-            rows += sd_ratio_rows_for_fit(f, fc.subgroup_columns, curves)
+            rows += sd_ratio_rows_for_fit(f, fc.subgroup_columns)
             if verbose:
                 tag = mc if seed is None else f"{mc} s{seed}"
                 print(f"    {tag:24s} fit={f.fit_runtime_s:6.1f}s "

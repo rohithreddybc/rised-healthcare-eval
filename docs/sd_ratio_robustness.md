@@ -149,8 +149,6 @@ No. The partition that carries the maximum is nearly always the same one, but th
 
 The penalised logistic regression puts this partition between 3.339 and 6.388; the random forest puts it between 2.105 and 2.501. Those two ranges do not overlap. Whatever else rho-hat is at this partition, it is not a measurement of the cohort.
 
-8 of 488 refit rows have a rho-hat beyond the sweep grid's last node (3.167); their induced flag rate is clamped to the endpoint and flagged in the CSV. Every one of them is already at or near a flag rate of 1.0, so the clamp does not change any conclusion -- but the sweep carries no information out there and the manuscript's most extreme anchor now sits outside it.
-
 ## 2. Does the ordinal age-versus-sex pattern survive?
 
 2 partition(s) are not admissible under every specification and are excluded from the rank analysis: `nhanes2123|insured`, `nhis2024|insurance`.
@@ -193,25 +191,17 @@ the ordering *between* the middle partitions -- which race partition
 sits above which income partition, say -- is not supported. Only the
 coarse age-high / sex-low contrast is.
 
-## 3. The induced false-flag-rate distribution
+## 3. The withdrawn induced false-flag-rate mapping
 
-Each rho-hat is mapped onto the existing `casemix_sweep.csv` curve by
-linear interpolation in the SD ratio. `permutation_null` is the
-incumbent -- the manuscript's own procedure. Nominal level is 0.05, so
-the manuscript's "median roughly double nominal" claim is a median
-near 0.10.
-
-| method | published median | refit: median of spec medians | min | max | specs with median > 0.10 | sweep MC SE |
-|---|---|---|---|---|---|---|
-| `permutation_null` | 0.094 | 0.109 | 0.086 | 0.151 | 19 / 24 | 0.0090 |
-| `diciccio2020` | 0.093 | 0.107 | 0.086 | 0.148 | 16 / 24 | 0.0090 |
-| `lum2022` | 0.117 | 0.135 | 0.107 | 0.186 | 24 / 24 | 0.0098 |
-| `fixed_threshold_005` | 0.378 | 0.414 | 0.359 | 0.491 | 24 / 24 | 0.0146 |
-| `four_fifths` | 0.000 | 0.000 | 0.000 | 0.000 | 0 / 24 | 0.0000 |
-
-The sweep itself has Monte-Carlo error: 1,000 simulations per grid node,
-so a flag rate near 0.10 carries an SE near 0.009. Differences between
-specifications smaller than about 0.02 are not resolvable by this curve.
+Earlier versions of this grid carried an `induced_flag_rate_<method>`
+column per row, obtained by reading each rho-hat onto the `casemix_sweep.csv`
+curve by linear interpolation. That mapping is withdrawn: it borrows one
+geometry for every partition, its interpolation rule is load-bearing and was
+unreported, and several partitions bracket into a sweep segment whose
+endpoints are not resolvable at 1,000 simulations. The columns have been
+removed from `sd_ratio_robustness.csv` and nothing reads them. The implied
+case-mix gap of `casemix_implied_gap_robustness.csv` replaces them, computed
+from each partition's own per-level geometry with no interpolation.
 
 ## 4. Cohort or model? A variance decomposition
 

@@ -29,8 +29,6 @@ from recompute.comparators.sd_ratio_report import (
 )
 from recompute.comparators.sd_ratio_robustness import (
     RESULTS,
-    induced_flag_rate,
-    load_sweep_curves,
     sd_ratio_rows_for_fit,
 )
 from recompute.refit import (
@@ -58,9 +56,8 @@ def fast_cohort():
 
 def test_published_fit_reproduces_published_table(fast_cohort):
     """The published model, through the NEW code path, must match the old CSV."""
-    curves = load_sweep_curves()
     rows = sd_ratio_rows_for_fit(published_fit(fast_cohort),
-                                 fast_cohort.subgroup_columns, curves)
+                                 fast_cohort.subgroup_columns)
     got = {(r["rule"], r["partition"]): r["partition_sd_ratio"] for r in rows}
     old = pd.read_csv(PUBLISHED_CSV)
     old = old[old["cohort"] == FAST_COHORT].drop_duplicates(
@@ -126,27 +123,6 @@ def test_diabetes130_keeps_a_group_split():
         tr, te = split_indices(fc, s)
         leak = float(np.isin(fc.groups[te], np.unique(fc.groups[tr])).mean())
         assert leak == 0.0, f"seed {s} leaked {leak:.4f} of test rows"
-
-
-# ── the sweep mapping ────────────────────────────────────────────────────────
-def test_flag_rate_interpolation_hits_the_grid_nodes():
-    curves = load_sweep_curves()
-    x, f, _ = curves["permutation_null"]
-    for xi, fi in zip(x, f):
-        got, _, extrap = induced_flag_rate(curves["permutation_null"], xi)
-        assert got == pytest.approx(fi, abs=1e-12)
-        assert not extrap
-
-
-def test_flag_rate_flags_extrapolation():
-    curves = load_sweep_curves()
-    x, _, _ = curves["permutation_null"]
-    _, _, extrap = induced_flag_rate(curves["permutation_null"],
-                                     float(x[-1]) + 1.0)
-    assert extrap
-    _, _, extrap_in = induced_flag_rate(curves["permutation_null"],
-                                        float(x[0]))
-    assert not extrap_in
 
 
 # ── the decomposition ────────────────────────────────────────────────────────

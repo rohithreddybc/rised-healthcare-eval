@@ -53,10 +53,7 @@ import pandas as pd
 from scipy.stats import binomtest, rankdata, spearmanr
 
 from recompute.comparators.core import REPO
-from recompute.comparators.sd_ratio_robustness import (
-    OUT_CSV,
-    SWEEP_METHODS,
-)
+from recompute.comparators.sd_ratio_robustness import OUT_CSV
 from recompute.refit import PUBLISHED
 
 RESULTS = REPO / "recompute" / "results"
@@ -288,35 +285,6 @@ def age_vs_sex(ref: pd.DataFrame, pub: pd.DataFrame) -> Dict[str, object]:
     }
 
 
-# ── (3) induced false-flag rate ──────────────────────────────────────────────
-def flag_rate_summary(ref: pd.DataFrame, pub: pd.DataFrame,
-                      methods: Sequence[str] = SWEEP_METHODS) -> pd.DataFrame:
-    rows = []
-    for m in methods:
-        col = f"induced_flag_rate_{m}"
-        if col not in ref.columns:
-            continue
-        per_spec = ref.groupby("spec_id")[col].median()
-        se_col = f"induced_flag_rate_mc_se_{m}"
-        rows.append({
-            "method": m,
-            "published_median": (float(pub[col].median())
-                                 if col in pub.columns else np.nan),
-            "refit_median_of_spec_medians": float(per_spec.median()),
-            "refit_min_spec_median": float(per_spec.min()),
-            "refit_max_spec_median": float(per_spec.max()),
-            "pooled_median": float(ref[col].median()),
-            "pooled_min": float(ref[col].min()),
-            "pooled_max": float(ref[col].max()),
-            "n_specs_median_above_2x_nominal": int(
-                (per_spec > 2 * NOMINAL).sum()),
-            "n_specs": int(per_spec.size),
-            "sweep_mc_se_at_median": (float(ref[se_col].median())
-                                      if se_col in ref.columns else np.nan),
-        })
-    return pd.DataFrame(rows)
-
-
 # ── (4) variance decomposition ───────────────────────────────────────────────
 def anova3_random(y: np.ndarray) -> Dict[str, float]:
     """Balanced three-way crossed random-effects ANOVA, one obs per cell.
@@ -446,7 +414,6 @@ def build_report(path: Path = OUT_CSV) -> str:
     ps = pairwise_spearman(bal)
     pvp = spearman_vs_published(bal, pub)
     avs = age_vs_sex(ref, pub)
-    flags = flag_rate_summary(ref, pub)
     dec, dec_dropped = decomposition(ref, classes, seeds)
 
     spec_medians = specs["median"].to_numpy(dtype=float)
@@ -626,16 +593,6 @@ def build_report(path: Path = OUT_CSV) -> str:
       "Those two ranges do not overlap. Whatever else rho-hat is at this "
       "partition, it is not a measurement of the cohort.")
     A("")
-    n_extrap = int(ref[f"induced_flag_rate_extrapolated_{HEADLINE_METHOD}"].sum())
-    if n_extrap:
-        A(f"{n_extrap} of {len(ref)} refit rows have a rho-hat beyond the "
-          "sweep grid's last node (3.167); their induced flag rate is clamped "
-          "to the endpoint and flagged in the CSV. Every one of them is "
-          "already at or near a flag rate of 1.0, so the clamp does not change "
-          "any conclusion -- but the sweep carries no information out there and "
-          "the manuscript's most extreme anchor now sits outside it.")
-        A("")
-
     # ── (2) rank stability ───────────────────────────────────────────────────
     A("## 2. Does the ordinal age-versus-sex pattern survive?")
     A("")
@@ -700,29 +657,19 @@ def build_report(path: Path = OUT_CSV) -> str:
     A("coarse age-high / sex-low contrast is.")
     A("")
 
-    # ── (3) induced flag rate ────────────────────────────────────────────────
-    A("## 3. The induced false-flag-rate distribution")
+    # ── (3) the withdrawn mapping ─────────────────────────────────
+    A("## 3. The withdrawn induced false-flag-rate mapping")
     A("")
-    A("Each rho-hat is mapped onto the existing `casemix_sweep.csv` curve by")
-    A("linear interpolation in the SD ratio. `permutation_null` is the")
-    A("incumbent -- the manuscript's own procedure. Nominal level is 0.05, so")
-    A("the manuscript's \"median roughly double nominal\" claim is a median")
-    A("near 0.10.")
-    A("")
-    A("| method | published median | refit: median of spec medians | min | max "
-      "| specs with median > 0.10 | sweep MC SE |")
-    A("|---|---|---|---|---|---|---|")
-    for _, r in flags.iterrows():
-        A(f"| `{r['method']}` | {_fmt(r['published_median'])} | "
-          f"{_fmt(r['refit_median_of_spec_medians'])} | "
-          f"{_fmt(r['refit_min_spec_median'])} | "
-          f"{_fmt(r['refit_max_spec_median'])} | "
-          f"{int(r['n_specs_median_above_2x_nominal'])} / {int(r['n_specs'])} | "
-          f"{_fmt(r['sweep_mc_se_at_median'], 4)} |")
-    A("")
-    A("The sweep itself has Monte-Carlo error: 1,000 simulations per grid node,")
-    A("so a flag rate near 0.10 carries an SE near 0.009. Differences between")
-    A("specifications smaller than about 0.02 are not resolvable by this curve.")
+    A("Earlier versions of this grid carried an `induced_flag_rate_<method>`")
+    A("column per row, obtained by reading each rho-hat onto the "
+      "`casemix_sweep.csv`")
+    A("curve by linear interpolation. That mapping is withdrawn: it borrows one")
+    A("geometry for every partition, its interpolation rule is load-bearing and was")
+    A("unreported, and several partitions bracket into a sweep segment whose")
+    A("endpoints are not resolvable at 1,000 simulations. The columns have been")
+    A("removed from `sd_ratio_robustness.csv` and nothing reads them. The implied")
+    A("case-mix gap of `casemix_implied_gap_robustness.csv` replaces them, computed")
+    A("from each partition's own per-level geometry with no interpolation.")
     A("")
 
     # ── (4) decomposition ────────────────────────────────────────────────────
