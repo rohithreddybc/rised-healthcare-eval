@@ -249,6 +249,11 @@ def load_diabetes130() -> Dict[str, Any]:
             "n_patients": n_patients,
             "n_test_patients": int(len(np.unique(pid_te))),
             "group_split_test_row_leakage": leaked,
+            # Train-side patient ids. Purely additive: nothing in the published
+            # path reads it. ``recompute.refit`` needs the group vector for the
+            # WHOLE cohort in order to redraw the group split under a different
+            # seed, and ``groups_test`` alone covers only the test rows.
+            "groups_train": pid[tr],
             "row_split": {
                 "X_train": Xr_tr, "X_test": Xr_te,
                 "y_train": yr_tr, "y_test": yr_te,
