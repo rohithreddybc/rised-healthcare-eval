@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use RISED in your research, please cite both the software and the paper."
-title: "RISED: A Pre-Deployment Evaluation Framework for High-Stakes AI Decision-Support Systems"
-version: 0.2.0
-date-released: "2026-07-28"
+title: "RISED: evaluation harness and analysis code for subgroup fairness auditing of clinical prediction models"
+version: 0.3.0
+date-released: "2026-08-12"
 license: MIT
 repository-code: "https://github.com/rohithreddybc/rised-healthcare-eval"
 identifiers:
@@ -29,12 +29,13 @@ authors:
     given-names: "Abhishek"
     orcid: "https://orcid.org/0009-0000-1956-4656"
 keywords:
-  - expert systems
-  - pre-deployment evaluation
-  - trustworthy AI
-  - clinical decision support
   - algorithmic fairness
-  - model robustness
+  - clinical prediction models
+  - subgroup analysis
+  - case mix
+  - discrimination
+  - permutation tests
+  - clinical decision support
 preferred-citation:
   type: unpublished
   title: "Subgroup AUROC-gap tests are not evidence of unfairness in clinical prediction models: case-mix differences make the equal-discrimination null false"
