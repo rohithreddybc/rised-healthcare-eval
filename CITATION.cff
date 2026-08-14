@@ -7,11 +7,14 @@ license: MIT
 repository-code: "https://github.com/rohithreddybc/rised-healthcare-eval"
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.PLACEHOLDER
+    value: 10.5281/zenodo.21918249
     description: >-
-      Archived software release (Zenodo). PLACEHOLDER: the Zenodo deposit has
-      not been minted yet. Replace this value with the real DOI before
-      submission and update the badge in README.md.
+      Archived software release (Zenodo) for version 0.3.0. This DOI points at
+      this specific release, which is the one the manuscript cites.
+  - type: doi
+    value: 10.5281/zenodo.21918248
+    description: >-
+      Concept DOI (Zenodo). Always resolves to the latest published version.
 authors:
   - family-names: "Bellibatlu"
     given-names: "Rohith Reddy"

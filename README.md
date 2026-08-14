@@ -182,12 +182,13 @@ want that layer checked too.
 
 MIT licence, see `LICENSE`.
 
-Citation metadata is in `CITATION.cff`. **The Zenodo archive DOI in that file
-is a placeholder** (`10.5281/zenodo.PLACEHOLDER`): the deposit has not been
-minted yet. This is a blocking item before submission; mint the deposit, then
-replace the placeholder in `CITATION.cff` and update the DOI badge below.
+Citation metadata is in `CITATION.cff`. Version 0.3.0 is archived on Zenodo at
+[10.5281/zenodo.21918249](https://doi.org/10.5281/zenodo.21918249), which is the
+DOI the manuscript cites. The concept DOI
+[10.5281/zenodo.21918248](https://doi.org/10.5281/zenodo.21918248) always
+resolves to the most recent published version.
 
-[![DOI](https://img.shields.io/badge/DOI-pending--zenodo--deposit-red)](CITATION.cff)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21918249-blue)](https://doi.org/10.5281/zenodo.21918249)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11.7](https://img.shields.io/badge/python-3.11.7-blue)](requirements-lock.txt)
 
