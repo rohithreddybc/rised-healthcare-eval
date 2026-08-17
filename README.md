@@ -199,8 +199,9 @@ resolves to the most recent published version.
              equal-discrimination null false},
   author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
              Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
-  note    = {Manuscript in preparation for submission to
-             BMC Medical Research Methodology},
+  note    = {Manuscript under review at BMC Medical Research Methodology.
+             A preprint is posted via Springer Nature In Review on
+             Research Square},
   year    = {2026}
 }
 ```

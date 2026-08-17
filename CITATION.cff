@@ -54,4 +54,4 @@ preferred-citation:
     - family-names: "Israni"
       given-names: "Abhishek"
   year: 2026
-  notes: "Manuscript in preparation for submission to BMC Medical Research Methodology. This repository's recompute/ pipeline and docs/ reports are the code and results behind this manuscript; the rised/ package is a separate evaluation library used to produce the ten fitted cohorts the manuscript analyses."
+  notes: "Manuscript under review at BMC Medical Research Methodology, journal submission ID 46fdfc77-8fb5-4af3-96b7-e42ebdbc6f86; a preprint is posted via Springer Nature In Review on Research Square. This repository's recompute/ pipeline and docs/ reports are the code and results behind this manuscript; the rised/ package is a separate evaluation library used to produce the ten fitted cohorts the manuscript analyses."
