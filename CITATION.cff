@@ -25,12 +25,11 @@ authors:
   - family-names: "Jajoo"
     given-names: "Yash"
     orcid: "https://orcid.org/0009-0005-8103-7415"
-  - family-names: "Lakhanpal"
-    given-names: "Shyamal"
-    orcid: "https://orcid.org/0009-0008-3948-511X"
   - family-names: "Israni"
     given-names: "Abhishek"
     orcid: "https://orcid.org/0009-0000-1956-4656"
+  - family-names: "Joshi"
+    given-names: "Rahul"
 keywords:
   - algorithmic fairness
   - clinical prediction models
@@ -49,9 +48,9 @@ preferred-citation:
       given-names: "Manpreet"
     - family-names: "Jajoo"
       given-names: "Yash"
-    - family-names: "Lakhanpal"
-      given-names: "Shyamal"
     - family-names: "Israni"
       given-names: "Abhishek"
+    - family-names: "Joshi"
+      given-names: "Rahul"
   year: 2026
   notes: "Manuscript under review at BMC Medical Research Methodology, journal submission ID 46fdfc77-8fb5-4af3-96b7-e42ebdbc6f86; a preprint is posted via Springer Nature In Review on Research Square. This repository's recompute/ pipeline and docs/ reports are the code and results behind this manuscript; the rised/ package is a separate evaluation library used to produce the ten fitted cohorts the manuscript analyses."

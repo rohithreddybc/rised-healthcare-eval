@@ -198,7 +198,7 @@ resolves to the most recent published version.
              clinical prediction models: case-mix differences make the
              equal-discrimination null false},
   author  = {Bellibatlu, Rohith Reddy and Singh, Manpreet and
-             Jajoo, Yash and Lakhanpal, Shyamal and Israni, Abhishek},
+             Jajoo, Yash and Israni, Abhishek and Joshi, Rahul},
   note    = {Manuscript under review at BMC Medical Research Methodology.
              A preprint is posted via Springer Nature In Review on
              Research Square},
